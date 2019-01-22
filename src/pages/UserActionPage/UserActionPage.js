@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import callApi from './../../utils/APICaller';
 import { Link } from 'react-router-dom';
+import { actAddUsersRequest, actGetUserRequest, actUpdateUserRequest } from './../../actions/index';
+import { connect } from 'react-redux';
 class UserActionPage extends Component {
     constructor(props) {
         super(props);
@@ -11,19 +12,23 @@ class UserActionPage extends Component {
             chkbStatus: ''
         };
     }
-
+    // Dispatch action và lưu itemEditing vào store
     componentDidMount() {
-        var {match} = this.props;
-        if(match) {
+        var { match } = this.props;
+        if (match) {
             var id = match.params.id;
-            callApi(`users/${id}`, 'GET', null).then(res => {
-                var data = res.data;
-                this.setState({
-                    id : data.id,
-                    txtName : data.username,
-                    txtPassword : data.password,
-                    chkbStatus : data.status
-                });
+            this.props.onEditUser(id);
+        }
+    }
+    // Nhận lại props sau khi mapStateToProps
+    componentWillReceiveProps(nextProps) {
+        if(nextProps && nextProps.itemEditing) {
+            var {itemEditing} = nextProps;
+            this.setState({
+                id : itemEditing.id,
+                txtName : itemEditing.username,
+                txtPassword : itemEditing.password,
+                chkbStatus : itemEditing.status
             });
         }
     }
@@ -39,25 +44,20 @@ class UserActionPage extends Component {
 
     onSave = (event) => {
         event.preventDefault();
-        var {id, txtName, txtPassword, chkbStatus } = this.state;
+        var { id, txtName, txtPassword, chkbStatus } = this.state;
         var { history } = this.props;
-        if(id) { //Update
-            callApi(`users/${id}`, 'PUT', {
-                username: txtName,
-                password: txtPassword,
-                status: chkbStatus
-            }).then(res => {
-                history.goBack();
-            });
-        }else {
-            callApi('users', 'POST', {
-                username: txtName,
-                password: txtPassword,
-                status: chkbStatus
-            }).then(res => {
-                history.goBack();
-            });
+        var user = {
+            id: id,
+            username: txtName,
+            password: txtPassword,
+            status: chkbStatus
+        };
+        if (id) { // Update
+            this.props.onUpdateUser(user);
+        } else { // Create
+            this.props.onAddUser(user);
         }
+        history.goBack();
     }
 
     render() {
@@ -67,7 +67,7 @@ class UserActionPage extends Component {
 
                 <form onSubmit={this.onSave}>
                     <div className="form-group">
-                        <label>Username: </label>
+                        <label>Tên Đăng Nhập: </label>
                         <input
                             type="text"
                             className="form-control"
@@ -77,7 +77,7 @@ class UserActionPage extends Component {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Password: </label>
+                        <label>Mật Khẩu: </label>
                         <input
                             type="text"
                             className="form-control"
@@ -87,7 +87,7 @@ class UserActionPage extends Component {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Status : </label>
+                        <label>Trạng Thái : </label>
 
                     </div>
                     <div className="checkbox">
@@ -97,23 +97,43 @@ class UserActionPage extends Component {
                                 name="chkbStatus"
                                 value={chkbStatus}
                                 onChange={this.onChange}
-                                checked = {chkbStatus}
+                                checked={chkbStatus}
                             />
-                            Active
+                            Kích Hoạt
                         </label>
                     </div>
-                  
+
                     <button type="submit" className="btn btn-primary">
-                        <span className="fas fa-save mr-5"></span>Save
+                        <span className="fas fa-save mr-5"></span>Lưu Lại
                     </button>&nbsp;&nbsp;&nbsp;
                     <Link to="/user-list" className="btn btn-danger">
-                        <span className="fas fa-ban mr-5"></span>Cancel
+                        <span className="fas fa-ban mr-5"></span>Hủy Bỏ
                     </Link>
-                   
+
                 </form>
             </div>
         );
     }
 }
 
-export default UserActionPage;
+const mapStateToProps = state => {
+    return {
+        itemEditing: state.itemEditing
+    }
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        onAddUser: (user) => {
+            dispatch(actAddUsersRequest(user));
+        },
+        onEditUser: (id) => {
+            dispatch(actGetUserRequest(id));
+        },
+        onUpdateUser: (user) => {
+            dispatch(actUpdateUserRequest(user));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserActionPage);

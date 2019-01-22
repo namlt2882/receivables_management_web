@@ -7,7 +7,7 @@ class NotFoundPage extends Component {
             <div className="container">          
                <div className="alert alert-danger">
                    <button type="button" className="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                   <strong>404!</strong> Not Found Page
+                   <strong>404!</strong> Không tìm thấy trang...
                </div>
             </div>
             

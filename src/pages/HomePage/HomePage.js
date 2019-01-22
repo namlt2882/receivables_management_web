@@ -5,7 +5,7 @@ class HomePage extends Component {
         return (
             
             <div className="container">
-                <h1>Home Page Content</h1>
+                <h1>Nội dung trang chủ</h1>
             </div>
             
         );
