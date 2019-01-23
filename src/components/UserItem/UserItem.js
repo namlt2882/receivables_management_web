@@ -8,7 +8,7 @@ class UserItem extends Component {
     }
     render() {
         var { user, index } = this.props;
-        var statusName = user.status ? 'Kịch Hoạt' : 'Ẩn';
+        var statusName = user.status ? 'Kích Hoạt' : 'Ẩn';
         var statusClass = user.status ? 'success' : 'default';
         return (
             <tr>

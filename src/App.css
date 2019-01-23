@@ -46,3 +46,27 @@
 .text-center {
   text-align: center;
 }
+.flr {
+  float: right;
+}
+.mgb-15 {
+  margin-bottom: 15px;
+}
+.pr-5 {
+  padding-right: 5px;
+}
+.pl-5 {
+  padding-left: 5px;
+}
+
+.dropdown-menu .fa:before {
+  padding-right: 10px;
+}
+
+.sort_selected::after {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  margin: 0px 0px 0px 4px;
+  display: inline-block;
+}

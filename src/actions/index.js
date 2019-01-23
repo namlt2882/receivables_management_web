@@ -75,3 +75,19 @@ export const actUpdateUser = (user) => {
         user
     }
 }
+
+// Filter table
+export const actFilter = (filter) => {
+    return {
+        type : Types.FILTER_TABLE,
+        filter // Bao gồm filterName và filterStatus
+    }
+}
+
+// Sort table
+export const actSort = (sort) => {
+    return {
+        type : Types.SORT_TABLE,
+        sort // Bao gồm sortBy và sortValue
+    }
+}
