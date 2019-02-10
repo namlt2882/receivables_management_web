@@ -11,6 +11,16 @@ const menus = [
         name: 'Quản lý tài khoản',
         to: '/user-list',
         exact: false
+    },
+    {
+        name: 'Profile',
+        to: '/profile',
+        exact: false
+    },
+    {
+        name: 'Message Form',
+        to: '/message-form',
+        exact: false
     }
 ];
 
