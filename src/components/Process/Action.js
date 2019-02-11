@@ -13,10 +13,18 @@ class Action extends Component {
         doWithFirstOne(this.props.process.stages, this.props.stageId, (stage) => {
             doWithFirstOne(stage.actions, this.props.actionId, (act) => {
                 action = act;
-          })  
+            })
         })
-        return (<div>
-            <h4>{action.name}</h4>
+        return (<div className='panel panel-default'>
+            <div className="panel-body action-body">
+                <div className='row'>
+                    <h5 className="panel-title col-sm-9">{action.name}</h5>
+                    <div className='col-sm-3 panel-action'>
+                        <span><i class="fa fa-trash fa-2" aria-hidden="true"></i></span>
+                        <span><i class="fas fa-arrow-down fa-2"></i></span>
+                    </div>
+                </div>
+            </div>
         </div>);
     }
 }

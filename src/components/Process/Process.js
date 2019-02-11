@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { ProcessAction } from './../../actions/ProcessAction'
 import Stage from './Stage'
+import './Process.scss'
 
 class Process extends Component {
     constructor(props) {
@@ -18,9 +19,11 @@ class Process extends Component {
                 </div>
                 <div className="panel-body">
                     <div>
-                        Description:
-                        <div>
-                            <input value={process.description} />
+                        <div className='process-info'>
+                            <div class="form-group">
+                                <label>Description:</label>
+                                <input value={process.description} class="form-control" />
+                            </div>
                         </div>
                         <div className="stage-list">
                             {

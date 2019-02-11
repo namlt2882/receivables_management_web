@@ -1,0 +1,34 @@
+.stage-list {}
+
+.stage-holder {
+    
+}
+.action-holder{
+    padding: 10px;
+    border: solid 1px #ddd;
+}
+.action-holder>div{
+    margin-bottom: 10px;
+}
+.action{
+
+}
+.action-body{
+    padding: 10px;
+}
+.process-info{
+    padding: 10px;
+    margin: 10px;
+}
+.note{
+    font-style: italic;
+    overflow: visible;
+    height: auto;
+}
+.panel-action{
+    
+}
+.panel-action>span{
+    margin: 5px;
+    cursor: pointer;
+}

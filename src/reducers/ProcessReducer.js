@@ -1,6 +1,5 @@
 import * as Types from './../constants/ActionTypes';
 import { IdGenerator, findAndEdit, findAndRemove, doWithFirstOne } from './../utils/Utility'
-import jQuery from 'jquery'
 
 export class Action {
     id = IdGenerator.generateId();
@@ -56,7 +55,6 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             }
             doWithFirstOne(state.stages, stageId, (sta) => {
                 sta.actions.push(newAction);
-                console.log(sta.actions);
             });
             return { ...state };
         case Types.EDIT_ACTION:
