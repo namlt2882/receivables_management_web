@@ -15,12 +15,24 @@ export const ProcessAction = {
             type: Types.ADD_STAGE
         }
     },
+    deleteStage: (stageId) => {
+        return {
+            type: Types.DELETE_STAGE,
+            stageId
+        }
+    },
 
     //action
     addAction: (stageId) => {
         return {
             type: Types.ADD_ACTION,
             stageId
+        }
+    },
+    deleteAction: (stageId, actionId) => {
+        return {
+            type: Types.DELETE_ACTION,
+            stageId, actionId
         }
     }
 }

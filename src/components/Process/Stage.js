@@ -14,6 +14,10 @@ class Stage extends Component {
         this.props.addAction(this.props.stageId);
     }
 
+    deleteStage = () => {
+        this.props.deleteStage(this.props.stageId);
+    }
+
     render() {
         let stage = null;
         doWithFirstOne(this.props.process.stages, this.props.stageId, (sta) => {
@@ -24,7 +28,7 @@ class Stage extends Component {
                 <div className='row'>
                     <h3 className="panel-title col-sm-10">{stage.name}</h3>
                     <div className='col-sm-2 panel-action'>
-                        <span><i class="fa fa-trash fa-2" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteStage}></i></span>
                         <span><i class="fas fa-arrow-down fa-2"></i></span>
                     </div>
                 </div>
@@ -68,6 +72,9 @@ const mapDispatchToProps = (dispatch, props) => {
     return {
         addAction: (stageId) => {
             dispatch(ProcessAction.addAction(stageId));
+        },
+        deleteStage: (stageId) => {
+            dispatch(ProcessAction.deleteStage(stageId));
         }
     }
 }
