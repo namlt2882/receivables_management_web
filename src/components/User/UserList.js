@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { actFilter } from './../../actions/index';
+import { actFilter } from './../../actions/UserAction';
 
 class UserList extends Component {
 
@@ -31,18 +31,18 @@ class UserList extends Component {
         return (
             <div className="panel panel-primary">
                 <div className="panel-heading">
-                    <h3 className="panel-title text-center">Danh sách tài khoản</h3>
+                    <h3 className="panel-title text-center">User List</h3>
                 </div>
                 <div className="panel-body">
                     <table className="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th>STT</th>
-                                <th>Mã tài khoản</th>
-                                <th>Tên tài khoản</th>
-                                <th>Mật khẩu</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
+                                <th>ID</th>
+                                <th>User Code</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                             <tr>
                         <td></td>
@@ -64,9 +64,9 @@ class UserList extends Component {
                                 onChange = {this.onChange}
                                 value = {this.state.filterStatus}
                             >
-                                <option value={-1}>Tất Cả</option>
-                                <option value={0}>Ẩn</option>
-                                <option value={1}>Kích Hoạt</option>
+                                <option value={-1}>All</option>
+                                <option value={0}>Ban</option>
+                                <option value={1}>Unban</option>
                             </select>
                         </td>
                         <td></td>

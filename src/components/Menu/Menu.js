@@ -3,12 +3,12 @@ import {Route, Link} from 'react-router-dom';
 
 const menus = [
     {
-        name: 'Trang chủ',
+        name: 'Dashboard',
         to: '/',
         exact: true
     },
     {
-        name: 'Quản lý tài khoản',
+        name: 'User Management',
         to: '/user-list',
         exact: false
     },
@@ -19,7 +19,7 @@ const menus = [
     },
     {
         name: 'Message Form',
-        to: '/message-form',
+        to: '/message-list',
         exact: false
     }
 ];
