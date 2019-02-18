@@ -70,3 +70,16 @@
   margin: 0px 0px 0px 4px;
   display: inline-block;
 }
+
+.panel-action{
+  margin: 5px;
+  padding: 5px;
+  float: right;
+}
+.panel-action button{
+  margin: 10px;
+}
+.warning-text{
+  color: red;
+  font-style: italic;
+}

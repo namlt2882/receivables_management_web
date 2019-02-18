@@ -4,7 +4,7 @@ import itemEditing from './itemEditing';
 import filterTable from './filterTable';
 import sortTable from './sortTable';
 import profiles from './ProfileReducer'
-import { process } from './ProcessReducer'
+import { process, processStatus } from './ProcessReducer'
 
 const appReducers = combineReducers({
     users,
@@ -12,7 +12,8 @@ const appReducers = combineReducers({
     filterTable,
     sortTable,
     profiles,
-    process
+    process,
+    processStatus
 });
 
 export default appReducers;

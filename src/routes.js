@@ -41,12 +41,12 @@ const routes = [
     {
         path: '/profile/:id',
         exact: true,
-        main: ({ match, history }) => <EditProfile readonly={true} match={match} history={history} />
+        main: ({ match, history }) => <EditProfile match={match} history={history} />
     },
     {
         path: '/profile/:id/edit',
         exact: false,
-        main: ({ match, history }) => <EditProfile readonly={false} match={match} history={history} />
+        main: ({ match, history }) => <EditProfile match={match} history={history} />
     },
     {
         path: '',

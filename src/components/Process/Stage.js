@@ -23,13 +23,19 @@ class Stage extends Component {
         doWithFirstOne(this.props.process.stages, this.props.stageId, (sta) => {
             stage = sta;
         })
+        var readOnly = this.props.processStatus.readOnly;
         return (<div className='panel panel-default'>
             <div className="panel-heading">
                 <div className='row'>
-                    <h3 className="panel-title col-sm-10">{stage.name}</h3>
-                    <div className='col-sm-2 panel-action'>
-                        <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteStage}></i></span>
-                        <span><i class="fas fa-arrow-down fa-2"></i></span>
+                    {readOnly ? <h3 className="panel-title col-sm-10">{stage.name}</h3> :
+                        <div className='col-sm-10'><input value={stage.name} /></div>
+                    }
+                    <div className='col-sm-2 panel-process-action'>
+                        {readOnly ? null :
+                            <div>
+                                <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteStage}></i></span>
+                                <span><i class="fas fa-arrow-down fa-2"></i></span>
+                            </div>}
                     </div>
                 </div>
             </div>
@@ -39,7 +45,7 @@ class Stage extends Component {
                         <div>
                             <div class="form-group">
                                 <label>Long:</label>
-                                <input class="form-control" />
+                                <input class="form-control" readOnly={readOnly} value={stage.long} />
                             </div>
                             <div className='note'>
                                 Notes:<br />
@@ -54,18 +60,21 @@ class Stage extends Component {
                             <label>Action:</label>
                             <div className='action-holder'>
                                 {stage.actions.map((action, i) => <Action stageId={stage.id} actionId={action.id} key={i} />)}
-                                <button className='btn btn-info mb-15' onClick={this.addAction}>Add Action</button>
+                                {readOnly ? null :
+                                    <button className='btn btn-info mb-15' onClick={this.addAction}>Add Action</button>
+                                }
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>);
+        </div >);
     }
 }
 const mapStateToProps = state => {
     return {
-        process: state.process
+        process: state.process,
+        processStatus: state.processStatus
     }
 }
 const mapDispatchToProps = (dispatch, props) => {

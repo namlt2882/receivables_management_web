@@ -25,10 +25,13 @@
     overflow: visible;
     height: auto;
 }
-.panel-action{
+.panel-process-action{
     
 }
-.panel-action>span{
+.panel-process-action>div{
+    float: right;
+}
+.panel-process-action span{
     margin: 5px;
     cursor: pointer;
 }

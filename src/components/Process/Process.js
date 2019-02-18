@@ -12,6 +12,7 @@ class Process extends Component {
     render() {
         var process = this.props.process;
         var stages = process.stages;
+        var readOnly = this.props.processStatus.readOnly;
         return (<div>
             <div className="panel panel-primary">
                 <div className="panel-heading">
@@ -22,14 +23,16 @@ class Process extends Component {
                         <div className='process-info'>
                             <div class="form-group">
                                 <label>Description:</label>
-                                <input value={process.description} class="form-control" />
+                                <input value={process.description} class="form-control" readOnly={readOnly} />
                             </div>
                         </div>
                         <div className="stage-list">
                             {
                                 stages.map((stage, i) => <Stage stageId={stage.id} key={i} />)
                             }
-                            <button className='btn btn-info mb-15' onClick={this.props.addStage}>Add stage</button>
+                            {readOnly ? null :
+                                (<button className='btn btn-info mb-15' onClick={this.props.addStage}>Add stage</button>)
+                            }
                         </div>
                     </div>
                 </div>
@@ -40,7 +43,8 @@ class Process extends Component {
 
 const mapStateToProps = state => {
     return {
-        process: state.process
+        process: state.process,
+        processStatus: state.processStatus
     }
 }
 const mapDispatchToProps = (dispatch, props) => {
