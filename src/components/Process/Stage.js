@@ -37,21 +37,35 @@ class Stage extends Component {
         this.props.editStage(this.stage);
     }
 
+    displayOrCollapse = () => {
+        var displayBody = !this.stage.displayBody;
+        this.stage.displayBody = displayBody;
+        this.props.editStage(this.stage);
+    }
+
+    incrementStage = () => {
+        this.props.incrementStage(this.props.stageId);
+    }
+
+    decrementStage = () => {
+        this.props.decrementStage(this.props.stageId);
+    }
+
     render() {
+        let process = this.props.process;
         let stage = null;
         doWithFirstOne(this.props.process.stages, this.props.stageId, (sta) => {
             stage = sta;
         })
-        console.log(stage.order);
         this.stage = stage;
         this.state.nameWarning = stage.name === '' ? 'Stage name should not empty!' : '';
         this.state.durationWarning = stage.duration <= 0 ? 'Duration must longer than 0 day!' : '';
         var readOnly = this.props.processStatus.readOnly;
         return (<div className='panel panel-default'>
-            <div className="panel-heading">
+            <div className="panel-heading clickable">
                 <div className='row'>
-                    {readOnly ? <h3 className="panel-title col-sm-10">{stage.name}</h3> :
-                        <div className='col-sm-10'>
+                    {readOnly ? <h3 className="panel-title col-sm-6">{stage.name}</h3> :
+                        <div className='col-sm-6'>
                             <input className='form-control' value={stage.name} ref='inputName'
                                 onChange={this.editName} onBlur={() => {
                                     console.log(this.state.nameWarning);
@@ -62,16 +76,22 @@ class Stage extends Component {
                             <span className='warning-text'>{readOnly ? null : this.state.nameWarning}</span>
                         </div>
                     }
-                    <div className='col-sm-2 panel-process-action'>
-                        {readOnly ? null :
-                            <div>
-                                <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteStage}></i></span>
-                                <span><i class="fas fa-arrow-down fa-2"></i></span>
-                            </div>}
+                    <div className='col-sm-6 panel-process-action'>
+                        <div>
+                            {readOnly ? null :
+                                <div>
+                                    {stage.order !== 1 ? <span onClick={this.incrementStage}><i class="fas fa-arrow-up fa-2"></i></span> : null}
+                                    {stage.order < process.stages.length ? <span onClick={this.decrementStage}><i class="fas fa-arrow-down fa-2"></i></span> : null}
+                                    <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteStage}></i></span>
+                                </div>}
+                            {stage.displayBody ?
+                                <span onClick={this.displayOrCollapse}><a>Collapse</a></span> :
+                                <span onClick={this.displayOrCollapse}><a>Expanse</a></span>}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className='panel-body'>
+            <div className='panel-body' ref='body' style={{ display: stage.displayBody ? 'block' : 'none' }}>
                 <div className='row'>
                     <div className='stage-info col-sm-5'>
                         <div>
@@ -126,6 +146,12 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         editStage: (stage) => {
             dispatch(ProcessAction.editStage(stage));
+        },
+        incrementStage: (stageId) => {
+            dispatch(ProcessAction.incrementStage(stageId));
+        },
+        decrementStage: (stageId) => {
+            dispatch(ProcessAction.decrementStage(stageId));
         }
     }
 }

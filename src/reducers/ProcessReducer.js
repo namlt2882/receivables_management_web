@@ -1,22 +1,22 @@
 import * as Types from './../constants/ActionTypes';
-import { IdGenerator, findAndEdit, findAndRemove, doWithFirstOne } from './../utils/Utility'
+import { IdGenerator, findAndEdit, findAndRemove, doWithFirstOne, findIndex } from './../utils/Utility'
 
 export const ProcessActionTypes = [
     {
         'type': 1,
-        'name':'SMS'
+        'name': 'SMS'
     },
     {
         'type': 2,
-        'name':'Phone call'
+        'name': 'Phone call'
     },
     {
         'type': 3,
-        'name':'Visit'
+        'name': 'Visit'
     },
     {
         'type': 4,
-        'name':'Notification'
+        'name': 'Notification'
     }
 ]
 
@@ -38,11 +38,12 @@ export class Action {
 }
 
 export class Stage {
-    setData(processId, id, name, duration) {
+    setData(processId, id, name, duration, order) {
         this.processId = processId;
         this.id = id;
         this.name = name;
         this.duration = duration;
+        this.order = order;
         return this;
     }
     id = IdGenerator.generateId();
@@ -50,7 +51,8 @@ export class Stage {
     order = 1;
     processId = null;
     duration = 30;
-    actions = [new Action()]
+    actions = [new Action()];
+    displayBody = true
 }
 
 export class Process {
@@ -66,7 +68,16 @@ export class Process {
     stages = [new Stage()]
 }
 
+const resetStageIndex = (stages) => {
+    let index = 1;
+    stages.map((stage) => {
+        stage.order = index;
+        index++;
+    })
+}
+
 export const process = (state = new Process(), { type, order, stageId, actionId, process, stage, action }) => {
+    var index, up, down;
     switch (type) {
         case Types.NEW_PROCESS:
             state = new Process();
@@ -85,6 +96,7 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             if (order) {
                 newStage.order = order;
             }
+            newStage.order = state.stages.length + 1;
             state.stages.push(newStage);
             return { ...state };
         case Types.EDIT_STAGE:
@@ -92,6 +104,22 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             return { ...state };
         case Types.DELETE_STAGE:
             findAndRemove(state.stages, stageId);
+            return { ...state };
+        case Types.INCREMENT_STAGE_ORDER:
+            index = findIndex(state.stages, stageId);
+            up = state.stages[index];
+            down = state.stages[index - 1];
+            state.stages[index - 1] = up;
+            state.stages[index] = down;
+            resetStageIndex(state.stages);
+            return { ...state };
+        case Types.DECREMENT_STAGE_ORDER:
+            index = findIndex(state.stages, stageId);
+            up = state.stages[index + 1];
+            down = state.stages[index];
+            state.stages[index] = up;
+            state.stages[index + 1] = down;
+            resetStageIndex(state.stages);
             return { ...state };
         //ACTION
         case Types.ADD_ACTION:

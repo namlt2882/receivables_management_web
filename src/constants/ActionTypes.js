@@ -27,6 +27,8 @@ export const LOAD_CACHE = 'LOAD_CACHE';
 export const ADD_STAGE = 'ADD_STAGE';
 export const EDIT_STAGE = 'EDIT_STAGE';
 export const DELETE_STAGE = 'DELETE_STAGE';
+export const INCREMENT_STAGE_ORDER = 'INCREMENT_STAGE_ORDER';
+export const DECREMENT_STAGE_ORDER = 'DECREMENT_STAGE_ORDER';
 
 //Action
 export const ADD_ACTION = 'ADD_ACTION';

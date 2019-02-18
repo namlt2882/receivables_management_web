@@ -62,6 +62,18 @@ export const ProcessAction = {
             stage
         }
     },
+    incrementStage: (stageId) => {
+        return {
+            type: Types.INCREMENT_STAGE_ORDER,
+            stageId
+        }
+    },
+    decrementStage: (stageId) => {
+        return {
+            type: Types.DECREMENT_STAGE_ORDER,
+            stageId
+        }
+    },
 
     //action
     addAction: (stageId) => {
@@ -86,9 +98,9 @@ export const ProcessAction = {
 
 const getMockProcess = () => {
     let process = new Process().setData(IdGenerator.generateId(), 'ACB Process', 'Customize process for ACB');
-    let stage1 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 1', 30);
-    let stage2 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 2', 30);
-    let stage3 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 3', 30);
+    let stage1 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 1', 30, 1);
+    let stage2 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 2', 30, 2);
+    let stage3 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 3', 30, 3);
     process.stages = [stage1, stage2, stage3];
     let action1 = new Action().setData(null, null, 'SMS', null, 1);
     let action2 = new Action().setData(null, null, 'Phone call', null, 2);

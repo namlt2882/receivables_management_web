@@ -57,6 +57,19 @@ export const doWithFirstOne = function (arr, id, callback) {
     return returnValue;
 }
 
+export const findIndex = function (arr, id) {
+    let index = -1;
+    arr.some((origin) => {
+        index++;
+        if (origin.id === id) {
+            return true;
+        } else {
+            return false;
+        }
+    })
+    return index;
+}
+
 export const IdGenerator = {
     IncrementSeed: -1,
     generateId: function () {
