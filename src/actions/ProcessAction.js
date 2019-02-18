@@ -56,6 +56,12 @@ export const ProcessAction = {
             stageId
         }
     },
+    editStage: (stage) => {
+        return {
+            type: Types.EDIT_STAGE,
+            stage
+        }
+    },
 
     //action
     addAction: (stageId) => {

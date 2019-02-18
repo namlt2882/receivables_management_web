@@ -38,18 +38,18 @@ export class Action {
 }
 
 export class Stage {
-    setData(processId, id, name, long) {
+    setData(processId, id, name, duration) {
         this.processId = processId;
         this.id = id;
         this.name = name;
-        this.long = long;
+        this.duration = duration;
         return this;
     }
     id = IdGenerator.generateId();
     name = 'New Stage';
     order = 1;
     processId = null;
-    long = 30;
+    duration = 30;
     actions = [new Action()]
 }
 

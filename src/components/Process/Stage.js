@@ -7,7 +7,10 @@ import { doWithFirstOne } from './../../utils/Utility'
 class Stage extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            nameWarning: '',
+            durationWarning: ''
+        }
     }
 
     addAction = () => {
@@ -18,17 +21,49 @@ class Stage extends Component {
         this.props.deleteStage(this.props.stageId);
     }
 
+    editName = (e) => {
+        this.stage.name = e.target.value;
+        this.props.editStage(this.stage);
+        var warning = '';
+        if (e.target.value.trim() === '') {
+            warning = 'Stage name should not empty!'
+        }
+        this.setState({ nameWarning: warning });
+    }
+
+    editDuration = (e) => {
+        if (e.target.value === '') {
+            e.target.value = '0';
+        }
+        this.stage.duration = parseInt(e.target.value);
+        this.props.editStage(this.stage);
+        var warning = '';
+        if (this.stage.duration <=0) {
+            warning = 'Duration must longer than 0 day!'
+        }
+        this.setState({ durationWarning: warning });
+    }
+
     render() {
         let stage = null;
         doWithFirstOne(this.props.process.stages, this.props.stageId, (sta) => {
             stage = sta;
         })
+        this.stage = stage;
         var readOnly = this.props.processStatus.readOnly;
         return (<div className='panel panel-default'>
             <div className="panel-heading">
                 <div className='row'>
                     {readOnly ? <h3 className="panel-title col-sm-10">{stage.name}</h3> :
-                        <div className='col-sm-10'><input value={stage.name} /></div>
+                        <div className='col-sm-10'>
+                            <input className='form-control' value={stage.name} ref='inputName'
+                                onChange={this.editName} onBlur={() => {
+                                    if (this.state.nameWarning !== '') {
+                                        this.refs.inputName.focus();
+                                    }
+                                }}/>
+                            <span className='warning-text'>{this.state.nameWarning}</span>
+                        </div>
                     }
                     <div className='col-sm-2 panel-process-action'>
                         {readOnly ? null :
@@ -44,8 +79,15 @@ class Stage extends Component {
                     <div className='stage-info col-sm-5'>
                         <div>
                             <div class="form-group">
-                                <label>Long:</label>
-                                <input class="form-control" readOnly={readOnly} value={stage.long} />
+                                <label>Duration:</label>
+                                <input type='number' min='0' class="form-control" readOnly={readOnly}
+                                    ref='inputDuration' value={stage.duration}
+                                    onChange={this.editDuration} onBlur={() => {
+                                        if (this.state.durationWarning !== '') {
+                                            this.refs.inputDuration.focus();
+                                        }
+                                    }}/>
+                                <span className='warning-text'>{this.state.durationWarning}</span>
                             </div>
                             <div className='note'>
                                 Notes:<br />
@@ -84,6 +126,9 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         deleteStage: (stageId) => {
             dispatch(ProcessAction.deleteStage(stageId));
+        },
+        editStage: (stage) => {
+            dispatch(ProcessAction.editStage(stage));
         }
     }
 }
