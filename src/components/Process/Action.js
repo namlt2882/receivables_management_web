@@ -8,7 +8,7 @@ class Action extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            nameWarning:''
+            nameWarning: ''
         }
     }
 
@@ -35,14 +35,11 @@ class Action extends Component {
     }
 
     editName = (e) => {
-        var name = e.target.value;
-        this.action.name = name;
-        this.props.editAction(this.props.stageId, this.props.actionId, this.action);
-        var warning = '';
-        if (name.trim() === '') {
-            warning = 'Action name should not empty!';
+        if (e.target.value.trim() === '') {
+            e.target.value = '';
         }
-        this.setState({ nameWarning: warning });
+        this.action.name = e.target.value;
+        this.props.editAction(this.props.stageId, this.props.actionId, this.action);
     }
 
     getExistedAction = () => {
@@ -71,6 +68,7 @@ class Action extends Component {
         this.stage = stage;
         this.state.actionType = action.type;
         this.state.existedAction = this.getExistedAction();
+        this.state.nameWarning = action.name === '' ? 'Action name should not empty!' : '';
         return (<div className='panel panel-default'>
             <div className="panel-body action-body">
                 <div className='row'>
@@ -84,7 +82,7 @@ class Action extends Component {
                                             this.refs.inputName.focus();
                                         }
                                     }} />
-                                <span className='warning-text'>{this.state.nameWarning}</span>
+                                <span className='warning-text'>{readOnly ? null : this.state.nameWarning}</span>
                             </div>
                             <div className='col-sm-4'>
                                 <select className='form-control' ref='selectType' onChange={this.editType} value={this.state.actionType}>

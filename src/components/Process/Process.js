@@ -7,11 +7,24 @@ import './Process.scss'
 class Process extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            descriptionWarning: ''
+        }
     }
+
+    editDescription = (e) => {
+        if (e.target.value.trim() === '') {
+            e.target.value = '';
+        }
+        this.process.description = e.target.value;
+        this.props.editProcess(this.process);
+    }
+
     render() {
         var process = this.props.process;
         var stages = process.stages;
+        this.process = process;
+        this.state.descriptionWarning = process.description === '' ? 'Description should not be empty!' : '';
         var readOnly = this.props.processStatus.readOnly;
         return (<div>
             <div className="panel panel-primary">
@@ -21,9 +34,24 @@ class Process extends Component {
                 <div className="panel-body">
                     <div>
                         <div className='process-info'>
-                            <div class="form-group">
+                            <div className="form-group">
                                 <label>Description:</label>
-                                <input value={process.description} class="form-control" readOnly={readOnly} />
+                                <input value={process.description} class="form-control"
+                                    readOnly={readOnly} ref='inputDescription'
+                                    onChange={this.editDescription} onBlur={() => {
+                                        if (this.state.descriptionWarning !== '') {
+                                            this.refs.inputDescription.focus();
+                                        }
+                                    }} />
+                                <span className='warning-text'>{readOnly ? null : this.state.descriptionWarning}</span>
+                            </div>
+                            <div className='form-group'>
+                                <label>Customer:</label>
+                                <select className='form-control' disabled={readOnly}>
+                                    <option>ACB</option>
+                                    <option>Agribank</option>
+                                    <option>TP Bank</option>
+                                </select>
                             </div>
                         </div>
                         <div className="stage-list">
@@ -51,6 +79,9 @@ const mapDispatchToProps = (dispatch, props) => {
     return {
         addStage: () => {
             dispatch(ProcessAction.addStage());
+        },
+        editProcess: (process) => {
+            dispatch(ProcessAction.editProcess(process));
         }
     }
 }

@@ -22,13 +22,11 @@ class Stage extends Component {
     }
 
     editName = (e) => {
+        if (e.target.value.trim() === '') {
+            e.target.value = '';
+        }
         this.stage.name = e.target.value;
         this.props.editStage(this.stage);
-        var warning = '';
-        if (e.target.value.trim() === '') {
-            warning = 'Stage name should not empty!'
-        }
-        this.setState({ nameWarning: warning });
     }
 
     editDuration = (e) => {
@@ -37,11 +35,6 @@ class Stage extends Component {
         }
         this.stage.duration = parseInt(e.target.value);
         this.props.editStage(this.stage);
-        var warning = '';
-        if (this.stage.duration <=0) {
-            warning = 'Duration must longer than 0 day!'
-        }
-        this.setState({ durationWarning: warning });
     }
 
     render() {
@@ -49,7 +42,10 @@ class Stage extends Component {
         doWithFirstOne(this.props.process.stages, this.props.stageId, (sta) => {
             stage = sta;
         })
+        console.log(stage.order);
         this.stage = stage;
+        this.state.nameWarning = stage.name === '' ? 'Stage name should not empty!' : '';
+        this.state.durationWarning = stage.duration <= 0 ? 'Duration must longer than 0 day!' : '';
         var readOnly = this.props.processStatus.readOnly;
         return (<div className='panel panel-default'>
             <div className="panel-heading">
@@ -58,11 +54,12 @@ class Stage extends Component {
                         <div className='col-sm-10'>
                             <input className='form-control' value={stage.name} ref='inputName'
                                 onChange={this.editName} onBlur={() => {
+                                    console.log(this.state.nameWarning);
                                     if (this.state.nameWarning !== '') {
                                         this.refs.inputName.focus();
                                     }
-                                }}/>
-                            <span className='warning-text'>{this.state.nameWarning}</span>
+                                }} />
+                            <span className='warning-text'>{readOnly ? null : this.state.nameWarning}</span>
                         </div>
                     }
                     <div className='col-sm-2 panel-process-action'>
@@ -86,8 +83,8 @@ class Stage extends Component {
                                         if (this.state.durationWarning !== '') {
                                             this.refs.inputDuration.focus();
                                         }
-                                    }}/>
-                                <span className='warning-text'>{this.state.durationWarning}</span>
+                                    }} />
+                                <span className='warning-text'>{readOnly ? null : this.state.durationWarning}</span>
                             </div>
                             <div className='note'>
                                 Notes:<br />
