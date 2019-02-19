@@ -24,6 +24,7 @@ class ProfileList extends Component {
                                 <th>Id</th>
                                 <th>Profile name</th>
                                 <th>Description</th>
+                                <th>Customer</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -32,6 +33,7 @@ class ProfileList extends Component {
                                 <td>{profile.id}</td>
                                 <td>{profile.name}</td>
                                 <td>{profile.description}</td>
+                                <td>{profile.customer !== null ? profile.customer.name : ''}</td>
                                 <td>
                                     <Link to={`/profile/${profile.id}`} className="btn btn-info mb-15">
                                         <span className="fas fa-user-edit mr-5"></span>

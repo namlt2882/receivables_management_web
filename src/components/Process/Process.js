@@ -8,7 +8,8 @@ class Process extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            descriptionWarning: ''
+            descriptionWarning: '',
+            nameWarning: ''
         }
     }
 
@@ -20,20 +21,42 @@ class Process extends Component {
         this.props.editProcess(this.process);
     }
 
+    editName = (e) => {
+        if (e.target.value.trim() === '') {
+            e.target.value = '';
+        }
+        this.process.name = e.target.value;
+        this.props.editProcess(this.process);
+    }
+
     render() {
         var process = this.props.process;
         var stages = process.stages;
         this.process = process;
         this.state.descriptionWarning = process.description === '' ? 'Description should not be empty!' : '';
+        this.state.nameWarning = process.name === '' ? 'Process name should not be empty!' : '';
         var readOnly = this.props.processStatus.readOnly;
         return (<div>
             <div className="panel panel-primary">
-                <div className="panel-heading">
+                {/* Heading */}
+                {readOnly ? <div className="panel-heading">
                     <h3 className="panel-title text-center">{process.name}</h3>
-                </div>
+                </div> : null}
                 <div className="panel-body">
                     <div>
                         <div className='process-info'>
+                            {/* Input name */}
+                            {readOnly ? null : <div className="form-group">
+                                <label>Profile Name:</label>
+                                <input value={process.name} className='form-control' ref='inputName'
+                                    onChange={this.editName} onBlur={() => {
+                                        if (this.state.nameWarning !== '') {
+                                            this.refs.inputName.focus();
+                                        }
+                                    }} />
+                                <span className='warning-text'>{this.state.nameWarning}</span>
+                            </div>}
+                            {/* Input description */}
                             <div className="form-group">
                                 <label>Description:</label>
                                 <input value={process.description} class="form-control"
@@ -45,6 +68,7 @@ class Process extends Component {
                                     }} />
                                 <span className='warning-text'>{readOnly ? null : this.state.descriptionWarning}</span>
                             </div>
+                            {/* Input customer */}
                             <div className='form-group'>
                                 <label>Customer:</label>
                                 <select className='form-control' disabled={readOnly}>

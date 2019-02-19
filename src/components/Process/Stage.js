@@ -62,7 +62,7 @@ class Stage extends Component {
         this.state.durationWarning = stage.duration <= 0 ? 'Duration must longer than 0 day!' : '';
         var readOnly = this.props.processStatus.readOnly;
         return (<div className='panel panel-default'>
-            <div className="panel-heading clickable">
+            <div className="panel-heading">
                 <div className='row'>
                     {readOnly ? <h3 className="panel-title col-sm-6">{stage.name}</h3> :
                         <div className='col-sm-6'>
