@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { actAddUsersRequest, actGetUserRequest, actUpdateUserRequest } from './../../actions/index';
+import { actAddUsersRequest, actGetUserRequest, actUpdateUserRequest } from './../../actions/UserAction';
 import { connect } from 'react-redux';
 class UserActionPage extends Component {
     constructor(props) {
@@ -67,7 +67,7 @@ class UserActionPage extends Component {
 
                 <form onSubmit={this.onSave}>
                     <div className="form-group">
-                        <label>Tên Đăng Nhập: </label>
+                        <label>Username: </label>
                         <input
                             type="text"
                             className="form-control"
@@ -77,7 +77,7 @@ class UserActionPage extends Component {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Mật Khẩu: </label>
+                        <label>Password: </label>
                         <input
                             type="text"
                             className="form-control"
@@ -87,7 +87,7 @@ class UserActionPage extends Component {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Trạng Thái : </label>
+                        <label>Status: </label>
 
                     </div>
                     <div className="checkbox">
@@ -99,15 +99,15 @@ class UserActionPage extends Component {
                                 onChange={this.onChange}
                                 checked={chkbStatus}
                             />
-                            Kích Hoạt
+                            Unban
                         </label>
                     </div>
 
                     <button type="submit" className="btn btn-primary">
-                        <span className="fas fa-save mr-5"></span>Lưu Lại
+                        <span className="fas fa-save mr-5"></span>Save
                     </button>&nbsp;&nbsp;&nbsp;
                     <Link to="/user-list" className="btn btn-danger">
-                        <span className="fas fa-ban mr-5"></span>Hủy Bỏ
+                        <span className="fas fa-ban mr-5"></span>Cancel
                     </Link>
 
                 </form>

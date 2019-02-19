@@ -1,3 +1,4 @@
+// User
 export const FETCH_USERS = 'FETCH_USERS';
 export const ADD_USER = 'ADD_USER';
 export const UPDATE_USER = 'UPDATE_USER';
@@ -5,6 +6,11 @@ export const DELETE_USER = 'DELETE_USER';
 export const EDIT_USER = 'EDIT_USER';
 export const FILTER_TABLE = 'FILTER_TABLE';
 export const SORT_TABLE = 'SORT_TABLE';
+
+// MessageForm
+export const FETCH_MESSAGES = 'FETCH_MESSAGES';
+export const ADD_MESSAGE = 'ADD_MESSAGE';
+export const SEARCH_MESSAGE = 'SEARCH_MESSAGE';
 
 // Profile
 export const FETCH_PROFILES = 'FETCH_PROFILES';
@@ -34,3 +40,4 @@ export const DECREMENT_STAGE_ORDER = 'DECREMENT_STAGE_ORDER';
 export const ADD_ACTION = 'ADD_ACTION';
 export const EDIT_ACTION = 'EDIT_ACTION';
 export const DELETE_ACTION = 'DELETE_ACTION';
+

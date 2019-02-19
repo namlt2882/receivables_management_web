@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
-import UserList from './../../components/UserList/UserList';
-import UserItem from './../../components/UserItem/UserItem';
+import UserList from './../../components/User/UserList';
+import UserItem from './../../components/User/UserItem';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { actFetchUsersRequest, actDeleteUsersRequest, actFilter, actSort } from './../../actions/index';
+import { actFetchUsersRequest, actDeleteUsersRequest, actFilter, actSort } from './../../actions/UserAction';
 
 class UserListPage extends Component {
 
@@ -77,7 +77,7 @@ class UserListPage extends Component {
                 </div> */}
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <Link to="/user/add" className="btn btn-info mb-15">
-                        <span className="fas fa-user-plus mr-5"></span> Thêm Tài Khoản
+                        <span className="fas fa-user-plus mr-5"></span> Add New Account
                     </Link>
 
                     <div className="dropdown flr">
@@ -89,7 +89,7 @@ class UserListPage extends Component {
                             aria-haspopup="true"
                             aria-expanded="true"
                         >
-                            <span className="fas fa-filter mr-5"></span> Sắp Xếp
+                            <span className="fas fa-filter mr-5"></span> Sort
                         </button>
                         <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
                             <li onClick={() => this.onClick('username', 1)}>
@@ -114,7 +114,7 @@ class UserListPage extends Component {
                                     role="button"
                                     className={(sortTable.by === 'status' && sortTable.value === 1) 
                                     ? 'sort_selected fas fa-check-circle' : '' }>
-                                    <span className="pl-5">Kích Hoạt</span>
+                                    <span className="pl-5">Unban</span>
                                 </a>
                             </li>
                             <li onClick={() => this.onClick('status', -1)}>
@@ -122,7 +122,7 @@ class UserListPage extends Component {
                                     role="button"
                                     className={(sortTable.by === 'status' && sortTable.value === -1) 
                                     ? 'sort_selected fas fa-check-circle' : '' }>
-                                    <span className="pl-5">Ẩn</span>
+                                    <span className="pl-5">Ban</span>
                                 </a>
                             </li>
                         </ul>
