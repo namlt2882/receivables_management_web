@@ -1,17 +1,22 @@
 import * as Types from './../constants/ActionTypes';
 
 export class Receivable {
-    id = 1;
-    name = "New Receivable";
-    profile = null;
-    closedDay = null;
-    isDeleted = null;
-    collectors = [];
+    Id = null;
+    Name = "New Receivable";
+    ClosedDay = null;
+    PayableDay = null;
+    PrepaidAmount = 0;
+    DebAmount = 0;
+    CustomerId = null;
+    LocationId = null;
 }
 
 export const receivableList = (state = [], { type, list }) => {
     switch (type) {
         case Types.FETCH_RECEIVABLE_LIST:
+            state = list;
+            return state;
+        case Types.SET_RECEIVABLE_LIST:
             state = list;
             return state;
         default: return state;
