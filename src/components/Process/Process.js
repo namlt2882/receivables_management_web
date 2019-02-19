@@ -36,7 +36,7 @@ class Process extends Component {
         this.state.descriptionWarning = process.description === '' ? 'Description should not be empty!' : '';
         this.state.nameWarning = process.name === '' ? 'Process name should not be empty!' : '';
         var readOnly = this.props.processStatus.readOnly;
-        return (<div>
+        return (
             <div className="panel panel-primary">
                 {/* Heading */}
                 {readOnly ? <div className="panel-heading">
@@ -89,7 +89,7 @@ class Process extends Component {
                     </div>
                 </div>
             </div>
-        </div>);
+        );
     }
 }
 

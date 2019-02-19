@@ -96,8 +96,13 @@ class Action extends Component {
                 <div className='row'>
                     {readOnly ?
                         // If read only
-                        <div className='col-sm-10'>
-                            <h5 className="panel-title">{action.name}</h5>
+                        <div className='col-sm-10 row'>
+                            <div className='col-sm-6'>
+                                <h5>Name: {action.name}</h5>
+                            </div>
+                            <div className='col-sm-6'>
+                                <h5>Message form: {messageForm !== null ? messageForm.Name : ''}</h5>
+                            </div>
                         </div> :
                         //If not read only
                         <div className='col-sm-9 row'>
@@ -153,7 +158,7 @@ class Action extends Component {
                     }
                     <div className='col-sm-2 panel-process-action'>
                         {/* Actions */}
-                        {readOnly ? <h5>Message form: {messageForm !== null ? messageForm.Name : ''}</h5> :
+                        {readOnly ? null :
                             <div>
                                 <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteAction}></i></span>
                             </div>}
