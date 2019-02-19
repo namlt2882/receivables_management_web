@@ -1,6 +1,7 @@
 import * as Types from './../constants/ActionTypes';
 import { IdGenerator, findAndEdit, findAndRemove, doWithFirstOne, findIndex } from './../utils/Utility'
 
+
 export const ProcessActionTypes = [
     {
         'type': 1,
@@ -51,7 +52,7 @@ export class Stage {
     order = 1;
     processId = null;
     duration = 30;
-    actions = [new Action()];
+    actions = [];
     displayBody = true
 }
 

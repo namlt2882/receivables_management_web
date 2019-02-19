@@ -36,7 +36,7 @@ const routes = [
     {
         path: '/profile/add',
         exact: true,
-        main: () => <AddProfile />
+        main: ({ match, history }) => <AddProfile match={match} history={history}/>
     },
     {
         path: '/profile/:id',
