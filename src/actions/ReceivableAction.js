@@ -18,6 +18,22 @@ export const ReceivableAction = {
         return {
             type: Types.EDIT_RECEIVABLE
         }
+    },
+    getReceivable: () => {
+        return {
+            type: Types.GET_RECEIVABLE
+        }
+    },
+    // receivable status
+    setEditable: () => {
+        return {
+            type: Types.SET_RECEIVABLE_EDITABLE
+        }
+    },
+    cancelEditable: () => {
+        return {
+            type: Types.SET_RECEIVABLE_UNEDITABLE
+        }
     }
 }
 
@@ -31,6 +47,12 @@ export const ReceivableRequest = {
         return async (dispatch) => {
             const res = await callApi('receivable', 'GET', null);
             dispatch(ReceivableAction.fetchReceivableList(res.data));
+        }
+    },
+    getReceivable: (id) => {
+        return async (dispatch) => {
+            const res = await callApi(`receivable/${id}`, 'GET', null);
+            dispatch(ReceivableAction.getReceivable(res.data));
         }
     }
 }
