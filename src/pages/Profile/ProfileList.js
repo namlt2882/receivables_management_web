@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchProfilesRequest } from '../../actions/ProfileActions';
+import { ProfileRequest } from '../../actions/ProfileActions';
 import { Link } from 'react-router-dom';
 
 class ProfileList extends Component {
@@ -58,7 +58,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch, props) => {
     return {
         fetchAllProfiles: () => {
-            dispatch(fetchProfilesRequest())
+            dispatch(ProfileRequest.fetchProfiles())
         }
     }
 }

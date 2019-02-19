@@ -1,16 +1,6 @@
 import * as Types from './../constants/ActionTypes';
 
-// var findIndex = (profile, id) => {
-//     var result = -1;
-//     profile.forEach((user, index) => {
-//         if (user.id === id) {
-//             result = index;
-//         }
-//     });
-//     return result;
-// }
-
-const profiles = (state = [], action) => {
+export const profiles = (state = [], action) => {
     switch (action.type) {
         case Types.FETCH_PROFILES:
             state = action.profiles;
@@ -22,4 +12,11 @@ const profiles = (state = [], action) => {
     }
 };
 
-export default profiles;
+export const messageForms = (state = [], { type, messageForms }) => {
+    switch (type) {
+        case Types.FETCH_PROFILE_MESSAGE_FORMS:
+            state = messageForms;
+            return state;
+        default: return state;
+    }
+}

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Process from './../../components/Process/Process'
 import { connect } from 'react-redux';
-import { ProcessAction, ProcessActionRequest, cancelEditable, enableEditable } from './../../actions/ProcessAction'
+import { ProfileRequest } from './../../actions/ProfileActions'
+import { ProcessAction, enableEditable } from './../../actions/ProcessAction'
 import './ProfilePage.scss'
 
 class AddProfile extends Component {
@@ -9,14 +10,22 @@ class AddProfile extends Component {
         super(props);
         this.state = {}
         this.goBack = this.goBack.bind(this);
+        this.createNewProfile = this.createNewProfile.bind(this);
     }
     componentDidMount() {
         this.props.setEditable();
         this.props.newProcess();
+        this.props.fetchMessageForms();
     }
     goBack() {
         var { history } = this.props;
         history.goBack();
+    }
+
+    createNewProfile() {
+        this.props.createNewProfile(this.props.process, (data) => {
+            this.goBack();
+        });
     }
 
     render() {
@@ -24,7 +33,7 @@ class AddProfile extends Component {
             <div className='row'>
                 <div className='col-sm-12'>
                     <div className='panel-action'>
-                        <button className='btn btn-primary'>Save</button>
+                        <button className='btn btn-primary' onClick={this.createNewProfile}>Save</button>
                         <button className='btn btn-default' onClick={this.goBack}>Cancel</button>
                     </div>
                 </div>
@@ -46,6 +55,12 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         newProcess: () => {
             dispatch(ProcessAction.newProcess());
+        },
+        fetchMessageForms: () => {
+            dispatch(ProfileRequest.fetchMessageForms());
+        },
+        createNewProfile: (process, callback) => {
+            dispatch(ProfileRequest.createNewProfile(process, callback));
         }
     }
 }

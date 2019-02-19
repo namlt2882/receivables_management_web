@@ -4,7 +4,7 @@ import itemEditing from './itemEditing';
 import filterTable from './filterTable';
 import sortTable from './sortTable';
 
-import profiles from './ProfileReducer'
+import { profiles, messageForms } from './ProfileReducer'
 import { process, processStatus } from './ProcessReducer'
 import { messages } from './MessageReducer';
 import { receivable, receivableList, receivableStatus } from './ReceivableReducer';
@@ -16,6 +16,7 @@ const appReducers = combineReducers({
     filterTable,
     sortTable,
     profiles,
+    messageForms,
     process,
     processStatus,
     messages,

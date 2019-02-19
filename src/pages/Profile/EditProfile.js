@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Process from './../../components/Process/Process'
 import { connect } from 'react-redux';
-import { ProcessAction, ProcessActionRequest, cancelEditable, enableEditable } from './../../actions/ProcessAction'
+import { ProfileRequest } from './../../actions/ProfileActions'
+import { ProcessAction, ProfileProcessRequest, cancelEditable, enableEditable } from './../../actions/ProcessAction'
 import './ProfilePage.scss'
 
 class EditProfile extends Component {
@@ -11,6 +12,7 @@ class EditProfile extends Component {
     }
     componentDidMount() {
         this.props.getProcessDetailRequest(1);
+        this.props.fetchMessageForms();
     }
     setEditable = () => {
         this.props.setEditable();
@@ -52,9 +54,11 @@ const mapDispatchToProps = (dispatch, props) => {
             dispatch(cancelEditable());
         },
         getProcessDetailRequest: (id) => {
-            dispatch(ProcessActionRequest.getProcessDetailRequest(id));
+            dispatch(ProfileProcessRequest.getProcessDetailRequest(id));
+        },
+        fetchMessageForms: () => {
+            dispatch(ProfileRequest.fetchMessageForms());
         }
-
     }
 }
 

@@ -1,5 +1,5 @@
 import * as Types from '../constants/ActionTypes';
-import callApi from '../utils/APICaller';
+import { callApi } from '../utils/APICaller';
 import { Process, Stage, Action } from './../reducers/ProcessReducer'
 import { IdGenerator } from './../utils/Utility'
 
@@ -124,7 +124,7 @@ export const cancelEditable = () => {
     }
 }
 
-export const ProcessActionRequest = {
+export const ProfileProcessRequest = {
     getProcessDetailRequest: (id) => {
         return async (dispatch) => {
             // const res = await callApi(`process/{id}`, 'GET', null);

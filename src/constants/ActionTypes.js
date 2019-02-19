@@ -19,6 +19,9 @@ export const ADD_PROFILE = 'ADD_PROFILE';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const DELETE_PROFILE = 'DELETE_PROFILE';
 
+// Profile message form
+export const FETCH_PROFILE_MESSAGE_FORMS = 'FETCH_PROFILE_MESSAGE_FORMS'
+
 //Process
 export const NEW_PROCESS = 'NEW_PROCESS';
 export const SET_PROCESS = 'SET_PROCESS';

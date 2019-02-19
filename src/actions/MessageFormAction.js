@@ -1,5 +1,5 @@
 import * as Types from '../constants/ActionTypes';
-import callApi from '../utils/APICaller';
+import { callApi } from '../utils/APICaller';
 
 // Gọi lên API để lấy dữ liệu về lưu vào store
 export const actFetchMessageRequest = () => {

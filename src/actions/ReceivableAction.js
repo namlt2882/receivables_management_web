@@ -1,5 +1,5 @@
 import * as Types from '../constants/ActionTypes';
-import callApi from '../utils/APICaller';
+import { callApi } from '../utils/APICaller';
 import { receivable } from '../reducers/ReceivableReducer';
 
 export const ReceivableAction = {

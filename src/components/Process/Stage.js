@@ -93,7 +93,7 @@ class Stage extends Component {
             </div>
             <div className='panel-body' ref='body' style={{ display: stage.displayBody ? 'block' : 'none' }}>
                 <div className='row'>
-                    <div className='stage-info col-sm-5'>
+                    <div className='stage-info col-sm-3'>
                         <div>
                             <div class="form-group">
                                 <label>Duration:</label>
@@ -114,7 +114,7 @@ class Stage extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className='col-sm-7'>
+                    <div className='col-sm-9'>
                         <div class="form-group">
                             <label>Action:</label>
                             <div className='action-holder'>

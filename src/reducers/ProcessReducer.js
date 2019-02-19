@@ -4,19 +4,19 @@ import { IdGenerator, findAndEdit, findAndRemove, doWithFirstOne, findIndex } fr
 
 export const ProcessActionTypes = [
     {
-        'type': 1,
+        'type': 0,
         'name': 'SMS'
     },
     {
-        'type': 2,
+        'type': 1,
         'name': 'Phone call'
     },
     {
-        'type': 3,
+        'type': 2,
         'name': 'Visit'
     },
     {
-        'type': 4,
+        'type': 3,
         'name': 'Notification'
     }
 ]
@@ -34,8 +34,19 @@ export class Action {
     name = 'New action';
     order = 1;
     stageId = null;
-    frequency = null;
-    type = 4
+    frequency = 3;
+    type = 3;
+    startTime = 730;
+    messageFormId = null;
+    toProfile(action) {
+        return {
+            "Name": action.name,
+            "Frequency": action.frequency,
+            "StartTime": action.startTime,
+            "Type": action.type,
+            "ProfileMessageFormId": action.messageFormId
+        }
+    }
 }
 
 export class Stage {
@@ -49,11 +60,22 @@ export class Stage {
     }
     id = IdGenerator.generateId();
     name = 'New Stage';
-    order = 1;
+    order = 0;
     processId = null;
     duration = 30;
     actions = [];
-    displayBody = true
+    displayBody = true;
+
+    toProfile(stage) {
+        var tmp = new Action();
+        return {
+            "Name": stage.name,
+            "Duration": stage.duration,
+            "Sequence": stage.order,
+            "Actions": stage.actions.map((action) => tmp.toProfile(action))
+        }
+    }
+
 }
 
 export class Process {
@@ -66,7 +88,20 @@ export class Process {
     id = IdGenerator.generateId();
     name = 'New Process';
     description = '';
-    stages = [new Stage()]
+    stages = [new Stage()];
+    toProfile(process) {
+        var tmp = new Stage();
+        var tmp2 = new Action();
+        return {
+            "Name": process.name,
+            "DebtAmountFrom": 0,
+            "DebtAmountTo": 0,
+            "Stages": process.stages.map((stage) => {
+                var model = tmp.toProfile(stage);
+                return model;
+            })
+        }
+    }
 }
 
 const resetStageIndex = (stages) => {
@@ -97,7 +132,7 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             if (order) {
                 newStage.order = order;
             }
-            newStage.order = state.stages.length + 1;
+            newStage.order = state.stages.length;
             state.stages.push(newStage);
             return { ...state };
         case Types.EDIT_STAGE:
