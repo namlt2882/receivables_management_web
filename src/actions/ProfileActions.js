@@ -20,7 +20,7 @@ export const ProfileAction = {
 export const ProfileRequest = {
     fetchProfiles: () => {
         return async (dispatch) => {
-            const res = await callApi('profile', 'GET', null);
+            const res = await fetch('Profile', 'GET', null);
             dispatch(ProfileAction.fetchProfiles(res.data));
         };
     },
@@ -32,7 +32,7 @@ export const ProfileRequest = {
     },
     createNewProfile: (profile, callback) => {
         return async (dispatch) => {
-            const res = await fetch(`Profile/AddProfile`, 'POST', new Process().toProfile(profile));
+            const res = await fetch(`Profile`, 'POST', new Process().toProfile(profile));
             callback(res.data);
         }
     }

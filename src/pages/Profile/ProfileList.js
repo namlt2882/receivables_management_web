@@ -23,17 +23,15 @@ class ProfileList extends Component {
                             <tr>
                                 <th>Id</th>
                                 <th>Profile name</th>
-                                <th>Description</th>
-                                <th>Customer</th>
+                                {/* <th>Customer</th> */}
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {profiles.map((profile) => (<tr>
-                                <td>{profile.id}</td>
-                                <td>{profile.name}</td>
-                                <td>{profile.description}</td>
-                                <td>{profile.customer !== null ? profile.customer.name : ''}</td>
+                                <td>{profile.Id}</td>
+                                <td>{profile.Name}</td>
+                                {/* <td>{profile.customer !== null ? profile.customer.name : ''}</td> */}
                                 <td>
                                     <Link to={`/profile/${profile.id}`} className="btn btn-info mb-15">
                                         <span className="fas fa-user-edit mr-5"></span>
