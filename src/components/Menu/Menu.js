@@ -8,7 +8,12 @@ const menus = [
         exact: true
     },
     {
-        name: 'User Management',
+        name: 'Receivable',
+        to: '/receivable',
+        exact: false
+    },
+    {
+        name: 'User',
         to: '/user-list',
         exact: false
     },

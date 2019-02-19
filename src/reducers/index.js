@@ -6,7 +6,8 @@ import sortTable from './sortTable';
 
 import profiles from './ProfileReducer'
 import { process, processStatus } from './ProcessReducer'
-import {messages} from './MessageReducer';
+import { messages } from './MessageReducer';
+import { receivable, receivableList } from './ReceivableReducer';
 
 
 const appReducers = combineReducers({
@@ -17,7 +18,9 @@ const appReducers = combineReducers({
     profiles,
     process,
     processStatus,
-    messages
+    messages,
+    receivable,
+    receivableList
 });
 
 export default appReducers;

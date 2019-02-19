@@ -8,6 +8,9 @@ import ProfileList from './pages/Profile/ProfileList';
 import AddProfile from './pages/Profile/AddProfile';
 import MessageListPage from './pages/MessageFormPage/MessageListPage';
 import MessageActionPage from './pages/MessageFormPage/MessageActionPage';
+import ImportReceivable from './pages/Receivable/ImportReceivable'
+import ReceivableDetail from './pages/Receivable/ReceivableDetail'
+import ReceivableList from './pages/Receivable/ReceivableList'
 
 const routes = [
     {
@@ -38,7 +41,7 @@ const routes = [
     {
         path: '/profile/add',
         exact: true,
-        main: ({ match, history }) => <AddProfile match={match} history={history}/>
+        main: ({ match, history }) => <AddProfile match={match} history={history} />
     },
     {
         path: '/profile/:id',
@@ -47,24 +50,45 @@ const routes = [
     },
     {
         path: '/profile/:id/edit',
-        exact: false,
+        exact: true,
         main: ({ match, history }) => <EditProfile match={match} history={history} />
     },
     {
         path: '/message-list',
-        exact: false,
+        exact: true,
         main: () => <MessageListPage />
     },
     {
         path: '/message/add',
-        exact: false,
+        exact: true,
         main: ({ history }) => <MessageActionPage history={history} />
     },
     {
+        path: '/receivable',
+        exact: true,
+        main: ({ match, history }) => <ReceivableList />
+    },
+    {
+        path: '/receivable/add',
+        exact: true,
+        main: ({ match, history }) => <ImportReceivable match={match} history={history} />
+    },
+    {
+        path: '/receivable/:id',
+        exact: true,
+        main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
+    },
+    {
+        path: '/receivable/:id/edit',
+        exact: true,
+        main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
+    },
+    {
         path: '',
-        exact: false,
+        exact: true,
         main: () => <NotFoundPage />
-    }
+    },
+
 ];
 
 export default routes;
