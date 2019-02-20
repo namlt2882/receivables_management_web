@@ -61,3 +61,6 @@ export const FETCH_CUSTOMERS = 'FETCH_CUSTOMERS'
 
 //Contact
 export const SET_CONTACTS = 'SET_CONTACTS'
+
+//Collector
+export const FETCH_COLLECTORS = 'FETCH_COLLECTORS'

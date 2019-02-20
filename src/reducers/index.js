@@ -9,7 +9,7 @@ import { process, processStatus } from './ProcessReducer'
 import { messages } from './MessageReducer';
 import { receivable, receivableList, receivableStatus } from './ReceivableReducer';
 import { contacts } from './ContactReducer'
-
+import { collectors } from './CollectorReducer'
 
 const appReducers = combineReducers({
     users,
@@ -25,7 +25,8 @@ const appReducers = combineReducers({
     receivableList,
     receivableStatus,
     customers,
-    contacts
+    contacts,
+    collectors
 });
 
 export default appReducers;

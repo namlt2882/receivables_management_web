@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { CustomerRequest } from './../../actions/CustomerAction'
 import { ProfileRequest } from './../../actions/ProfileActions'
+import { CollectorRequest } from './../../actions/CollectorAction'
 import XLSX from 'xlsx';
 import { Link } from 'react-router-dom';
 
@@ -11,13 +12,17 @@ class ImportReceivable extends Component {
         this.state = {
             receivableData: null,
             contactData: null,
-            fileWarning: ''
+            fileWarning: '',
+            selectCollector: null
         }
+        this.addCollector = this.addCollector.bind(this);
+        this.removeCollector = this.removeCollector.bind(this);
     }
 
     componentDidMount() {
         this.props.fetchAllProfiles();
         this.props.fetchCustomers();
+        this.props.fetchCollectors();
     }
 
     handleFile = (e) => {
@@ -64,6 +69,7 @@ class ImportReceivable extends Component {
 
     mapContactToReceivable = (receivableData, contactData) => {
         receivableData.map((rei) => {
+            rei.Collectors = [];
             rei.Debtor = null;
             rei.Contacts = [];
         })
@@ -75,6 +81,30 @@ class ImportReceivable extends Component {
             }
         });
         return receivableData;
+    }
+
+    addCollector(no, collector) {
+        var receivableData = this.state.receivableData;
+        receivableData.some((rei) => {
+            if (rei.No === no) {
+                rei.Collectors.push(collector);
+                return true;
+            }
+            return false;
+        });
+        this.setState({ receivableData: receivableData })
+    }
+
+    removeCollector(no, collectorId) {
+        var receivableData = this.state.receivableData;
+        receivableData.some((rei) => {
+            if (rei.No === no) {
+                rei.Collectors = rei.Collectors.filter((collector) => collector.Id !== collectorId);
+                return true;
+            }
+            return false;
+        });
+        this.setState({ receivableData: receivableData })
     }
 
     render() {
@@ -132,6 +162,7 @@ class ImportReceivable extends Component {
                                 <th>Prepaid Amount</th>
                                 <th>Debtor</th>
                                 <th>Contacts</th>
+                                <th>Collector</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -149,6 +180,33 @@ class ImportReceivable extends Component {
                                         }
                                         return contact.Name;
                                     })}</td>
+                                    <td>
+                                        {/* Collector list */}
+
+                                        {rei.Collectors.length > 0 ?
+                                            <div className='row collector-simple-list'>
+                                                {/*Already has collector */}
+                                                {rei.Collectors.map((collector) => {
+                                                    var name = collector.FirstName + collector.LastName;
+                                                    return <div className='col-sm-12 row no-padding-right'>
+                                                        <div className='col-sm-9 no-padding-right' style={{ overflow: 'auto' }}>{name}</div>
+                                                        {/* Remove button */}
+                                                        <div className='col-sm-2'>
+                                                            <a style={{ cursor: 'pointer' }} onClick={() => { this.removeCollector(rei.No, collector.Id) }}>
+                                                                <i class="fas fa-minus-circle"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>;
+                                                })}
+                                            </div> :
+                                            //Do not has collector
+                                            <ImportCollectorForm collectors={this.props.collectors.filter((collector) => {
+                                                return rei.Collectors.filter(clt => collector.Id === clt.Id).length == 0;
+                                            })}
+                                                receivable={rei}
+                                                addCollector={this.addCollector} />}
+
+                                    </td>
                                 </tr>
                             })}
                         </tbody>
@@ -159,10 +217,63 @@ class ImportReceivable extends Component {
     }
 }
 
+class ImportCollectorForm extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedCollector: null,
+            selectedCollectorId: '-1'
+        }
+    }
+
+    onChangeCollector = (e) => {
+        var Id = e.target.value;
+        if (Id === '-1') {
+            this.setState({
+                selectedCollectorId: '-1',
+                selectedCollector: null
+            })
+        } else {
+            this.props.collectors.some((collector) => {
+                if (collector.Id === Id) {
+                    this.setState({
+                        selectedCollectorId: collector.Id,
+                        selectedCollector: collector
+                    });
+                    return true;
+                }
+                return false;
+            })
+        }
+    }
+
+    addCollector = () => {
+        this.props.addCollector(this.props.receivable.No, this.state.selectedCollector);
+    }
+
+    render() {
+        var selectedCollector = this.state.selectedCollector;
+        var selectedCollectorId = this.state.selectedCollectorId;
+        return (<div className='form-group'>
+            <select className='form-control' value={selectedCollectorId}
+                onChange={this.onChangeCollector}>
+                <option value='-1'>--</option>
+                {this.props.collectors.map((collector) =>
+                    <option value={collector.Id}>
+                        {collector.FirstName + collector.LastName}
+                    </option>)}
+            </select>
+            <button className='btn btn-primary' onClick={this.addCollector}>Add</button>
+        </div>)
+    }
+}
+
 const mapStateToProps = state => {
     return {
         customers: state.customers,
-        profiles: state.profiles
+        profiles: state.profiles,
+        collectors: state.collectors
     }
 }
 
@@ -173,6 +284,9 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         fetchAllProfiles: () => {
             dispatch(ProfileRequest.fetchProfiles())
+        },
+        fetchCollectors: () => {
+            dispatch(CollectorRequest.fetchCollectors());
         }
     }
 }

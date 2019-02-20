@@ -26,7 +26,7 @@ export const ProfileRequest = {
     },
     fetchMessageForms: () => {
         return async (dispatch) => {
-            const res = await fetch(`ProfileMessageForm/GetAll`, 'GET', null);
+            const res = await fetch(`ProfileMessageForm`, 'GET', null);
             dispatch(ProfileAction.fetchMessageForms(res.data));
         }
     },
