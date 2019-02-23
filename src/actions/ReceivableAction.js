@@ -1,5 +1,5 @@
 import * as Types from '../constants/ActionTypes';
-import { callApi } from '../utils/APICaller';
+import { callApi, fetch } from '../utils/APICaller';
 import { receivable } from '../reducers/ReceivableReducer';
 
 export const ReceivableAction = {
@@ -22,6 +22,12 @@ export const ReceivableAction = {
     getReceivable: () => {
         return {
             type: Types.GET_RECEIVABLE
+        }
+    },
+    setReceivableList: (list) => {
+        return {
+            type: Types.SET_RECEIVABLE_LIST,
+            list
         }
     },
     // receivable status
@@ -53,6 +59,12 @@ export const ReceivableRequest = {
         return async (dispatch) => {
             const res = await callApi(`receivable/${id}`, 'GET', null);
             dispatch(ReceivableAction.getReceivable(res.data));
+        }
+    },
+    insertReceivables: (list) => {
+        return async (dispatch) => {
+            const res = await fetch('Receivable', 'POST', list);
+            dispatch(ReceivableAction.setReceivableList(res.data));
         }
     }
 }
