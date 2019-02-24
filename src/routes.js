@@ -1,27 +1,27 @@
 import React from 'react';
-import HomePage from './pages/HomePage/HomePage';
-import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
-import UserListPage from './pages/UserListPage/UserListPage';
-import UserActionPage from './pages/UserActionPage/UserActionPage';
-import EditProfile from './pages/Profile/EditProfile';
-import ProfileList from './pages/Profile/ProfileList';
-import AddProfile from './pages/Profile/AddProfile';
-import MessageListPage from './pages/MessageFormPage/MessageListPage';
-import MessageActionPage from './pages/MessageFormPage/MessageActionPage';
-import ImportReceivable from './pages/Receivable/ImportReceivable'
-import ReceivableDetail from './pages/Receivable/ReceivableDetail'
-import ReceivableList from './pages/Receivable/ReceivableList'
+import Dashboard from './components/dashboard/dashboard';
+import NotFoundPage from './components/common/not-found';
+import ListUser from './components/user-pages/list-user';
+import UserActionPage from './components/user-pages/user-action';
+import EditProfile from './components/profile-pages/edit-profile';
+import ProfileList from './components/profile-pages/list-profile';
+import AddProfile from './components/profile-pages/add-profile';
+import ListMessage from './components/message-form-pages/list-message';
+import MessageActionPage from './components/message-form-pages/message-action';
+import ImportReceivable from './components/receivable-pages/import-receivable'
+import ReceivableDetail from './components/receivable-pages/receivable-detail'
+import ReceivableList from './components/receivable-pages/list-receivable'
 
 const routes = [
     {
         path: '/',
         exact: true,
-        main: () => <HomePage />
+        main: () => <Dashboard />
     },
     {
         path: '/user-list',
         exact: false,
-        main: () => <UserListPage />
+        main: () => <ListUser />
     },
     {
         path: '/user/add',
@@ -56,7 +56,7 @@ const routes = [
     {
         path: '/message-list',
         exact: true,
-        main: () => <MessageListPage />
+        main: () => <ListMessage />
     },
     {
         path: '/message/add',
