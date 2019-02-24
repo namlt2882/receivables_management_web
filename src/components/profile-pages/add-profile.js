@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Process from '../../components/process-pages/process'
 import { connect } from 'react-redux';
 import { ProfileRequest } from './../../actions/profile-action'
 import { ProcessAction, enableEditable } from './../../actions/process-action'
 import './profile.scss'
+import Component from '../common/component'
+import { available } from '../common/loading-page';
 
 class AddProfile extends Component {
     constructor(props) {
@@ -13,6 +15,7 @@ class AddProfile extends Component {
         this.createNewProfile = this.createNewProfile.bind(this);
     }
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.setEditable();
         this.props.newProcess();
         this.props.fetchMessageForms();

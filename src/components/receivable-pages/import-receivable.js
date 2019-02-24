@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux'
 import { CustomerRequest } from './../../actions/customer-action'
 import { ProfileRequest } from './../../actions/profile-action'
@@ -6,6 +6,8 @@ import { CollectorRequest } from './../../actions/collector-action'
 import XLSX from 'xlsx';
 import { Link } from 'react-router-dom';
 import { ReceivableRequest } from '../../actions/receivable-action';
+import Component from '../common/component'
+import { available } from '../common/loading-page';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -25,6 +27,7 @@ class ImportReceivable extends Component {
     }
 
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.fetchAllProfiles();
         this.props.fetchCustomers();
         this.props.fetchCollectors();

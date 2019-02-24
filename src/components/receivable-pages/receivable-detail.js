@@ -1,13 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { ReceivableAction, ReceivableRequest } from '../../actions/receivable-action'
+import Component from '../common/component'
+import { available } from '../common/loading-page';
 
-class ImportReceivable extends Component {
+class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {}
     }
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.getReceivable(1);
     }
 
@@ -81,4 +84,4 @@ const mapDispatchToProps = (dispatch, props) => {
         }
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(ImportReceivable);
+export default connect(mapStateToProps, mapDispatchToProps)(ReceivableDetail);

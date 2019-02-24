@@ -1,15 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { ReceivableRequest } from '../../actions/receivable-action'
 import { receivable } from '../../reducers/receivable-reducer';
 import { Link } from 'react-router-dom';
+import { available } from '../common/loading-page'
+import Component from '../common/component'
 
-class ImportReceivable extends Component {
+class ReceivableList extends Component {
     constructor(props) {
         super(props);
         this.state = {}
     }
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.fetchReceivableList();
     }
 
@@ -17,7 +20,7 @@ class ImportReceivable extends Component {
         var receivableList = this.props.receivableList;
         var index = 0;
         return (<div>
-            <Link to="/receivable/add" className="btn btn-info mb-15">Add Receivable</Link>
+            <Link to="/receivable/add" className="btn btn-info">Import</Link>
             <div className='panel panel-primary'>
                 <div className='panel-heading'>
                     <h3 className='panel-title text-center'>Receivable list</h3>
@@ -52,7 +55,7 @@ class ImportReceivable extends Component {
                                     }
                                     index++;
                                 })}</td>
-                                <td><Link to={`/receivable/${receivable.id}`}>
+                                <td><Link to={`/receivable/${receivable.id}/view`}>
                                     View</Link></td>
                             </tr>)}
                         </tbody>
@@ -74,4 +77,4 @@ const mapDispatchToProps = (dispatch, props) => {
         }
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(ImportReceivable);
+export default connect(mapStateToProps, mapDispatchToProps)(ReceivableList);

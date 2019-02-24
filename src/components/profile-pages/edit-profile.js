@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Process from '../../components/process-pages/process'
 import { connect } from 'react-redux';
 import { ProfileRequest } from './../../actions/profile-action'
 import { ProcessAction, ProfileProcessRequest, cancelEditable, enableEditable } from './../../actions/process-action'
 import './profile.scss'
+import Component from '../common/component'
+import { available } from '../common/loading-page';
 
 class EditProfile extends Component {
     constructor(props) {
@@ -11,6 +13,7 @@ class EditProfile extends Component {
         this.state = {}
     }
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.getProcessDetailRequest(1);
         this.props.fetchMessageForms();
     }

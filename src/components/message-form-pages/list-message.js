@@ -1,10 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import MessageItem from './message-item';
 import MessageList from './message-list';
 import { Link } from 'react-router-dom';
 import { actFetchMessageRequest } from '../../actions/message-form-action';
+import Component from '../common/component'
+import { available } from '../common/loading-page'
+
 class ListMessage extends Component {
 
     // constructor(props) {
@@ -16,6 +19,7 @@ class ListMessage extends Component {
 
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.fetchAllMessages();
     }
 

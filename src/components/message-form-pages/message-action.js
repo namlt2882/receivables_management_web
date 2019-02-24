@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { actAddMessageRequest } from '../../actions/message-form-action';
 import { connect } from 'react-redux';
+import Component from '../common/component'
+
 class MessageActionPage extends Component {
     constructor(props) {
         super(props);

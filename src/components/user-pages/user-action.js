@@ -1,7 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { actAddUsersRequest, actGetUserRequest, actUpdateUserRequest } from '../../actions/user-action';
 import { connect } from 'react-redux';
+import Component from '../common/component'
+import { available } from '../common/loading-page';
+
 class UserActionPage extends Component {
     constructor(props) {
         super(props);
@@ -14,6 +17,7 @@ class UserActionPage extends Component {
     }
     // Dispatch action và lưu itemEditing vào store
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         var { match } = this.props;
         if (match) {
             var id = match.params.id;

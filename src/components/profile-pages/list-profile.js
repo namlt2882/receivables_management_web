@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { ProfileRequest } from '../../actions/profile-action';
 import { Link } from 'react-router-dom';
+import Component from '../common/component'
+import { available } from '../common/loading-page'
 
 class ProfileList extends Component {
 
     componentDidMount() {
+        available(resolve => setTimeout(resolve, 400));
         this.props.fetchAllProfiles();
     }
 
@@ -33,7 +36,7 @@ class ProfileList extends Component {
                                 <td>{profile.Name}</td>
                                 {/* <td>{profile.customer !== null ? profile.customer.name : ''}</td> */}
                                 <td>
-                                    <Link to={`/profile/${profile.Id}`}>View</Link>
+                                    <Link to={`/profile/${profile.Id}/view`}>View</Link>
                                 </td>
                             </tr>))}
                         </tbody>

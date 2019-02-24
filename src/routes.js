@@ -20,17 +20,17 @@ const routes = [
     },
     {
         path: '/user-list',
-        exact: false,
+        exact: true,
         main: () => <ListUser />
     },
     {
         path: '/user/add',
-        exact: false,
+        exact: true,
         main: ({ history }) => <UserActionPage history={history} />
     },
     {
         path: '/user/:id/edit',
-        exact: false,
+        exact: true,
         main: ({ match, history }) => <UserActionPage match={match} history={history} /> //Đối tượng match dùng để lấy cái id để edit
     },
     {
@@ -44,7 +44,7 @@ const routes = [
         main: ({ match, history }) => <AddProfile match={match} history={history} />
     },
     {
-        path: '/profile/:id',
+        path: '/profile/:id/view',
         exact: true,
         main: ({ match, history }) => <EditProfile match={match} history={history} />
     },
@@ -74,7 +74,7 @@ const routes = [
         main: ({ match, history }) => <ImportReceivable match={match} history={history} />
     },
     {
-        path: '/receivable/:id',
+        path: '/receivable/:id/view',
         exact: true,
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
     },
@@ -82,13 +82,7 @@ const routes = [
         path: '/receivable/:id/edit',
         exact: true,
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
-    },
-    {
-        path: '',
-        exact: true,
-        main: () => <NotFoundPage />
-    },
-
+    }
 ];
 
 export default routes;
