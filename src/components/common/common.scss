@@ -1,0 +1,79 @@
+.my-navbar{
+    background-color: #0069d9 !important;
+    padding: 0px !important;
+    margin: 0px !important;
+    width: 100%;
+    z-index: 1;
+}
+.navbar-holder{
+    height: 70px;
+    z-index: 1;
+}
+.navbar-holder>.my-navbar{
+    position: fixed;
+}
+.nav-link:hover svg{
+    opacity: 1 !important;
+}
+.nav-item a{
+    text-align: center;
+    min-width: 80px;
+    color: white;
+}
+.nav-item a:hover{
+    color: white;
+    text-decoration: underline;
+}
+.choosen-nav-item{
+    font-weight: bold;
+    text-decoration: underline;
+}
+.navbar-brand a{
+    color: white;
+    font-weight: 400;
+    font-size: 26px;
+}
+.navbar-brand a:hover{
+    color: white;
+    text-decoration: none;
+}
+
+.nav-icon{
+
+}
+.nav-icon>div{
+    background-color: #0069d9;
+    border: 1px solid #0069d9;
+    border-radius: 50px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 5px 10px 10px 10px;
+}
+.nav-icon svg:first-child{
+    opacity: 0.7;
+}
+.nav-icon>div:hover svg:first-child{
+    opacity: 1;
+}
+.nav-icon>div:hover{
+    cursor: pointer;
+}
+.nav-icon-panel{
+    top: 10px !important;
+}
+.transparent-button{
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0px !important;
+    outline: none !important;
+    border-radius: 50px;
+}
+.transparent-button:active {
+    @extend .transparent-button;
+}
+.transparent-button:focus {
+    @extend .transparent-button;
+}
+.noti-item-icon{
+    margin: 0 5 0 5;
+}

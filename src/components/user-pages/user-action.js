@@ -107,12 +107,8 @@ class UserActionPage extends Component {
                         </label>
                     </div>
 
-                    <button type="submit" className="btn btn-primary">
-                        <span className="fas fa-save mr-5"></span>Save
-                    </button>&nbsp;&nbsp;&nbsp;
-                    <Link to="/user-list" className="btn btn-danger">
-                        <span className="fas fa-ban mr-5"></span>Cancel
-                    </Link>
+                    <button>Save</button>&nbsp;&nbsp;&nbsp;
+                    <Link to="/user-list">Cancel</Link>
 
                 </form>
             </div>

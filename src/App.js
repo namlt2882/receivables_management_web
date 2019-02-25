@@ -7,7 +7,6 @@ import LoginPage from './components/common/login';
 import { isLoggedIn } from './services/auth-service'
 import NotFoundPage from './components/common/not-found';
 
-
 class App extends Component {
   render() {
     isLoggedIn(() => { }, () => {
@@ -24,7 +23,7 @@ class App extends Component {
           {/* <Route path='' exact={false}> */}
           <div>
             <MyMenu />
-            <div className="container" style={{ padding: '20px' }}>
+            <div className="container" style={{ padding: '20px', zIndex: '0' }}>
               <div className='row justify-content-center align-self-center'>
                 <div className='col-sm-10'>
                   {this.privateContent(routes)}

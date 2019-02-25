@@ -28,10 +28,8 @@ class ListMessage extends Component {
         return (
             <div>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 mgb-15">
-                <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                    <Link to="/message/add" className="btn btn-info mb-15">
-                        <span className="fas fa-user-plus mr-5"></span> Add   
-                    </Link>
+                    <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <Link to="/message-list/add">Add</Link>
                     </div>
                     <div className="input-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
                         <input
@@ -40,14 +38,8 @@ class ListMessage extends Component {
                             className="form-control"
                             placeholder="Enter keyword ..."
                         />
-                        <span className="input-group-btn">
-                            <button
-                                type="button"
-                                className="btn btn-info"
-                            >
-                                <span className="fa fa-search mr-5"></span>Search
-                                </button>
-                        </span>
+                        <button className="btn btn-info">Search</button>
+
                     </div>
                 </div>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">

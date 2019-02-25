@@ -79,9 +79,7 @@ class ListUser extends Component {
                         </div>
                 </div> */}
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <Link to="/user/add" className="btn btn-info mb-15">
-                        <span className="fas fa-user-plus mr-5"></span> Add New Account
-                    </Link>
+                    <Link to="/user/add"> Add New Account</Link>
 
                     <div className="dropdown flr">
                         <button

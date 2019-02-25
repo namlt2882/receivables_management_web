@@ -123,12 +123,8 @@ class MessageActionPage extends Component {
                                 </select>
                             </div>
                             <div className="mb-15 col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <button type="submit" className="btn btn-primary">
-                                    <span className="fas fa-save mr-5"></span>Save
-                    </button>&nbsp;&nbsp;&nbsp;
-                    <Link to="/message-list" className="btn btn-danger">
-                                    <span className="fas fa-ban mr-5"></span>Cancel
-                    </Link>
+                                <button>Save</button>&nbsp;&nbsp;&nbsp;
+                    <Link to="/message-list">Cancel</Link>
                             </div>
                         </form>
                     </div>

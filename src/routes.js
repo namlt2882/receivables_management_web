@@ -59,7 +59,7 @@ const routes = [
         main: () => <ListMessage />
     },
     {
-        path: '/message/add',
+        path: '/message-list/add',
         exact: true,
         main: ({ history }) => <MessageActionPage history={history} />
     },
