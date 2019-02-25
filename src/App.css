@@ -90,3 +90,9 @@
 .clickable{
   cursor: pointer;
 }
+.collector-simple-list{
+  width: 150px;
+}
+.no-padding-right{
+  padding-right: 0px;
+}

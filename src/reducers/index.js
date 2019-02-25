@@ -1,13 +1,15 @@
 import { combineReducers } from 'redux';
-import users from './users';
-import itemEditing from './itemEditing';
-import filterTable from './filterTable';
-import sortTable from './sortTable';
-
-import profiles from './ProfileReducer'
-import { process, processStatus } from './ProcessReducer'
-import {messages} from './MessageReducer';
-
+import users from './user-reducer';
+import itemEditing from './item-editing';
+import filterTable from './filter-table';
+import sortTable from './sort-table';
+import { customers } from './customer-reducer'
+import { profiles, messageForms } from './profile-reducer'
+import { process, processStatus } from './process-reducer'
+import { messages } from './message-reducer';
+import { receivable, receivableList, receivableStatus } from './receivable-reducer';
+import { contacts } from './contact-reducer'
+import { collectors } from './collector-reducer'
 
 const appReducers = combineReducers({
     users,
@@ -15,9 +17,16 @@ const appReducers = combineReducers({
     filterTable,
     sortTable,
     profiles,
+    messageForms,
     process,
     processStatus,
-    messages
+    messages,
+    receivable,
+    receivableList,
+    receivableStatus,
+    customers,
+    contacts,
+    collectors
 });
 
 export default appReducers;
