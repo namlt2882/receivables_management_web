@@ -1,0 +1,30 @@
+.contact {
+    padding: 5px;
+    border: 1px solid blue;
+    border-radius: 10px;
+    position: relative;
+    z-index: 0;
+}
+
+.info-table {}
+
+.info-table tr {
+    border: 1px solid gray !important;
+}
+
+.info-table tr>td:first-child {
+    max-width: 100px;
+    font-weight: bold;
+}
+
+.info-table td {
+    border: none !important;
+    padding: 5px 15px 5px 15px !important;
+}
+
+.card-title {
+    font-size: 20px;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+}

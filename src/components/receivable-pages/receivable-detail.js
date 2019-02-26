@@ -1,87 +1,106 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { ReceivableAction, ReceivableRequest } from '../../actions/receivable-action'
 import Component from '../common/component'
-import { available } from '../common/loading-page';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
+import { ReceivableService } from '../../services/receivable-service';
+import { Table, Card, CardBody, CardTitle } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import Contact from './contact-pages/contact'
+import './receivable.scss'
+import { numAsDate } from '../../utils/time-converter';
+import { CustomerService } from '../../services/customer-service';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
+library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            maxLoading: 2,
+            receivable: null,
+            customer: null
+        }
     }
     componentDidMount() {
-        available(resolve => setTimeout(resolve, 400));
-        this.props.getReceivable(1);
+        available1();
+        let recceiId = this.props.match.params.id;
+        ReceivableService.get(recceiId).then(res => {
+            let receivable = res.data;
+            this.setState({ receivable: receivable });
+            this.incrementLoading();
+            CustomerService.get(receivable.CustomerId).then(res2 => {
+                this.setState({ customer: res2.data })
+                this.incrementLoading();
+            })
+        })
     }
-
+    edit(e) {
+        e.preventDefault();
+    }
     render() {
-        var readOnly = this.props.receivableStatus.readOnly;
-        var receivable = this.props.receivable;
-        var index = 0;
-        return (<div className='panel panel-primary'>
-            <div className='panel-heading'>
-                <h3 className='panel-title text-center'>{readOnly ? 'Receivable detail' : 'Edit receivable'}</h3>
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />;
+        }
+        let receivable = this.state.receivable;
+        let contacts = receivable != null ? receivable.Contacts : [];
+        let debtor = null;
+        contacts = contacts.filter((c) => {
+            if (c.Type == 0) {
+                debtor = c;
+                return false;
+            } else return true;
+        })
+        return (<div className='col-sm-12 row'>
+            {/* receivable information */}
+            <div className='col-sm-6'>
+                <Card>
+                    <CardTitle>
+                        <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
+                        Receivable Info
+                        </CardTitle>
+                    <CardBody>
+                        <Table className='info-table' hover>
+                            <tbody>
+                                <tr>
+                                    <td>Debt amount:</td>
+                                    <td>{receivable.DebtAmount}</td>
+                                </tr>
+                                <tr>
+                                    <td>Prepaid amount:</td>
+                                    <td>{receivable.PrepaidAmount}</td>
+                                </tr>
+                                <tr>
+                                    <td>Customer:</td>
+                                    <td>{this.state.customer.Name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Due day:</td>
+                                    <td>{numAsDate(receivable.PayableDay)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Collector:</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Status:</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </Table>
+                        <a href='' onClick={this.edit}>Edit</a>
+                    </CardBody>
+                </Card>
             </div>
-            <div className='panel-body'>
-                <div className='row'>
-                    <div className='col-sm-6'>
-                        <div className='form-group'>
-                            <label>Name:</label>
-                            <input className='form-control' value={receivable.name} />
-                        </div>
-                        <div className='form-group'>
-                            <label>Customer:</label>
-                            <select className='form-control'></select>
-                        </div>
-                        <div className='form-group'>
-                            <label>Profile:</label>
-                            <select className='form-control'></select>
-                        </div>
-                        <div className='form-group'>
-                            <label>Location:</label>
-                            <input className='form-control' />
-                        </div>
-                        <div className='form-group'>
-                            <label>Amount:</label>
-                            <input className='form-control' />
-                        </div>
-                        <div className='form-group'>
-                            <label>Collectors:</label>
-                            <span>
-                                {/* {collectors.length == 0 ? 'No body' : null}
-                                {collectors.map((collector) => {
-                                    if (index === 0) {
-                                        return collector.name;
-                                    } else {
-                                        return ', ' + collector.name;
-                                    }
-                                    index++;
-                                })} */}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            {/* contacts */}
+            <div className='col-sm-6'>
+                {/* Debtor */}
+                <Contact title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+                {/* Relatives */}
+                <Contact title='Relatives' isDebtor={false} contacts={contacts} />
             </div>
         </div>);
     }
 }
-const mapStateToProps = state => {
-    return {
-        receivable: state.receivable,
-        receivableStatus: state.receivableStatus
-    }
-}
-const mapDispatchToProps = (dispatch, props) => {
-    return {
-        enableEdit: () => {
-            dispatch(ReceivableAction.setEditable());
-        },
-        cancelEdit: () => {
-            dispatch(ReceivableAction.cancelEditable());
-        },
-        getReceivable: (id) => {
-            dispatch(ReceivableRequest.getReceivable(id));
-        }
-    }
-}
-export default connect(mapStateToProps, mapDispatchToProps)(ReceivableDetail);
+
+export default ReceivableDetail;

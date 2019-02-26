@@ -25,7 +25,7 @@ class App extends Component {
             <MyMenu />
             <div className="container" style={{ padding: '20px', zIndex: '0' }}>
               <div className='row justify-content-center align-self-center'>
-                <div className='col-sm-10'>
+                <div className='col-sm-12 row'>
                   {this.privateContent(routes)}
                 </div>
               </div>
