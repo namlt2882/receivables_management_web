@@ -4,6 +4,11 @@ import { Jumbotron, Button } from 'reactstrap';
 import { Redirect } from 'react-router-dom';
 import Component from './component';
 import { FormGroup, Label, Input } from 'reactstrap';
+import { isLoggedIn, AuthService } from '../../services/auth-service'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faKey, faUser } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+library.add(faKey, faUser);
 
 class LoginPage extends Component {
     constructor(props) {
@@ -13,9 +18,9 @@ class LoginPage extends Component {
             password: '',
             isLoggedIn: false
         }
-        // isLoggedIn(() => {
-        //     this.setIsLoggedIn(true);
-        // }, () => { });
+        isLoggedIn(() => {
+            this.setIsLoggedIn(true);
+        }, () => { });
         this.login = this.login.bind(this);
         this.changeUsername = this.changeUsername.bind(this);
         this.changePassword = this.changePassword.bind(this);
@@ -27,16 +32,12 @@ class LoginPage extends Component {
     }
 
     login() {
-        // AuthService.login(this.state.username, this.state.password)
-        //     .then(res => {
-        //         let token = res.data.token;
-        //         let role = res.data.user.Role;
-        //         localStorage.setItem('access_token', token);
-        //         localStorage.setItem('role', role);
-        //         window.location.href = '/'
-        //     }).catch(err => {
-        //         alert('Wrong username or password!')
-        //     })
+        AuthService.login(this.state.username, this.state.password)
+            .then(res => {
+                window.location.href = '/'
+            }).catch(err => {
+                alert('Wrong username or password!')
+            })
     }
 
     changeUsername(e) {
@@ -55,14 +56,18 @@ class LoginPage extends Component {
                 <div className='row justify-content-center align-self-center'>
                     <div className='col-sm-6' style={{ 'margin-top': '100px' }}>
                         <Jumbotron>
-                            <h3>Receivable management system</h3>
+                            <h3 style={{ color: 'blue' }}>Receivable management system</h3>
                             <FormGroup>
-                                <Label>Username</Label>
+                                <Label>
+                                    <FontAwesomeIcon icon='user' size='lg' color='black' style={{ marginRight: '10px' }} />
+                                    Username</Label>
                                 <Input type="text" required={true} placeholder="Username" value={this.state.username}
                                     onChange={this.changeUsername} />
                             </FormGroup>
                             <FormGroup>
-                                <Label>Password</Label>
+                                <Label>
+                                    <FontAwesomeIcon icon='key' size='lg' color='black' style={{ marginRight: '10px' }} />
+                                    Password</Label>
                                 <Input type="password" required={true} placeholder="Password" value={this.state.password}
                                     onChange={this.changePassword} />
                             </FormGroup>
