@@ -6,11 +6,14 @@ import { Table, Card, CardBody, CardTitle } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Contact from './contact-pages/contact'
 import './receivable.scss'
-import { numAsDate } from '../../utils/time-converter';
+import { dateToInt, compareIntDate, addDayAsInt, numAsDate } from '../../utils/time-converter';
 import { CustomerService } from '../../services/customer-service';
+import ReiceivableProgress from './receivable-progress'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
+import ReceivableProgress from './receivable-progress';
+import CurrentStage from './current-stage';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -19,7 +22,8 @@ class ReceivableDetail extends Component {
         this.state = {
             maxLoading: 2,
             receivable: null,
-            customer: null
+            customer: null,
+            currentStage: null
         }
     }
     componentDidMount() {
@@ -38,6 +42,41 @@ class ReceivableDetail extends Component {
     edit(e) {
         e.preventDefault();
     }
+    showHistory(e) {
+        e.preventDefault();
+    }
+    changeStatus(e) {
+        e.preventDefault();
+    }
+    calculateStage(stages, payableDay) {
+        let currentStage = null;
+        let currentDate = dateToInt(new Date());
+        let stageStartDay = payableDay;
+        stages.map((stage) => {
+            let nextStartDay = addDayAsInt(stageStartDay, stage.Duration);
+            let rsStartDay = compareIntDate(stageStartDay, currentDate);
+            let rsEndDay = compareIntDate(nextStartDay, currentDate);
+            if (rsStartDay >= 0 && rsEndDay <= 0) {
+                //in stage
+                stage.isCurrentStage = true;
+                stage.isIncommingStage = false;
+                stage.percent = (rsStartDay * 1.0 / stage.Duration) * 100;
+                currentStage = stage;
+            } else if (rsStartDay < 0) {
+                //incomming stage
+                stage.percent = 0;
+                stage.isCurrentStage = false;
+                stage.isIncommingStage = true;
+            } else if (rsEndDay > 0) {
+                // finished stage
+                stage.percent = 100;
+                stage.isCurrentStage = false;
+                stage.isIncommingStage = false;
+            }
+            stageStartDay = nextStartDay;
+        })
+        return currentStage;
+    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
@@ -51,7 +90,31 @@ class ReceivableDetail extends Component {
                 return false;
             } else return true;
         })
+        let stages = receivable.CollectionProgress.Stages;
+        let currentStage = this.calculateStage(stages, receivable.PayableDay);
+        let status = '';
+        switch (receivable.CollectionProgress.Status) {
+            case 0: status = 'Cancel';
+                break;
+            case 1: status = 'Collection';
+                break;
+            case 2: status = 'Done';
+                break;
+            case 3: status = 'Late';
+                break;
+        }
         return (<div className='col-sm-12 row'>
+            {/* receivable progress */}
+            <div className='col-sm-12 receivable-progress'>
+                <ReceivableProgress progress={receivable.CollectionProgress} />
+                <div>
+                    <a href='' onClick={this.showHistory} style={{ float: 'right' }}><i>SMS and phone call history</i></a>
+                </div>
+            </div>
+            {/* Current stage */}
+            <div className='col-sm-12'>
+                <CurrentStage currentStage={currentStage} />
+            </div>
             {/* receivable information */}
             <div className='col-sm-6'>
                 <Card>
@@ -84,11 +147,12 @@ class ReceivableDetail extends Component {
                                 </tr>
                                 <tr>
                                     <td>Status:</td>
-                                    <td></td>
+                                    <td>{status}</td>
                                 </tr>
                             </tbody>
                         </Table>
-                        <a href='' onClick={this.edit}>Edit</a>
+                        <a href='' onClick={this.edit} style={{ marginRight: '15px' }}>Edit</a>
+                        <a href='' onClick={this.changeStatus}>Change status</a>
                     </CardBody>
                 </Card>
             </div>

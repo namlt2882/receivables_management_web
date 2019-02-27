@@ -17,6 +17,10 @@
     font-weight: bold;
 }
 
+.deco-table tr>td:first-child {
+    font-weight: bold;
+}
+
 .info-table td {
     border: none !important;
     padding: 5px 15px 5px 15px !important;
@@ -24,7 +28,74 @@
 
 .card-title {
     font-size: 20px;
-    font-style: italic;
     font-weight: bold;
     text-align: center;
+}
+
+.receivable-progress {
+    margin: 20px;
+}
+
+.r-stage {
+    cursor: pointer;
+}
+
+.r-stage:hover .text-center {
+    text-decoration: underline;
+}
+
+.receivable-progress .progress {
+    height: 1.5rem;
+    font-size: 1rem;
+    background-color: #b5c0d1;
+}
+
+.receivable-progress .r-stage:first-child .progress {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.receivable-progress .r-stage:last-child .progress {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.receivable-progress .r-stage {
+    padding: 0px;
+}
+
+.receivable-progress .r-stage:hover .progress {
+    opacity: 0.7;
+}
+
+.receivable-progress .r-stage:not(:first-child):not(:last-child) .progress {
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+    border-radius: 0px;
+}
+
+.receivable-progress .r-stage:first-child .progress {
+    border-right: 2px solid black;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.receivable-progress .r-stage:last-child .progress {
+    border-left: 2px solid black;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.r-low-stage .progress-bar {
+    color: black;
+    text-align: center;
+}
+
+.progress-current-stage>.text-center {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.current-stage {
+    margin-bottom: 15px;
 }
