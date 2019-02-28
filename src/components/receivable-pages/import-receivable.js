@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { ReceivableRequest } from '../../actions/receivable-action';
 import Component from '../common/component'
 import { available } from '../common/loading-page';
+import { ReceivableService } from '../../services/receivable-service';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -105,10 +106,12 @@ class ImportReceivable extends Component {
     }
 
     insertReceivables() {
+        let currentDay = new Date();
+        let year = currentDay.getFullYear();
+        let month = currentDay.getMonth() + 1;
+        let day = currentDay.getDate();
+        let payableDay = '' + year + (month < 10 ? '0' + month : month) + (day < 10 ? '0' + day : day);
         var list = this.state.receivableData.map((rei) => {
-            var payableDay = parseInt('' + rei.Year +
-                (rei.Month < 10 ? '0' : '') + rei.Month +
-                (rei.Day < 10 ? '0' : '') + rei.Day);
             return {
                 "Contacts": rei.Contacts.map((contact) => {
                     return {
@@ -128,8 +131,10 @@ class ImportReceivable extends Component {
                 "LocationId": null
             };
         })
-        this.props.insertReceivables(list);
-        alert('Insert success!');
+        this.props.insertReceivables(list).then(res => {
+            alert('Insert successfully!')
+            window.location.href = '/receivable';
+        });
     }
 
     updateProfile(e) {
@@ -321,7 +326,9 @@ const mapDispatchToProps = (dispatch, props) => {
             dispatch(CollectorRequest.fetchCollectors());
         },
         insertReceivables: (list) => {
-            dispatch(ReceivableRequest.insertReceivables(list));
+            return ReceivableService.create(list).catch(err => {
+                alert('Service unavailable!');
+            })
         }
     }
 }

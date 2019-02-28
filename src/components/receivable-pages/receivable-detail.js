@@ -53,9 +53,12 @@ class ReceivableDetail extends Component {
         let currentDate = dateToInt(new Date());
         let stageStartDay = payableDay;
         stages.map((stage) => {
+            let endDay = addDayAsInt(stageStartDay, stage.Duration - 1);
             let nextStartDay = addDayAsInt(stageStartDay, stage.Duration);
             let rsStartDay = compareIntDate(stageStartDay, currentDate);
             let rsEndDay = compareIntDate(nextStartDay, currentDate);
+            stage.startDate = stageStartDay;
+            stage.endDate = endDay;
             if (rsStartDay >= 0 && rsEndDay <= 0) {
                 //in stage
                 stage.isCurrentStage = true;
@@ -112,9 +115,10 @@ class ReceivableDetail extends Component {
                 </div>
             </div>
             {/* Current stage */}
-            <div className='col-sm-12'>
+            {receivable.ClosedDay == null && currentStage != null ? <div className='col-sm-12'>
                 <CurrentStage currentStage={currentStage} />
-            </div>
+            </div> : null}
+
             {/* receivable information */}
             <div className='col-sm-6'>
                 <Card>
@@ -127,7 +131,7 @@ class ReceivableDetail extends Component {
                             <tbody>
                                 <tr>
                                     <td>Debt amount:</td>
-                                    <td>{receivable.DebtAmount}</td>
+                                    <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
                                 </tr>
                                 <tr>
                                     <td>Prepaid amount:</td>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Card, CardBody, CardTitle } from 'reactstrap';
+import { numAsDate } from '../../utils/time-converter';
 
 class CurrentStage extends Component {
     constructor(props) {
@@ -36,11 +37,19 @@ class CurrentStage extends Component {
                                 <td>Duration:</td>
                                 <td>{currentStage.Duration} days</td>
                             </tr>
+                            <tr>
+                                <td>Start day:</td>
+                                <td>{numAsDate(currentStage.startDate)}</td>
+                            </tr>
+                            <tr>
+                                <td>End day:</td>
+                                <td>{numAsDate(currentStage.endDate)}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
                 <div className='col-sm-4 row'>
-                    <div className='col-sm-4'>Actions:</div>
+                    <div className='col-sm-4'><b>Actions:</b></div>
                     <table className='col-sm-8'>
                         <tbody>
                             <tr>

@@ -6,5 +6,8 @@ export const ReceivableService = {
     },
     getAll: () => {
         return AuthRequest.get(`Receivable`);
+    },
+    create: (list) => {
+        return AuthRequest.post(`Receivable`, list);
     }
 }
