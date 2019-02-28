@@ -11,11 +11,12 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
     faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt,
-    faChalkboardTeacher, faSignOutAlt
+    faChalkboardTeacher, faSignOutAlt, faTasks
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { AuthService } from '../../services/auth-service';
 library.add(faBell, faUserCircle, faCreditCard,
-    faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt);
+    faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks);
 
 class MyMenu extends Component {
     constructor(props) {
@@ -46,8 +47,13 @@ class MyMenu extends Component {
                     <NavbarToggler onClick={this.toggle} />
                     <Collapse isOpen={this.state.isOpen} navbar>
                         <Nav className="ml-auto" navbar>
-                            {menus.map(({ name, to, exact, icon }) =>
-                                <Route
+                            {menus.map(({ name, to, exact, icon, roles }) => {
+                                let role = localStorage.getItem('role');
+                                let isAuthenticated = roles.some((r) => r === role);
+                                if (!isAuthenticated) {
+                                    return false;
+                                }
+                                return (<Route
                                     path={to} exact={exact}
                                     children={({ match }) => {
                                         var active = match ? 'active' : '';
@@ -65,7 +71,8 @@ class MyMenu extends Component {
                                             </NavLink>
                                         </NavItem>)
                                     }}
-                                />
+                                />)
+                            }
                             )}
                             <Notification dropdownProfile={this.state.dropdownProfile} />
                             <MyProfile dropdownProfile={this.state.dropdownProfile}
@@ -93,11 +100,16 @@ class MyProfile extends React.Component {
                     <DropdownToggle className='transparent-button'>
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
-                    <DropdownMenu className='nav-icon-panel'>
+                    <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
+                        <div className='col-sm-10' style={{cursor:'default'}}>
+                            Hi, <b>{localStorage.getItem('username')}</b><br/>
+                        </div>
                         <DropdownItem>
                             My profile
                             </DropdownItem>
-                        <DropdownItem>
+                        <DropdownItem onClick={() => {
+                            AuthService.logout();
+                        }}>
                             <FontAwesomeIcon icon='sign-out-alt' color='black' size='sm' />
                             Logout
                         </DropdownItem>
@@ -149,7 +161,8 @@ class Notification extends React.Component {
         return (<NavItem className='nav-icon'>
             <div>
                 <button id="popover-noti" type='button' className='transparent-button' onBlur={this.closeNoti}>
-                    <FontAwesomeIcon icon='bell' color='white' size='lg' className='noti-item-icon' />
+                    <FontAwesomeIcon icon='bell' color='white' size='lg' className='noti-item-icon'
+                        style={{ opacity: (isOpen ? '1' : '0.7') }} />
                 </button>
                 <Popover placement="bottom" target="popover-noti"
                     isOpen={isOpen}
@@ -172,30 +185,42 @@ const menus = [
         name: 'Dashboard',
         to: '/',
         exact: true,
-        icon: 'chart-line'
+        icon: 'chart-line',
+        roles: ['Collector', 'Admin', 'Manager']
+    },
+    {
+        name: 'Task',
+        to: '/task',
+        exact: false,
+        icon: 'tasks',
+        roles: ['Collector']
     },
     {
         name: 'Receivable',
         to: '/receivable',
         exact: false,
-        icon: 'credit-card'
+        icon: 'credit-card',
+        roles: ['Collector', 'Manager']
     },
     {
         name: 'User',
         to: '/user-list',
         exact: false,
-        icon: 'users'
+        icon: 'users',
+        roles: ['Admin']
     },
     {
         name: 'Profile',
         to: '/profile',
         exact: false,
-        icon: 'chalkboard-teacher'
+        icon: 'chalkboard-teacher',
+        roles: ['Manager']
     },
     {
         name: 'Message Form',
         to: '/message-list',
         exact: false,
-        icon: 'comment-alt'
+        icon: 'comment-alt',
+        roles: ['Manager']
     }
 ];

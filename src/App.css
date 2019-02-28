@@ -1,98 +1,117 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
+    animation: App-logo-spin infinite 20s linear;
+    height: 40vmin;
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .mb-15 {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .mr-10 {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 .mr-5 {
-  margin-right: 5px;
+    margin-right: 5px;
 }
 
 .ml-5 {
-  margin-left: 5px;
+    margin-left: 5px;
 }
 
 .text-center {
-  text-align: center;
+    text-align: center;
 }
+
 .flr {
-  float: right;
+    float: right;
 }
+
 .mgb-15 {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
+
 .pr-5 {
-  padding-right: 5px;
+    padding-right: 5px;
 }
+
 .pl-5 {
-  padding-left: 5px;
+    padding-left: 5px;
 }
 
 .dropdown-menu .fa:before {
-  padding-right: 10px;
+    padding-right: 10px;
 }
 
 .sort_selected::after {
-  font-family: FontAwesome;
-  font-weight: normal;
-  font-style: normal;
-  margin: 0px 0px 0px 4px;
-  display: inline-block;
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    margin: 0px 0px 0px 4px;
+    display: inline-block;
 }
 
-.panel-action{
-  margin: 5px;
-  padding: 5px;
-  float: right;
+.panel-action {
+    margin: 5px;
+    padding: 5px;
+    float: right;
 }
-.panel-action button{
-  margin: 10px;
+
+.panel-action button {
+    margin: 10px;
 }
-.warning-text{
-  color: red;
-  font-style: italic;
+
+.warning-text {
+    color: red;
+    font-style: italic;
 }
-.clickable{
-  cursor: pointer;
+
+.clickable {
+    cursor: pointer;
 }
-.collector-simple-list{
-  width: 150px;
+
+.collector-simple-list {
+    width: 150px;
 }
-.no-padding-right{
-  padding-right: 0px;
+
+.no-padding-right {
+    padding-right: 0px;
+}
+
+.big-modal {
+    width: 80% !important;
+    max-width: none !important;
+}
+
+.big-modal .modal-body {
+    max-height: 25rem !important;
+    overflow-y: scroll;
 }

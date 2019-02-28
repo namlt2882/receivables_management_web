@@ -9,36 +9,10 @@ export const ReceivableAction = {
             list
         };
     },
-    newReceivable: () => {
-        return {
-            type: Types.ADD_RECEIVABLE
-        }
-    },
-    editReceivable: () => {
-        return {
-            type: Types.EDIT_RECEIVABLE
-        }
-    },
-    getReceivable: () => {
-        return {
-            type: Types.GET_RECEIVABLE
-        }
-    },
     setReceivableList: (list) => {
         return {
             type: Types.SET_RECEIVABLE_LIST,
             list
-        }
-    },
-    // receivable status
-    setEditable: () => {
-        return {
-            type: Types.SET_RECEIVABLE_EDITABLE
-        }
-    },
-    cancelEditable: () => {
-        return {
-            type: Types.SET_RECEIVABLE_UNEDITABLE
         }
     }
 }
@@ -55,16 +29,9 @@ export const ReceivableRequest = {
             dispatch(ReceivableAction.fetchReceivableList(res.data));
         }
     },
-    getReceivable: (id) => {
-        return async (dispatch) => {
-            const res = await callApi(`receivable/${id}`, 'GET', null);
-            dispatch(ReceivableAction.getReceivable(res.data));
-        }
-    },
     insertReceivables: (list) => {
         return async (dispatch) => {
             const res = await fetch('Receivable', 'POST', list);
-            dispatch(ReceivableAction.setReceivableList(res.data));
         }
     }
 }

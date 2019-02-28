@@ -1,8 +1,7 @@
-import { Request, AuthRequest } from './../utils/request'
+import { Request, AuthRequest } from '../utils/request'
 
 export const isLoggedIn = (yes, no) => {
     let token = localStorage.getItem('access_token');
-    let result = true;
     if (token === undefined || token === null) {
         removeJwt();
         no();
@@ -30,12 +29,26 @@ const removeJwt = () => {
 
 export const AuthService = {
     login: (username, password) => {
-        return Request().post('auth/Login', {
-            'username': username,
-            'password': password
+        return Request().post('Auth/Login', {
+            'UserName': username,
+            'Password': password
+        }).then(res => {
+            let token = res.data.access_token;
+            let role = res.data.role;
+            let username = res.data.username;
+            localStorage.setItem('access_token', token);
+            localStorage.setItem('role', role);
+            localStorage.setItem('username', username);
         });
     },
     getUserInfo: () => {
-        return AuthRequest.get('auth/Info');
+        let username = localStorage.getItem('username');
+        return AuthRequest.get(`User/GetByUsername?username=${username}`);
+    },
+    logout: () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('username');
+        window.location.href = '/login'
     }
 }
