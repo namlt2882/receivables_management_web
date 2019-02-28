@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Card, CardBody, CardTitle } from 'reactstrap';
-import { numAsDate } from '../../utils/time-converter';
+import { numAsDate } from '../../../utils/time-converter';
+import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 
 class CurrentStage extends Component {
     constructor(props) {
@@ -48,11 +49,17 @@ class CurrentStage extends Component {
                         </tbody>
                     </table>
                 </div>
-                <div className='col-sm-4 row'>
-                    <div className='col-sm-4'><b>Actions:</b></div>
+                <div className='col-sm-6 row'>
+                    <div className='col-sm-3'><b>Actions:</b></div>
                     <table className='col-sm-8'>
                         <tbody>
-                            <tr>
+                            {currentStage.OriginalActions.map(oa => {
+                                return <tr>
+                                    <td>{describeActionType(oa.Name,oa.Type)}</td>
+                                    <td>{describeGroupActionFrequency(oa.Frequency)}</td>
+                                </tr>
+                            })}
+                            {/* <tr>
                                 <td>SMS</td>
                                 <td>3 days/time</td>
                             </tr>
@@ -63,7 +70,7 @@ class CurrentStage extends Component {
                             <tr>
                                 <td>Visit</td>
                                 <td>10 days/time</td>
-                            </tr>
+                            </tr> */}
                         </tbody>
                     </table>
                 </div>

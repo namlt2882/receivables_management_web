@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Progress } from 'reactstrap';
 import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
-import { numAsDate } from '../../utils/time-converter';
+import { numAsDate } from '../../../utils/time-converter';
+import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 
 class ReceivableProgress extends Component {
     constructor(props) {
@@ -77,18 +78,12 @@ class ReceivableProgress extends Component {
                                             <td>Status:</td>
                                             <td>{status}</td>
                                         </tr>
-                                        <tr>
-                                            <td>SMS:</td>
-                                            <td>3 days/time</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Phone call:</td>
-                                            <td>5 days/time</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Visit:</td>
-                                            <td>10 days/time</td>
-                                        </tr>
+                                        {stage.OriginalActions.map(oa => {
+                                            return <tr>
+                                                <td>{describeActionType(oa.Name, oa.Type)}:</td>
+                                                <td>{describeGroupActionFrequency(oa.Frequency)}</td>
+                                            </tr>
+                                        })}
                                     </tbody>
                                 </table>
                             </PopoverBody>

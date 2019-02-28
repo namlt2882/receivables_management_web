@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
-import { numAsDate, numAsTime } from '../../utils/time-converter';
-import Component from '../common/component';
+import { numAsDate, numAsTime } from '../../../utils/time-converter';
+import Component from '../../common/component';
 
 class ActionHistory extends Component {
     constructor(props) {
@@ -32,7 +32,7 @@ class ActionHistory extends Component {
                 <ModalHeader toggle={this.toggle}>SMS and Phone call history</ModalHeader>
                 <ModalBody>
                     {stages.map((stage) => <div>
-                        <span>{stage.Name}</span>
+                        <span><h3>{stage.Name}</h3></span>
                         <Table className='info-table' striped>
                             <tbody>
                                 {stage.Actions.map((action, i) => {
