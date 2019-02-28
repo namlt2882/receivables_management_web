@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import './App.scss';
 import MyMenu from './components/common/my-menu';
 import routes from './routes';
 import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
@@ -17,13 +17,20 @@ class App extends Component {
       }
     })
     return (
-      <Router>
+      <Router style={{ minHeight: '100%' }}>
         <Switch>
           <Route path='/login' exact={true} component={({ match, history }) => <LoginPage match={match} history={history} />} />
           {/* <Route path='' exact={false}> */}
           <div>
             <MyMenu />
-            <div className="container" style={{ padding: '20px', zIndex: '0' }}>
+            <div className="container" style={{
+              padding: '20px',
+              zIndex: '0',
+              backgroundColor: 'white',
+              minHeight: '85%',
+              borderRadius: '5px',
+              border: '1px solid #dddfe2'
+            }}>
               <div className='row justify-content-center align-self-center'>
                 <div className='col-sm-12 row'>
                   {this.privateContent(routes)}

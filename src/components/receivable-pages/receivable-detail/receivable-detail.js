@@ -137,17 +137,6 @@ class ReceivableDetail extends Component {
         })
         let stages = receivable.CollectionProgress.Stages;
         let currentStage = this.calculateStage(stages, receivable.PayableDay);
-        let status = '';
-        switch (receivable.CollectionProgress.Status) {
-            case 0: status = 'Cancel';
-                break;
-            case 1: status = 'Collection';
-                break;
-            case 2: status = 'Done';
-                break;
-            case 3: status = 'Late';
-                break;
-        }
         return (<div className='col-sm-12 row'>
             {/* receivable progress */}
             <div className='col-sm-12 receivable-progress'>
@@ -182,8 +171,12 @@ class ReceivableDetail extends Component {
                                     <td>{this.state.customer.Name}</td>
                                 </tr>
                                 <tr>
-                                    <td>Due day:</td>
+                                    <td>Start day:</td>
                                     <td>{numAsDate(receivable.PayableDay)}</td>
+                                </tr>
+                                <tr>
+                                    <td>End day:</td>
+                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Collector:</td>
@@ -191,7 +184,7 @@ class ReceivableDetail extends Component {
                                 </tr>
                                 <tr>
                                     <td>Status:</td>
-                                    <td>{status}</td>
+                                    <td>{describeStatus(receivable.CollectionProgress.Status)}</td>
                                 </tr>
                             </tbody>
                         </Table>
@@ -209,6 +202,21 @@ class ReceivableDetail extends Component {
             </div>
         </div>);
     }
+}
+
+export const describeStatus = (status) => {
+    let rs = status;
+    switch (status) {
+        case 0: rs = 'Cancel';
+            break;
+        case 1: rs = 'Collection';
+            break;
+        case 2: rs = 'Done';
+            break;
+        case 3: rs = 'Late';
+            break;
+    }
+    return rs;
 }
 
 export const describeGroupActionFrequency = (frequency) => {
