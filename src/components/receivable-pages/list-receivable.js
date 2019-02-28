@@ -51,7 +51,7 @@ class ReceivableList extends Component {
                         <tbody>
                             {receivableList.map((receivable) => {
                                 let status = '';
-                                switch (receivable.CollectioProgressStatus) {
+                                switch (receivable.CollectionProgressStatus) {
                                     case 0: status = 'Cancel';
                                         break;
                                     case 1: status = 'Collection';

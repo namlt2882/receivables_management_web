@@ -46,3 +46,17 @@ export const dateToInt = (date) => {
     return parseInt(rs);
 }
 
+export const numAsTime = (num) => {
+    let hour;
+    let minute;
+    if (num < 1000) {
+        num = num.toString();
+        hour = num.substring(0, 1);
+        minute = num.substring(1);
+    } else {
+        num = num.toString();
+        hour = num.substring(0, 2);
+        minute = num.substring(2);
+    }
+    return `${hour}:${minute}`
+}

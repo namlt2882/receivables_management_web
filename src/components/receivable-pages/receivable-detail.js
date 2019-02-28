@@ -14,6 +14,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
+import ActionHistory from './action-history';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -40,9 +41,6 @@ class ReceivableDetail extends Component {
         })
     }
     edit(e) {
-        e.preventDefault();
-    }
-    showHistory(e) {
         e.preventDefault();
     }
     changeStatus(e) {
@@ -110,9 +108,7 @@ class ReceivableDetail extends Component {
             {/* receivable progress */}
             <div className='col-sm-12 receivable-progress'>
                 <ReceivableProgress progress={receivable.CollectionProgress} />
-                <div>
-                    <a href='' onClick={this.showHistory} style={{ float: 'right' }}><i>SMS and phone call history</i></a>
-                </div>
+                <ActionHistory stages={receivable.CollectionProgress.Stages} />
             </div>
             {/* Current stage */}
             {receivable.ClosedDay == null && currentStage != null ? <div className='col-sm-12'>
