@@ -28,6 +28,7 @@ class ImportReceivable extends Component {
     }
 
     componentDidMount() {
+        document.title = 'Import receivables';
         available(resolve => setTimeout(resolve, 400));
         this.props.fetchAllProfiles();
         this.props.fetchCustomers();

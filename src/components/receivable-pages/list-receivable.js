@@ -16,6 +16,7 @@ class ReceivableList extends Component {
         }
     }
     componentDidMount() {
+        document.title = 'Receivables';
         available(resolve => setTimeout(resolve, 400));
         this.props.fetchReceivableList().then(res => {
             this.incrementLoading();

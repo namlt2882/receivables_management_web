@@ -15,6 +15,7 @@ class AddProfile extends Component {
         this.createNewProfile = this.createNewProfile.bind(this);
     }
     componentDidMount() {
+        document.title = 'Add new profile';
         available(resolve => setTimeout(resolve, 400));
         this.props.setEditable();
         this.props.newProcess();

@@ -8,6 +8,7 @@ import { available } from '../common/loading-page'
 class ProfileList extends Component {
 
     componentDidMount() {
+        document.title = 'Profiles';
         available(resolve => setTimeout(resolve, 400));
         this.props.fetchAllProfiles();
     }

@@ -13,6 +13,7 @@ class EditProfile extends Component {
         this.state = {}
     }
     componentDidMount() {
+        document.title = 'Profile detail';
         available(resolve => setTimeout(resolve, 400));
         this.props.getProcessDetailRequest(1);
         this.props.fetchMessageForms();

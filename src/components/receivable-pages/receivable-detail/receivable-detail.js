@@ -28,6 +28,7 @@ class ReceivableDetail extends Component {
         }
     }
     componentDidMount() {
+        document.title = 'Receivable detail';
         available1();
         let recceiId = this.props.match.params.id;
         ReceivableService.get(recceiId).then(res => {
@@ -135,6 +136,9 @@ class ReceivableDetail extends Component {
                 return false;
             } else return true;
         })
+        if (debtor != null) {
+            document.title = `${debtor.Name}'s receivable`;
+        }
         let stages = receivable.CollectionProgress.Stages;
         let currentStage = this.calculateStage(stages, receivable.PayableDay);
         return (<div className='col-sm-12 row'>
