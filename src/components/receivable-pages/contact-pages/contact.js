@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import {
-    Card, Table, CardBody, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
-    CardTitle, Button
+    Card, CardBody, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
+    CardTitle
 } from 'reactstrap';
+import { Button, Container, Header, Table } from 'semantic-ui-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserInjured, faUserFriends } from '@fortawesome/free-solid-svg-icons'
@@ -39,43 +40,41 @@ class Contact extends Component {
             }
         }
         return (
-            <Card className='contact'>
-                <CardTitle>
+            <Container style={this.props.style}>
+                <Header>
                     <FontAwesomeIcon icon={this.props.isDebtor ? 'user-injured' : 'user-friends'}
                         color='black' size='md' style={{ marginRight: '10px' }} />
                     {this.props.title}
-                </CardTitle>
-                <CardBody>
-                    {addable ? <a href='' onClick={this.add}>Add</a> : null}
-                    {this.props.contacts.map((contact, i) => (<Table key={i} hover className='info-table'>
-                        <tbody>
-                            <tr>
-                                <td>Id:</td>
-                                <td>{contact.IdNo}</td>
-                            </tr>
-                            <tr>
-                                <td>Name:</td>
-                                <td>{contact.Name}</td>
-                            </tr>
-                            <tr>
-                                <td>Phone:</td>
-                                <td>{contact.Phone}</td>
-                            </tr>
-                            <tr>
-                                <td>Address:</td>
-                                <td>{contact.Address}</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a>
-                                    {this.props.isDebtor ? null : <Button color='danger'>Delete</Button>}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </Table>))}
-                </CardBody>
-            </Card>);
+                </Header>
+                {addable ? <a href='' onClick={this.add}>Add</a> : null}
+                {this.props.contacts.map((contact, i) => (<Table key={i} hover className='info-table'>
+                    <Table.Body>
+                        <Table.Row>
+                            <Table.Cell>Id:</Table.Cell>
+                            <Table.Cell>{contact.IdNo}</Table.Cell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell>Name:</Table.Cell>
+                            <Table.Cell>{contact.Name}</Table.Cell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell>Phone:</Table.Cell>
+                            <Table.Cell>{contact.Phone}</Table.Cell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell>Address:</Table.Cell>
+                            <Table.Cell>{contact.Address}</Table.Cell>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell></Table.Cell>
+                            <Table.Cell>
+                                <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a>
+                                {this.props.isDebtor ? null : <Button color='red'>Delete</Button>}
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>))}
+            </Container>);
     }
 }
 export default Contact;

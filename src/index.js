@@ -8,6 +8,7 @@ import appReducers from './reducers/index';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'semantic-ui-css/semantic.min.css';
 
 const store = createStore(
     appReducers,

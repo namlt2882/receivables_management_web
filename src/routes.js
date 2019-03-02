@@ -66,7 +66,7 @@ const routes = [
     {
         path: '/receivable',
         exact: true,
-        main: ({ match, history }) => <ReceivableList />
+        main: ({ match, history }) => <ReceivableList match={match} history={history} />
     },
     {
         path: '/receivable/add',

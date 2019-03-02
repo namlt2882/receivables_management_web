@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { ReceivableRequest, ReceivableAction } from '../../actions/receivable-action'
-import { receivable } from '../../reducers/receivable-reducer';
 import { Link } from 'react-router-dom';
 import { available, PrimaryLoadingPage } from '../common/loading-page'
 import Component from '../common/component'
 import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
+import { Button, Container, Header, Table } from 'semantic-ui-react'
 
 class ReceivableList extends Component {
     constructor(props) {
@@ -29,55 +29,51 @@ class ReceivableList extends Component {
         }
         var receivableList = this.props.receivableList;
         var index = 0;
-        return (<div>
-            <Link to="/receivable/add" className="btn btn-info">Import</Link>
-            <div className='panel panel-primary'>
-                <div className='panel-heading'>
-                    <h3 className='panel-title text-center'>Receivable list</h3>
-                </div>
-                <div className='panel-body'>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Profile</th>
-                                <th>Prepaid amount</th>
-                                <th>Debt amount</th>
-                                <th>Payable day</th>
-                                <th>Status</th>
-                                <th>Customer</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {receivableList.map((receivable) => {
-                                let status = '';
-                                switch (receivable.CollectionProgressStatus) {
-                                    case 0: status = 'Cancel';
-                                        break;
-                                    case 1: status = 'Collection';
-                                        break;
-                                    case 2: status = 'Done';
-                                        break;
-                                    case 3: status = 'Late';
-                                        break;
-                                }
-                                return <tr>
-                                    <td>{receivable.Id}</td>
-                                    <td></td>
-                                    <td>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
-                                    <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
-                                    <td>{numAsDate(receivable.PayableDay)}</td>
-                                    <td>{status}</td>
-                                    <td></td>
-                                    <td><Link to={`/receivable/${receivable.Id}/view`}>
-                                        View</Link></td>
-                                </tr>
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        return (<div className='col-sm-12 row justify-content-center align-self-center'>
+            <Container>
+                <Header className='text-center'>Receivables</Header>
+                <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button>
+                <Table class="table-hover">
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell>Id</Table.HeaderCell>
+                            <Table.HeaderCell>Profile</Table.HeaderCell>
+                            <Table.HeaderCell>Prepaid amount</Table.HeaderCell>
+                            <Table.HeaderCell>Debt amount</Table.HeaderCell>
+                            <Table.HeaderCell>Payable day</Table.HeaderCell>
+                            <Table.HeaderCell>Status</Table.HeaderCell>
+                            <Table.HeaderCell>Customer</Table.HeaderCell>
+                            <Table.HeaderCell>Action</Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {receivableList.map((receivable) => {
+                            let status = '';
+                            switch (receivable.CollectionProgressStatus) {
+                                case 0: status = 'Cancel';
+                                    break;
+                                case 1: status = 'Collection';
+                                    break;
+                                case 2: status = 'Done';
+                                    break;
+                                case 3: status = 'Late';
+                                    break;
+                            }
+                            return <Table.Row>
+                                <Table.Cell>{receivable.Id}</Table.Cell>
+                                <Table.Cell></Table.Cell>
+                                <Table.Cell>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                                <Table.Cell>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                                <Table.Cell>{numAsDate(receivable.PayableDay)}</Table.Cell>
+                                <Table.Cell>{status}</Table.Cell>
+                                <Table.Cell></Table.Cell>
+                                <Table.Cell><Link to={`/receivable/${receivable.Id}/view`}>
+                                    View</Link></Table.Cell>
+                            </Table.Row>
+                        })}
+                    </Table.Body>
+                </Table>
+            </Container>
         </div>);
     }
 }

@@ -2,7 +2,6 @@ import React from 'react';
 import Component from '../../common/component'
 import { available1, PrimaryLoadingPage } from '../../common/loading-page';
 import { ReceivableService } from '../../../services/receivable-service';
-import { Table, Card, CardBody, CardTitle } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import Contact from '../contact-pages/contact'
 import '../receivable.scss'
@@ -15,6 +14,7 @@ import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
 import ActionHistory from './action-history';
+import { Button, Container, Header, Table, Divider } from 'semantic-ui-react'
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -149,58 +149,65 @@ class ReceivableDetail extends Component {
             </div>
             {/* Current stage */}
             {receivable.ClosedDay == null && currentStage != null ? <div className='col-sm-12'>
+                <Divider />
                 <CurrentStage currentStage={currentStage} />
+                <Divider />
             </div> : null}
 
             {/* receivable information */}
             <div className='col-sm-6'>
-                <Card>
-                    <CardTitle>
+                <Container>
+                    <Header>
                         <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
                         Receivable Info
-                        </CardTitle>
-                    <CardBody>
-                        <Table className='info-table' hover>
-                            <tbody>
-                                <tr>
-                                    <td>Debt amount:</td>
-                                    <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
-                                </tr>
-                                <tr>
-                                    <td>Prepaid amount:</td>
-                                    <td>{receivable.PrepaidAmount}</td>
-                                </tr>
-                                <tr>
-                                    <td>Customer:</td>
-                                    <td>{this.state.customer.Name}</td>
-                                </tr>
-                                <tr>
-                                    <td>Start day:</td>
-                                    <td>{numAsDate(receivable.PayableDay)}</td>
-                                </tr>
-                                <tr>
-                                    <td>End day:</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Collector:</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Status:</td>
-                                    <td>{describeStatus(receivable.CollectionProgress.Status)}</td>
-                                </tr>
-                            </tbody>
-                        </Table>
-                        <a href='' onClick={this.edit} style={{ marginRight: '15px' }}>Edit</a>
-                        <a href='' onClick={this.changeStatus}>Change status</a>
-                    </CardBody>
-                </Card>
+                        </Header>
+                    {/* <CardBody> */}
+                    <Table className='info-table' hover>
+                        <Table.Body>
+                            <Table.Row>
+                                <Table.Cell>Debt amount:</Table.Cell>
+                                <Table.Cell>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>Prepaid amount:</Table.Cell>
+                                <Table.Cell>{receivable.PrepaidAmount}</Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>Customer:</Table.Cell>
+                                <Table.Cell>{this.state.customer.Name}</Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>Start day:</Table.Cell>
+                                <Table.Cell>{numAsDate(receivable.PayableDay)}</Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>End day:</Table.Cell>
+                                <Table.Cell></Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>Collector:</Table.Cell>
+                                <Table.Cell></Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>Status:</Table.Cell>
+                                <Table.Cell>{describeStatus(receivable.CollectionProgress.Status)}</Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell></Table.Cell>
+                                <Table.Cell>
+                                    <a href='' onClick={this.edit} style={{ marginRight: '15px' }}>Edit</a>
+                                    <a href='' onClick={this.changeStatus}>Change status</a>
+                                </Table.Cell>
+                            </Table.Row>
+                        </Table.Body>
+                    </Table>
+                    {/* </CardBody> */}
+                </Container>
             </div>
             {/* contacts */}
             <div className='col-sm-6'>
                 {/* Debtor */}
-                <Contact title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+                <Contact style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
                 {/* Relatives */}
                 <Contact title='Relatives' isDebtor={false} contacts={contacts} />
             </div>
