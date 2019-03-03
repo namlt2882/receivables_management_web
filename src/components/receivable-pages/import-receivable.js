@@ -12,6 +12,7 @@ import { Container, Header, Table, Divider, Form } from 'semantic-ui-react';
 import { UserService } from '../../services/user-service';
 import { ProfileService } from '../../services/profile-service'
 import { CustomerService } from '../../services/customer-service';
+import { ifNullElseString } from '../../utils/utility';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -134,12 +135,28 @@ class ImportReceivable extends Component {
         var list = this.state.receivableData.map((rei) => {
             return {
                 "Contacts": rei.Contacts.map((contact) => {
+                    let address = `${ifNullElseString(contact.AddressNumber)} ${ifNullElseString(contact.Street)} Street`;
+                    if (address.trim() !== 'Street') {
+                        address += `, `
+                    } else {
+                        address = '';
+                    }
+                    address += `District ${ifNullElseString(contact.District)}`
+                    if (address.trim() !== 'District') {
+                        address += `, `
+                    } else {
+                        address = '';
+                    }
+                    address += `${ifNullElseString(contact.City)} City`
+                    if (address.trim() === 'City') {
+                        address = '';
+                    }
                     return {
                         "Type": contact.IsDebtor ? 0 : 1,
-                        "IdNo": '' + contact.IdNo,
-                        "Name": contact.Name,
-                        "Phone": '' + contact.Phone,
-                        "Address": `${contact.AddressNumber} ${contact.Street}, ${contact.District}, ${contact.City}`
+                        "IdNo": '' + ifNullElseString(contact.IdNo),
+                        "Name": ifNullElseString(contact.Name),
+                        "Phone": '' + ifNullElseString(contact.Phone),
+                        "Address": address
                     }
                 }),
                 "PayableDay": payableDay,
@@ -317,7 +334,7 @@ class SelectCollector extends Component {
                 <option value='-1'>--</option>
                 {this.props.collectors.map((collector) =>
                     <option value={collector.Id}>
-                        {collector.FirstName + collector.LastName}
+                        {`${collector.FirstName} ${collector.LastName}`}
                     </option>)}
             </select>
         </div>)

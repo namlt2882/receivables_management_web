@@ -15,16 +15,18 @@ import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
 import ActionHistory from './action-history';
 import { Button, Container, Header, Table, Divider } from 'semantic-ui-react'
+import { UserService } from '../../../services/user-service';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 2,
+            maxLoading: 3,
             receivable: null,
             customer: null,
-            currentStage: null
+            currentStage: null,
+            collector: null
         }
     }
     componentDidMount() {
@@ -37,6 +39,10 @@ class ReceivableDetail extends Component {
             this.incrementLoading();
             CustomerService.get(receivable.CustomerId).then(res2 => {
                 this.setState({ customer: res2.data })
+                this.incrementLoading();
+            })
+            UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
+                this.setState({ collector: res3.data })
                 this.incrementLoading();
             })
         })
@@ -128,6 +134,7 @@ class ReceivableDetail extends Component {
             return <PrimaryLoadingPage />;
         }
         let receivable = this.state.receivable;
+        let collector = this.state.collector;
         let contacts = receivable != null ? receivable.Contacts : [];
         let debtor = null;
         contacts = contacts.filter((c) => {
@@ -141,6 +148,11 @@ class ReceivableDetail extends Component {
         }
         let stages = receivable.CollectionProgress.Stages;
         let currentStage = this.calculateStage(stages, receivable.PayableDay);
+        let endDate = receivable.ClosedDay ? receivable.ClosedDay : null;
+        if (!endDate && stages.length > 0) {
+            let len = stages.length;
+            endDate = stages[len - 1].endDate;
+        }
         return (<div className='col-sm-12 row'>
             {/* receivable progress */}
             <div className='col-sm-12 receivable-progress'>
@@ -170,7 +182,7 @@ class ReceivableDetail extends Component {
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Prepaid amount:</Table.Cell>
-                                <Table.Cell>{receivable.PrepaidAmount}</Table.Cell>
+                                <Table.Cell>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Customer:</Table.Cell>
@@ -182,11 +194,15 @@ class ReceivableDetail extends Component {
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>End day:</Table.Cell>
-                                <Table.Cell></Table.Cell>
+                                <Table.Cell>
+                                    {`${(endDate ? numAsDate(endDate) : '')}${(!receivable.ClosedDay ? ' (Expectation)' : '')}`}
+                                </Table.Cell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Collector:</Table.Cell>
-                                <Table.Cell></Table.Cell>
+                                <Table.Cell>
+                                    {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
+                                </Table.Cell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Status:</Table.Cell>

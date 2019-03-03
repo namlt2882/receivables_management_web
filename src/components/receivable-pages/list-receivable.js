@@ -37,12 +37,10 @@ class ReceivableList extends Component {
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Id</Table.HeaderCell>
-                            <Table.HeaderCell>Profile</Table.HeaderCell>
                             <Table.HeaderCell>Prepaid amount</Table.HeaderCell>
                             <Table.HeaderCell>Debt amount</Table.HeaderCell>
                             <Table.HeaderCell>Payable day</Table.HeaderCell>
                             <Table.HeaderCell>Status</Table.HeaderCell>
-                            <Table.HeaderCell>Customer</Table.HeaderCell>
                             <Table.HeaderCell>Action</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
@@ -61,12 +59,10 @@ class ReceivableList extends Component {
                             }
                             return <Table.Row>
                                 <Table.Cell>{receivable.Id}</Table.Cell>
-                                <Table.Cell></Table.Cell>
                                 <Table.Cell>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
                                 <Table.Cell>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
                                 <Table.Cell>{numAsDate(receivable.PayableDay)}</Table.Cell>
                                 <Table.Cell>{status}</Table.Cell>
-                                <Table.Cell></Table.Cell>
                                 <Table.Cell><Link to={`/receivable/${receivable.Id}/view`}>
                                     View</Link></Table.Cell>
                             </Table.Row>

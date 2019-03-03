@@ -77,3 +77,11 @@ export const IdGenerator = {
         return IdGenerator.IncrementSeed;
     }
 }
+
+export const ifNullElseNull = (val) => {
+    return val ? val : null;
+}
+
+export const ifNullElseString = (val) => {
+    return val ? val : '';
+}
