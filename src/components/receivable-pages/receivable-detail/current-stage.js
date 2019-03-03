@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Table, Card, CardBody, CardTitle } from 'reactstrap';
 import { numAsDate } from '../../../utils/time-converter';
 import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
+import { Container, Header } from 'semantic-ui-react';
 
 class CurrentStage extends Component {
     constructor(props) {
@@ -18,14 +18,14 @@ class CurrentStage extends Component {
     }
     render() {
         let currentStage = this.props.currentStage;
-        return (<Card className='row current-stage' style={{ margin: '0px 0px 15px 0px' }}>
-            <CardTitle>Current stage
+        return (<Container className='row current-stage' style={{ margin: '0px 0px 15px 0px' }}>
+            <Header className='text-center'>Current stage
                 <a href='' onClick={this.toggleCollapse}
                     style={{ float: 'right', paddingRight: '20px', fontSize: '1rem' }}>
                     {this.state.collapse ? 'Expanse' : 'Collapse'}
                 </a>
-            </CardTitle>
-            <CardBody className='col-sm-12 row justify-content-center align-self-center'
+            </Header>
+            <div className='col-sm-12 row justify-content-center align-self-center'
                 style={{ display: this.state.collapse ? 'none' : 'flex' }}>
                 <div className='col-sm-4'>
                     <table className='deco-table'>
@@ -55,7 +55,7 @@ class CurrentStage extends Component {
                         <tbody>
                             {currentStage.OriginalActions.map(oa => {
                                 return <tr>
-                                    <td>{describeActionType(oa.Name,oa.Type)}</td>
+                                    <td>{describeActionType(oa.Name, oa.Type)}</td>
                                     <td>{describeGroupActionFrequency(oa.Frequency)}</td>
                                 </tr>
                             })}
@@ -74,8 +74,8 @@ class CurrentStage extends Component {
                         </tbody>
                     </table>
                 </div>
-            </CardBody>
-        </Card>);
+            </div>
+        </Container>);
     }
 }
 

@@ -1,14 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { CustomerRequest } from './../../actions/customer-action'
-import { ProfileRequest } from './../../actions/profile-action'
-import { CollectorRequest } from './../../actions/collector-action'
+import { CustomerAction } from './../../actions/customer-action'
+import { ProfileAction } from './../../actions/profile-action'
+import { CollectorAction } from './../../actions/collector-action'
 import XLSX from 'xlsx';
 import { Link } from 'react-router-dom';
-import { ReceivableRequest } from '../../actions/receivable-action';
 import Component from '../common/component'
-import { available } from '../common/loading-page';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { ReceivableService } from '../../services/receivable-service';
+import { Container, Header, Table, Divider, Form } from 'semantic-ui-react';
+import { UserService } from '../../services/user-service';
+import { ProfileService } from '../../services/profile-service'
+import { CustomerService } from '../../services/customer-service';
+import { ifNullElseString } from '../../utils/utility';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -19,7 +23,9 @@ class ImportReceivable extends Component {
             fileWarning: '',
             selectCollector: null,
             profileId: '-1',
-            customerId: '-1'
+            customerId: '-1',
+            loadingForm: false,
+            maxLoading: 3
         }
         this.setCollector = this.setCollector.bind(this);
         this.updateProfile = this.updateProfile.bind(this);
@@ -28,13 +34,24 @@ class ImportReceivable extends Component {
     }
 
     componentDidMount() {
-        available(resolve => setTimeout(resolve, 400));
-        this.props.fetchAllProfiles();
-        this.props.fetchCustomers();
-        this.props.fetchCollectors();
+        document.title = 'Import receivables';
+        available1();
+        CustomerService.getAll().then(res => {
+            this.props.fetchCustomers(res.data);
+            this.incrementLoading();
+        })
+        UserService.getCollectors().then(res => {
+            this.props.fetchCollectors(res.data);
+            this.incrementLoading();
+        })
+        ProfileService.getAll().then(res => {
+            this.props.fetchProfiles(res.data);
+            this.incrementLoading();
+        })
     }
 
     handleFile = (e) => {
+        this.setLoadingForm(true);
         var rABS = true;// true: readAsBinaryString ; false: readAsArrayBuffer
         var files = e.target.files, f = files[0];
         var reader = new FileReader();
@@ -73,7 +90,10 @@ class ImportReceivable extends Component {
             console.log(contactData);
             this.setState({ fileWarning: '' })
         }
-        if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+        try {
+            if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+        } catch (e) { }
+        this.setLoadingForm(false);
     }
 
     mapContactToReceivable = (receivableData, contactData) => {
@@ -106,6 +126,7 @@ class ImportReceivable extends Component {
     }
 
     insertReceivables() {
+        this.setLoadingForm(true);
         let currentDay = new Date();
         let year = currentDay.getFullYear();
         let month = currentDay.getMonth() + 1;
@@ -114,12 +135,28 @@ class ImportReceivable extends Component {
         var list = this.state.receivableData.map((rei) => {
             return {
                 "Contacts": rei.Contacts.map((contact) => {
+                    let address = `${ifNullElseString(contact.AddressNumber)} ${ifNullElseString(contact.Street)} Street`;
+                    if (address.trim() !== 'Street') {
+                        address += `, `
+                    } else {
+                        address = '';
+                    }
+                    address += `District ${ifNullElseString(contact.District)}`
+                    if (address.trim() !== 'District') {
+                        address += `, `
+                    } else {
+                        address = '';
+                    }
+                    address += `${ifNullElseString(contact.City)} City`
+                    if (address.trim() === 'City') {
+                        address = '';
+                    }
                     return {
                         "Type": contact.IsDebtor ? 0 : 1,
-                        "IdNo": '' + contact.IdNo,
-                        "Name": contact.Name,
-                        "Phone": '' + contact.Phone,
-                        "Address": `${contact.AddressNumber} ${contact.Street}, ${contact.District}, ${contact.City}`
+                        "IdNo": '' + ifNullElseString(contact.IdNo),
+                        "Name": ifNullElseString(contact.Name),
+                        "Phone": '' + ifNullElseString(contact.Phone),
+                        "Address": address
                     }
                 }),
                 "PayableDay": payableDay,
@@ -132,6 +169,7 @@ class ImportReceivable extends Component {
             };
         })
         this.props.insertReceivables(list).then(res => {
+            this.setLoadingForm(true);
             alert('Insert successfully!')
             window.location.href = '/receivable';
         });
@@ -161,30 +199,19 @@ class ImportReceivable extends Component {
     }
 
     render() {
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var customers = this.props.customers;
         var profiles = this.props.profiles;
         var isValidate = this.IsValidate();
         return (<div>
-            <div className='row'>
-                {/* Action */}
-                <div className='col-sm-12'>
-                    <div className='panel-action'>
-                        <div>
-                            <button className='btn btn-primary' onClick={this.insertReceivables}
-                                disabled={!isValidate}>Save</button>
-                            <button className="btn btn-default"><Link to="/receivable">Cancel</Link></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className='panel panel-primary'>
-                <div className='panel-heading'>
-                    <div className='panel-title text-center'>Import receivable</div>
-                </div>
-                <div className='panel-body row'>
+            <Container>
+                <Header className='text-center'>Import receivable</Header>
+                <Form loading={this.state.loadingForm} onSubmit={() => { }} className='row justify-content-center align-self-center'>
                     {/* Customer */}
-                    <div className='form-group col-sm-4 col-sm-offset-1'>
-                        <label>Customer:</label>
+                    <div className='form-group col-sm-4'>
+                        <label className='bold-text'>Customer:</label>
                         <select className='form-control col-sm-6' value={this.state.customerId}
                             onChange={this.updateCustomer}>
                             <option value={-1}>--</option>
@@ -194,64 +221,72 @@ class ImportReceivable extends Component {
                         </select>
                     </div>
                     {/* Profile */}
-                    <div className='form-group col-sm-4 col-sm-offset-1'>
-                        <label>Profile:</label>
+                    <div className='form-group col-sm-4'>
+                        <label className='bold-text'>Profile:</label>
                         <select className='form-control' value={this.state.profileId}
                             onChange={this.updateProfile}>
                             <option value='-1'>--</option>
                             {profiles.map((profile) => <option value={profile.Id}>{profile.Name}</option>)}
                         </select>
                     </div>
-                    <div className='form-group col-sm-4 col-sm-offset-1'>
-                        <label>Files:</label>
+                    {/* File */}
+                    <div className='form-group col-sm-8'>
+                        <label className='bold-text'>Files:</label>
                         <input type='file' onChange={this.handleFile} />
                         <span className='warning-text'>{this.state.fileWarning}</span>
                     </div>
-                </div>
-            </div>
-            {this.state.receivableData === null ? null : <div className='panel panel-primary'>
-                <div className='panel-body'>
-                    <table className='table table-bordered table-hover'>
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Debt Amount</th>
-                                <th>Prepaid Amount</th>
-                                <th>Debtor</th>
-                                <th>Contacts</th>
-                                <th>Collector</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.receivableData.map((rei) => {
-                                var index = -1;
-                                return <tr>
-                                    <td>{rei.No}</td>
-                                    <td>{rei.DebtAmount}</td>
-                                    <td>{rei.PrepaidAmount}</td>
-                                    <td>{rei.Debtor !== null ? rei.Debtor.Name : null}</td>
-                                    <td>{rei.Contacts.map((contact) => {
-                                        if (contact.IsDebtor) {
-                                            return null;
-                                        }
-                                        index++;
-                                        if (index > 0) {
-                                            return ', ' + contact.Name;
-                                        }
-                                        return contact.Name;
-                                    })}</td>
-                                    <td>
-                                        {/* Do not has collector */}
-                                        <SelectCollector collectors={this.props.collectors}
-                                            receivable={rei}
-                                            setCollector={this.setCollector} />
-                                    </td>
-                                </tr>
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            </div>}
+                    {/* Action */}
+                    <div className='col-sm-8'>
+                        <button className='btn btn-primary' onClick={this.insertReceivables}
+                            disabled={!isValidate}>Save</button>
+                        <button className="btn btn-default"><Link to="/receivable">Cancel</Link></button>
+                    </div>
+                    {this.state.receivableData === null ? null : <div className='panel panel-primary'>
+                        <Container>
+                            <Divider />
+                            <Table>
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>No</Table.HeaderCell>
+                                        <Table.HeaderCell>Debt Amount</Table.HeaderCell>
+                                        <Table.HeaderCell>Prepaid Amount</Table.HeaderCell>
+                                        <Table.HeaderCell>Debtor</Table.HeaderCell>
+                                        <Table.HeaderCell>Contacts</Table.HeaderCell>
+                                        <Table.HeaderCell>Collector</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {this.state.receivableData.map((rei) => {
+                                        var index = -1;
+                                        return <Table.Row>
+                                            <Table.Cell>{rei.No}</Table.Cell>
+                                            <Table.Cell>{rei.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                                            <Table.Cell>{rei.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                                            <Table.Cell>{rei.Debtor !== null ? rei.Debtor.Name : null}</Table.Cell>
+                                            <Table.Cell>{rei.Contacts.map((contact) => {
+                                                if (contact.IsDebtor) {
+                                                    return null;
+                                                }
+                                                index++;
+                                                if (index > 0) {
+                                                    return ', ' + contact.Name;
+                                                }
+                                                return contact.Name;
+                                            })}</Table.Cell>
+                                            <Table.Cell>
+                                                {/* Do not has collector */}
+                                                <SelectCollector collectors={this.props.collectors}
+                                                    receivable={rei}
+                                                    setCollector={this.setCollector} />
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    })}
+                                </Table.Body>
+                            </Table>
+                        </Container>
+                    </div>}
+                </Form>
+            </Container>
         </div>);
     }
 }
@@ -299,7 +334,7 @@ class SelectCollector extends Component {
                 <option value='-1'>--</option>
                 {this.props.collectors.map((collector) =>
                     <option value={collector.Id}>
-                        {collector.FirstName + collector.LastName}
+                        {`${collector.FirstName} ${collector.LastName}`}
                     </option>)}
             </select>
         </div>)
@@ -316,14 +351,14 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchCustomers: () => {
-            dispatch(CustomerRequest.fetchCustomers());
+        fetchCustomers: (customers) => {
+            dispatch(CustomerAction.setCustomers(customers));
         },
-        fetchAllProfiles: () => {
-            dispatch(ProfileRequest.fetchProfiles())
+        fetchProfiles: (profiles) => {
+            dispatch(ProfileAction.setProfiles(profiles))
         },
-        fetchCollectors: () => {
-            dispatch(CollectorRequest.fetchCollectors());
+        fetchCollectors: (collectors) => {
+            dispatch(CollectorAction.setCollectors(collectors));
         },
         insertReceivables: (list) => {
             return ReceivableService.create(list).catch(err => {

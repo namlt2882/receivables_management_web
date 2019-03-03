@@ -2,19 +2,10 @@ import * as Types from './action-type'
 import { fetch } from '../utils/api-caller'
 
 export const CustomerAction = {
-    fetchCustomers: (customers) => {
+    setCustomers: (customers) => {
         return {
-            type: Types.FETCH_CUSTOMERS,
+            type: Types.SET_CUSTOMER_LIST,
             customers
-        }
-    }
-}
-
-export const CustomerRequest = {
-    fetchCustomers: () => {
-        return async (dispatch) => {
-            var res = await fetch('customer', 'GET', null);
-            dispatch(CustomerAction.fetchCustomers(res.data));
         }
     }
 }

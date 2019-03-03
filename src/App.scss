@@ -1,3 +1,16 @@
+.body {
+    z-index: 0;
+    position: relative;
+}
+
+.root {
+    height: 100%;
+}
+
+.root>div {
+    @extend .root;
+}
+
 .App {
     text-align: center;
 }
@@ -112,6 +125,15 @@
 }
 
 .big-modal .modal-body {
-    max-height: 25rem !important;
+    max-height: 30rem !important;
     overflow-y: scroll;
+}
+
+.bold-text {
+    font-weight: bold;
+}
+
+.icon-btn {
+    cursor: pointer;
+    margin: 0px 10px 0px 10px;
 }

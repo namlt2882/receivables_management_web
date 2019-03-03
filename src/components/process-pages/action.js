@@ -1,188 +1,193 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { ProcessAction } from './../../actions/process-action'
-import { doWithFirstOne } from '../../utils/utility'
 import { ProcessActionTypes } from '../../reducers/process-reducer'
+import { Table } from 'semantic-ui-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+library.add(faTrashAlt);
 
 class Action extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            nameWarning: ''
+        let action = this.props.action;
+        let time = action.StartTime.toString();
+        if (action.StartTime < 1000) {
+            time = '0' + time;
         }
+        this.state = {
+            messageFormId: action.ProfileMessageFormId === null ? '-1' : action.ProfileMessageFormId,
+            name: action.Name,
+            type: action.Type,
+            frequency: action.Frequency,
+            hour: parseInt(time.substring(0, 2)),
+            minute: parseInt(time.substring(2))
+        }
+        this.editType = this.editType.bind(this);
+        this.editMessageForm = this.editMessageForm.bind(this);
+        this.deleteAction = this.deleteAction.bind(this);
+        this.editFrequency = this.editFrequency.bind(this);
+        this.editHour = this.editHour.bind(this);
+        this.editMinute = this.editMinute.bind(this);
     }
 
     deleteAction = () => {
-        this.props.deleteAction(this.props.stageId, this.props.actionId);
+        this.props.deleteAction(this.props.action.Id);
+    }
+
+    editFrequency(e) {
+        let action = this.props.action;
+        let value = e.target.value;
+        if (value === '') {
+            value = 0;
+        } else {
+            value = parseInt(value);
+            if (value > this.props.duration) {
+                value = this.props.duration;
+            }
+        }
+        e.target.value = value;
+        action.Frequency = value;
+        this.props.updateAction(action);
+        this.setState({ frequency: action.Frequency })
     }
 
     editType = (e) => {
         var actionName;
+        let action = this.props.action;
         if (e.target.value !== 4) {
             actionName = ProcessActionTypes[e.target.value].name;
         } else {
-            actionName = 'New action';
+            actionName = 'Notification';
         }
-        this.action.type = parseInt(e.target.value);
-        this.action.name = actionName;
-        this.props.editAction(this.props.stageId, this.props.actionId, this.action);
-        var existedAction = this.getExistedAction();
-        this.setState({
-            actionType: e.target.value,
-            existedAction: existedAction,
-            nameWarning: ''
-        })
+        action.Type = parseInt(e.target.value);
+        action.Name = actionName;
+        this.props.updateAction(action);
+        this.setState({ actionType: action.Type });
     }
 
     editMessageForm = (e) => {
+        let action = this.props.action;
+        let value;
         if (e.target.value === '-1') {
-            this.action.messageFormId = null;
+            action.ProfileMessageFormId = null;
+            value = '-1'
         } else {
-            this.action.messageFormId = parseInt(e.target.value);
+            action.ProfileMessageFormId = parseInt(e.target.value);
+            value = e.target.value
         }
-        this.props.editAction(this.props.stageId, this.props.actionId, this.action);
         this.setState({
-            messageFormId: e.target.value,
+            messageFormId: value
         })
+        this.props.updateAction(action);
     }
 
     editName = (e) => {
         if (e.target.value.trim() === '') {
             e.target.value = '';
         }
-        this.action.name = e.target.value;
-        this.props.editAction(this.props.stageId, this.props.actionId, this.action);
+        let action = this.props.action;
+        action.Name = e.target.value;
+        this.setState({
+            name: action.Name
+        })
+        this.props.updateAction(action);
     }
 
-    getExistedAction = () => {
-        var existedAction = [false, false, false]
-        this.stage.actions.map((act) => {
-            if (act.type !== 3) {
-                existedAction[act.type] = true;
-            }
-            return null;
+    editStartTime(hour, minute) {
+        this.setState({
+            hour: hour,
+            minute: minute
         })
-        return existedAction;
+        let time = '' + (hour < 10 ? `0${hour}` : hour) + (minute < 10 ? `0${minute}` : minute);
+        time = parseInt(time);
+        this.props.action.StartTime = time;
+        this.props.updateAction(this.props.action);
+    }
+
+    editHour(e) {
+        let hour = parseInt(e.target.value);
+        let minute = this.state.minute;
+        if (hour == 24) {
+            minute = 0;
+        }
+        this.editStartTime(hour, minute);
+    }
+
+    editMinute(e) {
+        let hour = this.state.hour;
+        let minute = parseInt(e.target.value);
+        if (hour == 24) {
+            minute = 0;
+        }
+        this.editStartTime(hour, minute);
     }
 
     render() {
-        var action = null;
-        var stage = null;
-        var messageForm = null;
-        //get stage and action from store
-        doWithFirstOne(this.props.process.stages, this.props.stageId, (sta) => {
-            stage = sta;
-            doWithFirstOne(sta.actions, this.props.actionId, (act) => {
-                action = act;
-            })
-        })
+        let action = this.props.action;
+        let _24Array = new Array(25).fill(0);
+        let _60Array = new Array(61).fill(0);
         // get message form
-        var mfList = this.props.messageForms;
-        mfList.map((forms) => {
-            if (forms.Id === action.messageFormId) {
-                messageForm = forms;
-            }
-            return false;
-        });
-        var readOnly = this.props.processStatus.readOnly;
-        this.action = action;
-        this.stage = stage;
-        this.state.actionType = action.type;
-        this.state.messageFormId = action.messageFormId;
-        this.state.existedAction = this.getExistedAction();
-        this.state.nameWarning = action.name === '' ? 'Action name should not empty!' : '';
-        return (<div className='panel panel-default'>
-            <div className="panel-body action-body">
-                <div className='row'>
-                    {readOnly ?
-                        // If read only
-                        <div className='col-sm-10 row'>
-                            <div className='col-sm-6'>
-                                <h5>Name: {action.name}</h5>
-                            </div>
-                            <div className='col-sm-6'>
-                                <h5>Message form: {messageForm !== null ? messageForm.Name : ''}</h5>
-                            </div>
-                        </div> :
-                        //If not read only
-                        <div className='col-sm-9 row'>
-                            {/* Input name */}
-                            <div className='col-sm-4'>
-                                <div className='form-group'>
-                                    <label>Name:</label>
-                                    <input value={action.name} className='form-control'
-                                        readOnly={action.type === 3 ? false : true}
-                                        onChange={this.editName} ref='inputName' onBlur={() => {
-                                            if (this.state.nameWarning.trim() !== '') {
-                                                this.refs.inputName.focus();
-                                            }
-                                        }} />
-                                    <span className='warning-text'>{readOnly ? null : this.state.nameWarning}</span>
-                                </div>
-                            </div>
-                            <div className='col-sm-4'>
-                                <div className='form-group'>
-                                    {/* Select action type */}
-                                    <label>Type:</label>
-                                    <select className='form-control' ref='selectType' onChange={this.editType} value={this.state.actionType}>
-                                        {ProcessActionTypes.map(({ type, name }) => {
-                                            if (type === 3 || type === action.type
-                                                || (type !== 3 && !this.state.existedAction[type])) {
-                                                return <option value={type} selected={type === action.type}>{name}</option>
-                                            } else {
-                                                return null;
-                                            }
-                                        })}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className='col-sm-4'>
-                                <div className='form-group'>
-                                    {/* Message form */}
-                                    <label>Message form:</label>
-                                    <select disabled={action.type !== 0 && action.type !== 1}
-                                        className='form-control' onChange={this.editMessageForm} value={this.state.messageFormId}>
-                                        <option value='-1' selected={action.messageFormId === null}>--</option>
-                                        {mfList.map((mf) => {
-                                            if ((action.type === 0 || action.type === 1) && action.type === mf.Type) {
-                                                return <option value={mf.Id} selected={action.messageFormId === mf.Id}>{mf.Name}</option>
-                                            } else {
-                                                return null;
-                                            }
-                                        }
-                                        )}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    <div className='col-sm-2 panel-process-action'>
-                        {/* Actions */}
-                        {readOnly ? null :
-                            <div>
-                                <span><i class="fa fa-trash fa-2" aria-hidden="true" onClick={this.deleteAction}></i></span>
-                            </div>}
-                    </div>
-                </div>
-            </div>
-        </div>);
+        return (<Table.Row>
+            <Table.Cell>
+                {this.props.no}
+            </Table.Cell>
+            <Table.Cell>
+                {/* Input name */}
+                {action.Type === 3 ? <input value={this.state.name}
+                    readOnly={action.Type === 3 ? false : true} required={true} onChange={this.editName} />
+                    : <span>{action.Name}</span>}
+            </Table.Cell>
+            <Table.Cell>
+                {/* Select action type */}
+                <select className='form-control' onChange={this.editType} value={this.state.actionType}>
+                    {ProcessActionTypes.map(({ type, name }) =>
+                        <option value={type} selected={type === action.Type}>
+                            {name}
+                        </option>)}
+                </select>
+            </Table.Cell>
+            <Table.Cell>
+                {/* Start time */}
+                <select value={this.state.hour} onChange={this.editHour}>
+                    {_24Array.map((tmp, i) =>
+                        <option value={i}>{i}</option>)}
+                </select>
+                <select value={this.state.minute} onChange={this.editMinute}>
+                    {_60Array.map((tmp, i) =>
+                        <option value={i}>{i}</option>)}
+                </select>
+            </Table.Cell>
+            <Table.Cell>
+                {/* Frequency */}
+                <input type='number' min='1' max={this.props.duration} value={this.state.frequency}
+                    onChange={this.editFrequency} />
+            </Table.Cell>
+            <Table.Cell>
+                {/* Message form */}
+                {action.Type !== 0 && action.Type !== 1 ? null :
+                    <select
+                        onChange={this.editMessageForm} value={this.state.messageFormId}>
+                        <option value='-1'>--</option>
+                        {this.props.messageForms
+                            .filter(mf => mf.Type !== action.Type)
+                            .map((mf) =>
+                                <option value={mf.Id}
+                                    selected={mf.Id === action.ProfileMessageFormId}>{mf.Name}</option>
+                            )}
+                    </select>}
+            </Table.Cell>
+            <Table.Cell>
+                {/* Actions */}
+                <FontAwesomeIcon icon='trash-alt' size='sm' color='black' className='icon-btn'
+                    onClick={this.deleteAction} />
+            </Table.Cell>
+        </Table.Row>);
     }
 }
 const mapStateToProps = state => {
     return {
-        process: state.process,
-        processStatus: state.processStatus,
         messageForms: state.messageForms
     }
 }
-const mapDispatchToProps = (dispatch, props) => {
-    return {
-        deleteAction: (stageId, actionId) => {
-            dispatch(ProcessAction.deleteAction(stageId, actionId));
-        },
-        editAction: (stageId, actionId, action) => {
-            dispatch(ProcessAction.editAction(stageId, actionId, action));
-        }
-    }
-}
-export default connect(mapStateToProps, mapDispatchToProps)(Action);
+export default connect(mapStateToProps)(Action);

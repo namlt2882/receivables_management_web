@@ -29,6 +29,9 @@ class Component extends React.Component {
         }
         return loading < this.state.maxLoading;
     }
+    setLoadingForm(value) {
+        this.setState({ loadingForm: value });
+    }
     render() {
         return (<div></div>);
     }

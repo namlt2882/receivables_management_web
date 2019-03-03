@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
 import Component from '../../common/component';
+import { Divider } from 'semantic-ui-react';
 
 class ActionHistory extends Component {
     constructor(props) {
@@ -31,7 +32,8 @@ class ActionHistory extends Component {
             <Modal isOpen={this.state.modal} className='big-modal'>
                 <ModalHeader toggle={this.toggle}>SMS and Phone call history</ModalHeader>
                 <ModalBody>
-                    {stages.map((stage) => <div>
+                    {stages.map((stage, i) => <div>
+                        {i >= 1 ? <Divider /> : null}
                         <span><h3>{stage.Name}</h3></span>
                         <Table className='info-table' striped>
                             <tbody>
@@ -61,15 +63,33 @@ class ActionRecord extends React.Component {
         let action = this.props.action;
         let date = numAsDate(action.ExcutionDay);
         let time = numAsTime(action.StartTime);
+        let color = 'warning';
+        switch (action.Status) {
+            case 1:
+                color = 'secondary'
+                break;
+            case 2:
+                color = 'success'
+                break;
+        }
         return (<tr>
             <td>{action.Name}</td>
             <td>
                 <span>At{` ${date} ${time}`}</span>
                 <span style={{ float: 'right' }}>
-                    <Badge color='success'>Done</Badge>
+                    <Badge color={color}>{describeActionStatus(action.Status)}</Badge>
                 </span>
             </td>
         </tr>);
+    }
+}
+
+const describeActionStatus = (status) => {
+    switch (status) {
+        case 1:
+            return 'Not done';
+        case 2: return 'Done';
+        default: return 'Late';
     }
 }
 

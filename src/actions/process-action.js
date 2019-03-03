@@ -43,7 +43,6 @@ export const ProcessAction = {
             type: Types.SET_PROCESS_UNEDITABLE
         }
     },
-
     //stage
     addStage: () => {
         return {
@@ -60,18 +59,6 @@ export const ProcessAction = {
         return {
             type: Types.EDIT_STAGE,
             stage
-        }
-    },
-    incrementStage: (stageId) => {
-        return {
-            type: Types.INCREMENT_STAGE_ORDER,
-            stageId
-        }
-    },
-    decrementStage: (stageId) => {
-        return {
-            type: Types.DECREMENT_STAGE_ORDER,
-            stageId
         }
     },
 
@@ -96,20 +83,6 @@ export const ProcessAction = {
     }
 }
 
-const getMockProcess = () => {
-    let process = new Process().setData(IdGenerator.generateId(), 'ACB Process', 'Customize process for ACB');
-    let stage1 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 1', 30, 1);
-    let stage2 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 2', 30, 2);
-    let stage3 = new Stage().setData(process.id, IdGenerator.generateId(), 'Stage 3', 30, 3);
-    process.stages = [stage1, stage2, stage3];
-    let action1 = new Action().setData(null, null, 'SMS', null, 1);
-    let action2 = new Action().setData(null, null, 'Phone call', null, 2);
-    stage1.actions = [{ ...action1, id: IdGenerator.generateId() }, { ...action2, id: IdGenerator.generateId() }];
-    stage2.actions = [{ ...action1, id: IdGenerator.generateId() }, { ...action2, id: IdGenerator.generateId() }]
-    stage3.actions = [{ ...action1, id: IdGenerator.generateId() }, { ...action2, id: IdGenerator.generateId() }]
-    return process;
-}
-
 export const enableEditable = () => {
     return (dispatch) => {
         dispatch(ProcessAction.setEditable());
@@ -125,10 +98,4 @@ export const cancelEditable = () => {
 }
 
 export const ProfileProcessRequest = {
-    getProcessDetailRequest: (id) => {
-        return async (dispatch) => {
-            // const res = await callApi(`process/{id}`, 'GET', null);
-            dispatch(ProcessAction.setProcess(getMockProcess()));
-        };
-    }
 }

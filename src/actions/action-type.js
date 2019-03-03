@@ -9,18 +9,16 @@ export const SORT_TABLE = 'SORT_TABLE';
 
 // MessageForm
 export const FETCH_MESSAGES = 'FETCH_MESSAGES';
+export const SET_MESSAGE_LIST = 'SET_MESSAGE_LIST';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const SEARCH_MESSAGE = 'SEARCH_MESSAGE';
 
 // Profile
-export const FETCH_PROFILES = 'FETCH_PROFILES';
+export const SET_PROFILE_LIST = 'SET_PROFILE_LIST';
 export const GET_PROFILE = 'GET_PROFILE';
 export const ADD_PROFILE = 'ADD_PROFILE';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const DELETE_PROFILE = 'DELETE_PROFILE';
-
-// Profile message form
-export const FETCH_PROFILE_MESSAGE_FORMS = 'FETCH_PROFILE_MESSAGE_FORMS'
 
 //Process
 export const NEW_PROCESS = 'NEW_PROCESS';
@@ -31,6 +29,8 @@ export const SET_PROCESS_EDITABLE = 'SET_PROCESS_EDITABLE';
 export const SET_PROCESS_UNEDITABLE = 'SET_PROCESS_UNEDITABLE';
 export const SAVE_CACHE = 'SAVE_CACHE';
 export const LOAD_CACHE = 'LOAD_CACHE';
+export const SUBMIT_FORM = 'SUBMIT_FORM';
+export const FINISH_SUBMIT_FORM = 'FINISH_SUBMIT_FORM';
 
 //Stage
 export const ADD_STAGE = 'ADD_STAGE';
@@ -45,14 +45,13 @@ export const EDIT_ACTION = 'EDIT_ACTION';
 export const DELETE_ACTION = 'DELETE_ACTION';
 
 //Receivable
-export const FETCH_RECEIVABLE_LIST = 'FETCH_RECEIVABLE_LIST';
 export const SET_RECEIVABLE_LIST = 'SET_RECEIVABLE_LIST';
 
 //Customer
-export const FETCH_CUSTOMERS = 'FETCH_CUSTOMERS'
+export const SET_CUSTOMER_LIST = 'SET_CUSTOMER_LIST'
 
 //Contact
 export const SET_CONTACTS = 'SET_CONTACTS'
 
 //Collector
-export const FETCH_COLLECTORS = 'FETCH_COLLECTORS'
+export const SET_COLLECTOR_LIST = 'SET_COLLECTOR_LIST'

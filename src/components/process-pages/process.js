@@ -3,93 +3,103 @@ import { connect } from 'react-redux';
 import { ProcessAction } from './../../actions/process-action'
 import Stage from './stage'
 import './process.scss'
+import { Modal, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Header, Form, Button } from 'semantic-ui-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faPen } from '@fortawesome/free-solid-svg-icons'
+library.add(faPen);
 
 class Process extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            descriptionWarning: '',
-            nameWarning: ''
+            openUpdateForm: false
         }
+        this.toggleUpdateForm = this.toggleUpdateForm.bind(this);
     }
 
-    editDescription = (e) => {
-        if (e.target.value.trim() === '') {
-            e.target.value = '';
-        }
-        this.process.description = e.target.value;
-        this.props.editProcess(this.process);
-    }
-
-    editName = (e) => {
-        if (e.target.value.trim() === '') {
-            e.target.value = '';
-        }
-        this.process.name = e.target.value;
-        this.props.editProcess(this.process);
+    toggleUpdateForm() {
+        this.setState(pre => ({
+            openUpdateForm: !pre.openUpdateForm
+        }))
     }
 
     render() {
         var process = this.props.process;
-        var stages = process.stages;
-        this.process = process;
-        this.state.descriptionWarning = process.description === '' ? 'Description should not be empty!' : '';
-        this.state.nameWarning = process.name === '' ? 'Process name should not be empty!' : '';
+        if (process) {
+            document.title = process.Name;
+        }
+        var stages = process.Stages;
         var readOnly = this.props.processStatus.readOnly;
         return (
-            <div className="panel panel-primary">
-                {/* Heading */}
-                {readOnly ? <div className="panel-heading">
-                    <h3 className="panel-title text-center">{process.name}</h3>
-                </div> : null}
-                <div className="panel-body">
-                    <div>
-                        <div className='process-info'>
-                            {/* Input name */}
-                            {readOnly ? null : <div className="form-group">
-                                <label>Profile Name:</label>
-                                <input value={process.name} className='form-control' ref='inputName'
-                                    onChange={this.editName} onBlur={() => {
-                                        if (this.state.nameWarning !== '') {
-                                            this.refs.inputName.focus();
-                                        }
-                                    }} />
-                                <span className='warning-text'>{this.state.nameWarning}</span>
-                            </div>}
-                            {/* Input description */}
-                            <div className="form-group">
-                                <label>Description:</label>
-                                <input value={process.description} class="form-control"
-                                    readOnly={readOnly} ref='inputDescription'
-                                    onChange={this.editDescription} onBlur={() => {
-                                        if (this.state.descriptionWarning !== '') {
-                                            this.refs.inputDescription.focus();
-                                        }
-                                    }} />
-                                <span className='warning-text'>{readOnly ? null : this.state.descriptionWarning}</span>
-                            </div>
-                            {/* Input customer */}
-                            <div className='form-group'>
-                                <label>Customer:</label>
-                                <select className='form-control' disabled={readOnly}>
-                                    <option>ACB</option>
-                                    <option>Agribank</option>
-                                    <option>TP Bank</option>
-                                </select>
-                            </div>
-                        </div>
+            <Container>
+                <Form loading={this.props.formLoading}>
+                    {/* Heading */}
+                    <Header className='text-center'>{process.Name}
+                        {readOnly ? null : <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn'
+                            onClick={this.toggleUpdateForm} />}
+                        <UpdateProcessForm process={process}
+                            isOpen={this.state.openUpdateForm}
+                            closeForm={this.toggleUpdateForm}
+                            updateProcess={this.props.editProcess} />
+                    </Header>
+                    <Form.Field>
+                        <label>Stages:</label>
                         <div className="stage-list">
                             {
-                                stages.map((stage, i) => <Stage stageId={stage.id} key={i} />)
+                                stages.map((stage, i) => <Stage stageId={stage.Id} key={i} />)
                             }
                             {readOnly ? null :
-                                (<button className='btn btn-info mb-15' onClick={this.props.addStage}>Add stage</button>)
+                                (<Button onClick={this.props.addStage}>Add stage</Button>)
                             }
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </Form.Field>
+                </Form>
+            </Container>
         );
+    }
+}
+
+export class UpdateProcessForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: this.props.process.Name
+        }
+        this.updateProcess = this.updateProcess.bind(this);
+        this.closeForm = this.closeForm.bind(this);
+    }
+    updateProcess(e) {
+        e.preventDefault();
+        let process = this.props.process;
+        process.Name = this.state.name;
+        this.props.updateProcess(process);
+        this.props.closeForm();
+    }
+    closeForm() {
+        this.props.closeForm();
+        let process = this.props.process;
+        this.setState({ name: process.Name })
+    }
+    render() {
+        return (<Modal isOpen={this.props.isOpen}>
+            <ModalBody>
+                {/* Input name */}
+                <Form action='/' onSubmit={this.updateProcess} ref='form'>
+                    <Form.Field>
+                        <Form.Input label='Profile Name:' value={this.state.name} required={true}
+                            onChange={(e) => { this.setState({ name: e.target.value }) }}
+                            placeholder='name of profile' />
+                    </Form.Field>
+                    <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
+                </Form>
+            </ModalBody>
+            <ModalFooter>
+                <Button type='submit' color='primary' onClick={() => { this.refs.btnSubmit.click() }}>OK</Button>
+                <Button color='secondary' onClick={this.closeForm}>Cancel</Button>
+            </ModalFooter>
+        </Modal>);
     }
 }
 

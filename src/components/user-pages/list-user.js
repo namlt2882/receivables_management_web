@@ -12,6 +12,7 @@ class ListUser extends Component {
 
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {
+        document.title = 'Users';
         available(resolve => setTimeout(resolve, 400));
         this.props.fetchAllUsers();
     }

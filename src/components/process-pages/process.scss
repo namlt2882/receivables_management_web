@@ -1,37 +1,43 @@
 .stage-list {}
 
-.stage-holder {
-    
-}
-.action-holder{
+.stage-holder {}
+
+.action-holder {
     padding: 10px;
     border: solid 1px #ddd;
 }
-.action-holder>div{
+
+.action-holder>div {
     margin-bottom: 10px;
 }
-.action{
 
-}
-.action-body{
+.action {}
+
+.action-body {
     padding: 10px;
 }
-.process-info{
+
+.process-info {
     padding: 10px;
     margin: 10px;
 }
-.note{
+
+.note {
     font-style: italic;
     overflow: visible;
     height: auto;
 }
-.panel-process-action{
-    
+
+.panel-process-action {
+    font-size: 1rem;
 }
-.panel-process-action>div{
+
+.panel-process-action>div {
     float: right;
 }
-.panel-process-action span{
-    margin: 5px;
-    cursor: pointer;
+
+.process-stage {
+    border: 1px solid rgb(221, 223, 226);
+    padding: 10px;
+    margin-bottom: 10px;
 }

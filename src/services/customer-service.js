@@ -1,7 +1,10 @@
 import { Request, AuthRequest } from '../utils/request'
 
 export const CustomerService = {
-    get(id) {
+    get: (id) => {
         return AuthRequest.get(`Customer/${id}`);
+    },
+    getAll: () => {
+        return AuthRequest.get('Customer');
     }
 }
