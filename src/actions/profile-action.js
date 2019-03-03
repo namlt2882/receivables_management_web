@@ -3,25 +3,16 @@ import { callApi, fetch } from '../utils/api-caller';
 import { Process } from '../reducers/process-reducer'
 
 export const ProfileAction = {
-    fetchProfiles: (profiles) => {
+    setProfiles: (profiles) => {
         return {
-            type: Types.FETCH_PROFILES,
+            type: Types.SET_PROFILE_LIST,
             profiles
         }
     },
-    fetchMessageForms: (messageForms) => {
+    setMessageForms: (messageForms) => {
         return {
-            type: Types.FETCH_PROFILE_MESSAGE_FORMS,
+            type: Types.SET_MESSAGE_LIST,
             messageForms
         }
-    }
-}
-
-export const ProfileRequest = {
-    fetchProfiles: () => {
-        return async (dispatch) => {
-            const res = await fetch('Profile', 'GET', null);
-            dispatch(ProfileAction.fetchProfiles(res.data));
-        };
     }
 }

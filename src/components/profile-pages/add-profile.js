@@ -78,7 +78,7 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         getAllMessageForms: () => {
             return ProfileService.getAllMessageForms().then(res => {
-                dispatch(ProfileAction.fetchMessageForms(res.data));
+                dispatch(ProfileAction.setMessageForms(res.data));
             })
         },
         createNewProfile: (profile, callback) => {

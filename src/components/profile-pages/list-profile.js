@@ -123,7 +123,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch, props) => {
     return {
         fetchAllProfiles: (profiles) => {
-            dispatch(ProfileAction.fetchProfiles(profiles));
+            dispatch(ProfileAction.setProfiles(profiles));
         },
         newProcess: () => {
             dispatch(ProcessAction.newProcess());

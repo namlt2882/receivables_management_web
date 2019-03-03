@@ -1,15 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { CustomerRequest } from './../../actions/customer-action'
-import { ProfileRequest } from './../../actions/profile-action'
-import { CollectorRequest } from './../../actions/collector-action'
+import { CustomerAction } from './../../actions/customer-action'
+import { ProfileAction } from './../../actions/profile-action'
+import { CollectorAction } from './../../actions/collector-action'
 import XLSX from 'xlsx';
 import { Link } from 'react-router-dom';
-import { ReceivableRequest } from '../../actions/receivable-action';
 import Component from '../common/component'
-import { available1 } from '../common/loading-page';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { ReceivableService } from '../../services/receivable-service';
 import { Container, Header, Table, Divider, Form } from 'semantic-ui-react';
+import { UserService } from '../../services/user-service';
+import { ProfileService } from '../../services/profile-service'
+import { CustomerService } from '../../services/customer-service';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -21,7 +23,8 @@ class ImportReceivable extends Component {
             selectCollector: null,
             profileId: '-1',
             customerId: '-1',
-            loadingForm: false
+            loadingForm: false,
+            maxLoading: 3
         }
         this.setCollector = this.setCollector.bind(this);
         this.updateProfile = this.updateProfile.bind(this);
@@ -32,9 +35,18 @@ class ImportReceivable extends Component {
     componentDidMount() {
         document.title = 'Import receivables';
         available1();
-        this.props.fetchAllProfiles();
-        this.props.fetchCustomers();
-        this.props.fetchCollectors();
+        CustomerService.getAll().then(res => {
+            this.props.fetchCustomers(res.data);
+            this.incrementLoading();
+        })
+        UserService.getCollectors().then(res => {
+            this.props.fetchCollectors(res.data);
+            this.incrementLoading();
+        })
+        ProfileService.getAll().then(res => {
+            this.props.fetchProfiles(res.data);
+            this.incrementLoading();
+        })
     }
 
     handleFile = (e) => {
@@ -170,6 +182,9 @@ class ImportReceivable extends Component {
     }
 
     render() {
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var customers = this.props.customers;
         var profiles = this.props.profiles;
         var isValidate = this.IsValidate();
@@ -319,14 +334,14 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchCustomers: () => {
-            dispatch(CustomerRequest.fetchCustomers());
+        fetchCustomers: (customers) => {
+            dispatch(CustomerAction.setCustomers(customers));
         },
-        fetchAllProfiles: () => {
-            dispatch(ProfileRequest.fetchProfiles())
+        fetchProfiles: (profiles) => {
+            dispatch(ProfileAction.setProfiles(profiles))
         },
-        fetchCollectors: () => {
-            dispatch(CollectorRequest.fetchCollectors());
+        fetchCollectors: (collectors) => {
+            dispatch(CollectorAction.setCollectors(collectors));
         },
         insertReceivables: (list) => {
             return ReceivableService.create(list).catch(err => {
