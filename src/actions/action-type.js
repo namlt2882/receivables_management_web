@@ -31,6 +31,8 @@ export const SET_PROCESS_EDITABLE = 'SET_PROCESS_EDITABLE';
 export const SET_PROCESS_UNEDITABLE = 'SET_PROCESS_UNEDITABLE';
 export const SAVE_CACHE = 'SAVE_CACHE';
 export const LOAD_CACHE = 'LOAD_CACHE';
+export const SUBMIT_FORM = 'SUBMIT_FORM';
+export const FINISH_SUBMIT_FORM = 'FINISH_SUBMIT_FORM';
 
 //Stage
 export const ADD_STAGE = 'ADD_STAGE';

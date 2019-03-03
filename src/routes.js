@@ -16,12 +16,12 @@ const routes = [
     {
         path: '/',
         exact: true,
-        main: () => <Dashboard />
+        main: ({ match, history }) => <Dashboard history={history}/>
     },
     {
         path: '/user-list',
         exact: true,
-        main: () => <ListUser />
+        main: ({ match, history }) => <ListUser history={history}/>
     },
     {
         path: '/user/add',
@@ -36,7 +36,7 @@ const routes = [
     {
         path: '/profile',
         exact: true,
-        main: () => <ProfileList />
+        main: ({ match, history }) => <ProfileList history={history}/>
     },
     {
         path: '/profile/add',
@@ -56,12 +56,12 @@ const routes = [
     {
         path: '/message-list',
         exact: true,
-        main: () => <ListMessage />
+        main: ({ match, history }) => <ListMessage history={history}/>
     },
     {
         path: '/message-list/add',
         exact: true,
-        main: ({ history }) => <MessageActionPage history={history} />
+        main: ({ match, history }) => <MessageActionPage history={history} />
     },
     {
         path: '/receivable',

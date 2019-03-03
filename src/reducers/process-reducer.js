@@ -22,98 +22,90 @@ export const ProcessActionTypes = [
 ]
 
 export class Action {
-    setData(stageId, id, name, frequency, type) {
-        this.stageId = stageId;
-        this.id = id;
-        this.name = name;
-        this.frequency = frequency;
-        this.type = type;
-        return this;
-    }
-    id = IdGenerator.generateId();
-    name = 'New action';
-    order = 1;
-    stageId = null;
-    frequency = 3;
-    type = 3;
-    startTime = 730;
-    messageFormId = null;
+    Id = IdGenerator.generateId();
+    Name = 'New action';
+    StageId = null;
+    Frequency = 1;
+    Type = 3;
+    StartTime = 730;
+    ProfileMessageFormId = null;
     toProfile(action) {
-        return {
-            "Name": action.name,
-            "Frequency": action.frequency,
-            "StartTime": action.startTime,
-            "Type": action.type,
-            "ProfileMessageFormId": action.messageFormId
+        let rs = {
+            "Name": action.Name,
+            "Frequency": action.Frequency,
+            "StartTime": action.StartTime,
+            "Type": action.Type,
+            "ProfileMessageFormId": action.ProfileMessageFormId
         }
+        if (action.Id && action.Id > 0) {
+            rs.Id = action.Id;
+        }
+        return rs;
     }
 }
 
 export class Stage {
-    setData(processId, id, name, duration, order) {
-        this.processId = processId;
-        this.id = id;
-        this.name = name;
-        this.duration = duration;
-        this.order = order;
-        return this;
-    }
-    id = IdGenerator.generateId();
-    name = 'New Stage';
-    order = 0;
-    processId = null;
-    duration = 30;
-    actions = [];
-    displayBody = true;
+    Id = IdGenerator.generateId();
+    Name = 'Stage 1';
+    Sequence = 0;
+    ProcessId = null;
+    Duration = 30;
+    Actions = [];
 
     toProfile(stage) {
-        var tmp = new Action();
-        return {
-            "Name": stage.name,
-            "Duration": stage.duration,
-            "Sequence": stage.order,
-            "Actions": stage.actions.map((action) => tmp.toProfile(action))
+        let tmp = new Action();
+        let rs = {
+            "Name": stage.Name,
+            "Duration": stage.Duration,
+            "Sequence": stage.Sequence,
+            "Actions": stage.Actions.map((action) => tmp.toProfile(action))
         }
+        if (stage.Id && stage.Id > 0) {
+            rs.Id = stage.Id;
+        }
+        return rs;
     }
 
 }
 
 export class Process {
-    setData(id, name, description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        return this;
-    }
-    id = IdGenerator.generateId();
-    name = 'New Process';
-    description = '';
-    stages = [new Stage()];
+    Id = IdGenerator.generateId();
+    Name = 'New Process';
+    Stages = [new Stage()];
     toProfile(process) {
-        var tmp = new Stage();
-        var tmp2 = new Action();
-        return {
-            "Name": process.name,
+        let tmp = new Stage();
+        let rs = {
+            "Name": process.Name,
             "DebtAmountFrom": 0,
             "DebtAmountTo": 0,
-            "Stages": process.stages.map((stage) => {
+            "Stages": process.Stages.map((stage) => {
                 var model = tmp.toProfile(stage);
                 return model;
             })
         }
+        if (process.Id && process.Id > 0) {
+            rs.Id = process.Id;
+        }
+        return rs;
     }
 }
 
 const resetStageIndex = (stages) => {
-    let index = 1;
-    stages.map((stage) => {
-        stage.order = index;
-        index++;
+    stages.map((stage, i) => {
+        stage.Sequence = (i + 1);
     })
 }
 
 export const process = (state = new Process(), { type, order, stageId, actionId, process, stage, action }) => {
     var index, up, down;
+    let stage1;
+    let action1;
+    if (stageId) {
+        stage1 = state.Stages.find(s => s.Id === stageId);
+        if (actionId && stage1) {
+            action1 = stage1.Actions.find(a => a.Id === actionId);
+        }
+    }
     switch (type) {
         case Types.NEW_PROCESS:
             state = new Process();
@@ -128,55 +120,39 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
         case Types.ADD_STAGE:
             //deep copy by jquery
             let newStage = new Stage();
-            newStage.processId = state.id;
+            newStage.ProcessId = state.Id;
             if (order) {
-                newStage.order = order;
+                newStage.Sequence = order;
             }
-            newStage.order = state.stages.length;
-            state.stages.push(newStage);
+            newStage.Sequence = state.Stages.length;
+            state.Stages.push(newStage);
+            state.Stages.forEach((s, i) => {
+                s.Name = 'Stage ' + (i + 1);
+            })
             return { ...state };
         case Types.EDIT_STAGE:
-            findAndEdit(state.stages, stage);
+            if (stage1) {
+                stage1 = { ...stage };
+                stage1.Actions = stage.Actions;
+            }
             return { ...state };
         case Types.DELETE_STAGE:
-            findAndRemove(state.stages, stageId);
-            return { ...state };
-        case Types.INCREMENT_STAGE_ORDER:
-            index = findIndex(state.stages, stageId);
-            up = state.stages[index];
-            down = state.stages[index - 1];
-            state.stages[index - 1] = up;
-            state.stages[index] = down;
-            resetStageIndex(state.stages);
-            return { ...state };
-        case Types.DECREMENT_STAGE_ORDER:
-            index = findIndex(state.stages, stageId);
-            up = state.stages[index + 1];
-            down = state.stages[index];
-            state.stages[index] = up;
-            state.stages[index + 1] = down;
-            resetStageIndex(state.stages);
+            process.Stages = process.Stages.filter((s) => s.Id === stageId);
+            state.Stages.forEach((s, i) => {
+                s.Name = 'Stage ' + (i + 1);
+            })
             return { ...state };
         //ACTION
         case Types.ADD_ACTION:
             let newAction = new Action();
-            newAction.stageId = stageId;
-            if (order) {
-                newAction.order = order;
-            }
-            doWithFirstOne(state.stages, stageId, (sta) => {
-                sta.actions.push(newAction);
-            });
+            newAction.StageId = stageId;
+            stage1.Actions.push(newAction);
             return { ...state };
         case Types.EDIT_ACTION:
-            doWithFirstOne(state.stages, stageId, (sta) => {
-                findAndEdit(sta.actions, action);
-            });
+            action1 = { ...action };
             return { ...state };
         case Types.DELETE_ACTION:
-            doWithFirstOne(state.stages, stageId, (sta) => {
-                findAndRemove(sta.actions, actionId);
-            });
+            stage1.Actions = stage1.Actions.filter(a => a.Id === actionId);
             return { ...state };
         case Types.SAVE_CACHE:
             localStorage.setItem('cache_process', JSON.stringify(state));
@@ -191,7 +167,8 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
 }
 
 export const processStatus = (state = {
-    readOnly: true
+    readOnly: true,
+    isSubmitForm: false
 }, { type }) => {
     switch (type) {
         case Types.SET_PROCESS_EDITABLE:

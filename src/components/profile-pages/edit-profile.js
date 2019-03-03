@@ -1,46 +1,67 @@
 import React from 'react';
 import Process from '../../components/process-pages/process'
 import { connect } from 'react-redux';
-import { ProfileRequest } from './../../actions/profile-action'
-import { ProcessAction, ProfileProcessRequest, cancelEditable, enableEditable } from './../../actions/process-action'
+import { ProfileAction } from './../../actions/profile-action'
+import { ProcessAction, cancelEditable, enableEditable } from './../../actions/process-action'
 import './profile.scss'
 import Component from '../common/component'
-import { available } from '../common/loading-page';
+import { available, PrimaryLoadingPage } from '../common/loading-page';
+import { Container, Button } from 'semantic-ui-react';
+import { ProfileService } from '../../services/profile-service'
 
 class EditProfile extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            maxLoading: 2,
+            formLoading: false
+        }
     }
     componentDidMount() {
         document.title = 'Profile detail';
+        var url = window.location.href;
+        var lastPart = url.substr(url.lastIndexOf('/') + 1);
+        if (lastPart == 'view') {
+            this.props.cancelEditable();
+        } else if (lastPart == 'edit') {
+            this.props.setEditable();
+        }
         available(resolve => setTimeout(resolve, 400));
-        this.props.getProcessDetailRequest(1);
-        this.props.fetchMessageForms();
+        this.props.getProfile(this.props.match.params.id).then(res => {
+            this.incrementLoading();
+        })
+        this.props.getAllMessageForms().then(res => {
+            this.incrementLoading();
+        });
     }
     setEditable = () => {
-        this.props.setEditable();
+        this.props.history.push(`/profile/${this.props.match.params.id}/edit`);
     }
     setUneditable = () => {
-        this.props.cancelEditable();
+        if (window.confirm('Are you sure? All data you edited will be lost!')) {
+            this.props.history.push(`/profile/${this.props.match.params.id}/view`);
+        }
     }
     render() {
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var readOnly = this.props.processStatus.readOnly;
-        return (<div>
+        return (<Container className='col-sm-12 row justify-content-center align-self-center'>
             <div className='row'>
                 <div className='col-sm-12'>
                     <div className='panel-action'>
-                        {readOnly ? <button className='btn btn-primary' onClick={this.setEditable}>Edit</button> :
+                        {readOnly ? <Button color='primary' onClick={this.setEditable}>Edit</Button> :
                             <div>
-                                <button className='btn btn-primary'>Save</button>
-                                <button className='btn btn-default' onClick={this.setUneditable}>Cancel</button>
+                                <Button color='primary'>Save</Button>
+                                <Button onClick={this.setUneditable}>Cancel</Button>
                             </div>
                         }
                     </div>
                 </div>
             </div>
-            <Process />
-        </div>);
+            <Process formLoading={this.state.formLoading}/>
+        </Container>);
     }
 }
 const mapStateToProps = state => {
@@ -57,11 +78,16 @@ const mapDispatchToProps = (dispatch, props) => {
         cancelEditable: () => {
             dispatch(cancelEditable());
         },
-        getProcessDetailRequest: (id) => {
-            dispatch(ProfileProcessRequest.getProcessDetailRequest(id));
+        getProfile: (id) => {
+            return ProfileService.getDetail(id).then(res => {
+                dispatch(ProcessAction.setProcess(res.data));
+            });
+
         },
-        fetchMessageForms: () => {
-            dispatch(ProfileRequest.fetchMessageForms());
+        getAllMessageForms: () => {
+            return ProfileService.getAllMessageForms().then(res => {
+                dispatch(ProfileAction.fetchMessageForms(res.data));
+            })
         }
     }
 }
