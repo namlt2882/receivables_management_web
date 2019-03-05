@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
 import Component from '../../common/component';
-import { Divider } from 'semantic-ui-react';
+import { Button, Divider } from 'semantic-ui-react';
 
 class ActionHistory extends Component {
     constructor(props) {
@@ -53,7 +53,7 @@ class ActionHistory extends Component {
                             </Table>
                         </div>
                     })}
-                    {isEmpty ? <span>Sorry, there is no SMS and phone call history!</span> : null}
+                    {isEmpty ? <span>Sorry, SMS and phone call history is empty!</span> : null}
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={this.closeModel}>Close</Button>

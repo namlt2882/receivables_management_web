@@ -17,6 +17,7 @@ import { UserService } from '../../../services/user-service';
 import { UtilityService } from '../../../services/utility-service';
 import { AuthService } from '../../../services/auth-service';
 import TaskHistory from './task-history';
+import ChangeStatus from '../edit/change-status';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -30,6 +31,10 @@ class ReceivableDetail extends Component {
             collector: null,
             currentDate: dateToInt(new Date())
         }
+        this.updateReceivable = this.updateReceivable.bind(this);
+    }
+    updateReceivable(receivable) {
+        this.setState({ receivable: receivable });
     }
     componentDidMount() {
         document.title = 'Receivable detail';
@@ -99,9 +104,12 @@ class ReceivableDetail extends Component {
         })
         return groupActions;
     }
-    calculateStage(stages, payableDay) {
+    calculateStage(stages, payableDay, closedDay) {
         let currentStage = null;
         let currentDate = this.state.currentDate;
+        if (closedDay) {
+            currentDate = closedDay;
+        }
         let stageStartDay = payableDay;
         //sort stages by sequence
         stages.sort((s1, s2) => s1.Sequence - s2.Sequence);
@@ -164,7 +172,7 @@ class ReceivableDetail extends Component {
             isFinished = receivable.ClosedDay !== null;
         }
         //get current stage
-        let currentStage = this.calculateStage(stages, receivable.PayableDay);
+        let currentStage = this.calculateStage(stages, receivable.PayableDay, receivable.ClosedDay);
         //get first date of process
         let totalDay = 0;
         let startDate = 0;
@@ -181,7 +189,9 @@ class ReceivableDetail extends Component {
         }
         let dateNote = '';
         if (isFinished) {
-            dateNote = `The process last ${compareIntDate(startDate, this.state.currentDate) + 1} day(s)`;
+            let tmp = compareIntDate(startDate, this.state.currentDate) + 1;
+            tmp = tmp < 0 ? 0 : tmp;
+            dateNote = `The process last ${tmp} day(s)`;
         } else {
             dateNote = totalDay < 0 ? `The process will start after ${Math.abs(totalDay)} day(s)` :
                 `The process started ${totalDay + 1} day(s) ago (at ${numAsDate(startDate)})`;
@@ -191,6 +201,7 @@ class ReceivableDetail extends Component {
             <div className='col-sm-12 receivable-progress'>
                 {/* show current date */}
                 <div style={{ textAlign: 'right' }}><b>Current date</b>: {numAsDate(this.state.currentDate)}</div>
+                {isFinished ? <div style={{ textAlign: 'right' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
                 {/* receivable progress */}
                 <ReceivableProgress progress={receivable.CollectionProgress} />
                 {/* show date note*/}
@@ -253,7 +264,8 @@ class ReceivableDetail extends Component {
                                 <Table.Cell></Table.Cell>
                                 <Table.Cell>
                                     <a href='' onClick={this.edit} style={{ marginRight: '15px' }}>Edit</a>
-                                    <a href='' onClick={this.changeStatus}>Change status</a>
+                                    {receivable.CollectionProgress.Status === 1 ?
+                                        <ChangeStatus updateReceivable={this.updateReceivable} debtor={debtor} receivable={receivable} /> : null}
                                 </Table.Cell>
                             </Table.Row>
                         </Table.Body>

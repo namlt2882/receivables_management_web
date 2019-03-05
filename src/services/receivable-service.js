@@ -9,5 +9,8 @@ export const ReceivableService = {
     },
     create: (list) => {
         return AuthRequest.post(`Receivable`, list);
+    },
+    closeReceivable: (id) => {
+        return AuthRequest.post(`Receivable/CloseReceivable?receivableId=${id}`);
     }
 }

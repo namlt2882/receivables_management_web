@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
 import Component from '../../common/component';
-import { Divider } from 'semantic-ui-react';
+import { Button, Divider } from 'semantic-ui-react';
 
 class TaskHistory extends Component {
     constructor(props) {

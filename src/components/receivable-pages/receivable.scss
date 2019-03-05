@@ -8,7 +8,10 @@
     max-width: 100px;
     font-weight: bold;
 }
-
+.deco-table td{
+    color: black !important;
+    font-weight: normal;
+}
 .deco-table tr>td:first-child {
     font-weight: bold;
 }
