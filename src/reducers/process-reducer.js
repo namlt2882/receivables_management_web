@@ -52,12 +52,12 @@ export class Stage {
     Duration = 30;
     Actions = [];
 
-    toProfile(stage) {
+    toProfile(stage, sequence) {
         let tmp = new Action();
         let rs = {
             "Name": stage.Name,
             "Duration": stage.Duration,
-            "Sequence": stage.Sequence,
+            "Sequence": sequence,
             "Actions": stage.Actions.map((action) => tmp.toProfile(action))
         }
         if (stage.Id && stage.Id > 0) {
@@ -78,8 +78,8 @@ export class Process {
             "Name": process.Name,
             "DebtAmountFrom": 0,
             "DebtAmountTo": 0,
-            "Stages": process.Stages.map((stage) => {
-                var model = tmp.toProfile(stage);
+            "Stages": process.Stages.map((stage, i) => {
+                var model = tmp.toProfile(stage, i + 1);
                 return model;
             })
         }

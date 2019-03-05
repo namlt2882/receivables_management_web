@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { numAsDate } from '../../../utils/time-converter';
+import { numAsDate, compareIntDate } from '../../../utils/time-converter';
 import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 import { Container, Header } from 'semantic-ui-react';
 
@@ -20,6 +20,9 @@ class CurrentStage extends Component {
         let currentStage = this.props.currentStage;
         return (<Container className='row current-stage' style={{ margin: '0px 0px 15px 0px' }}>
             <Header className='text-center'>Current stage
+            <span style={{ fontSize: '1rem', fontStyle: 'italic' }}>
+                    {` (${compareIntDate(this.props.currentDate, currentStage.endDate)} day left)`}
+                </span>
                 <a href='' onClick={this.toggleCollapse}
                     style={{ float: 'right', paddingRight: '20px', fontSize: '1rem' }}>
                     {this.state.collapse ? 'Expanse' : 'Collapse'}

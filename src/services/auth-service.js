@@ -50,5 +50,11 @@ export const AuthService = {
         localStorage.removeItem('role');
         localStorage.removeItem('username');
         window.location.href = '/login'
+    },
+    isCollector() {
+        return localStorage.getItem('role') === 'Collector';
+    },
+    isManager() {
+        return localStorage.getItem('role') === 'Manager';
     }
 }

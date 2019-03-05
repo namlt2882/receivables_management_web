@@ -2,12 +2,10 @@ import React from 'react';
 import Component from '../../common/component'
 import { available1, PrimaryLoadingPage } from '../../common/loading-page';
 import { ReceivableService } from '../../../services/receivable-service';
-import { Link } from 'react-router-dom';
 import Contact from '../contact-pages/contact'
 import '../receivable.scss'
 import { dateToInt, compareIntDate, addDayAsInt, numAsDate } from '../../../utils/time-converter';
 import { CustomerService } from '../../../services/customer-service';
-import ReiceivableProgress from './receivable-progress'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
@@ -16,23 +14,32 @@ import CurrentStage from './current-stage';
 import ActionHistory from './action-history';
 import { Button, Container, Header, Table, Divider } from 'semantic-ui-react'
 import { UserService } from '../../../services/user-service';
+import { UtilityService } from '../../../services/utility-service';
+import { AuthService } from '../../../services/auth-service';
+import TaskHistory from './task-history';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 3,
+            maxLoading: 4,
             receivable: null,
             customer: null,
             currentStage: null,
-            collector: null
+            collector: null,
+            currentDate: dateToInt(new Date())
         }
     }
     componentDidMount() {
         document.title = 'Receivable detail';
         available1();
         let recceiId = this.props.match.params.id;
+        UtilityService.getServerDate().then(res => {
+            let serverDate = parseInt(res.data);
+            this.setState({ currentDate: serverDate });
+            this.incrementLoading();
+        })
         ReceivableService.get(recceiId).then(res => {
             let receivable = res.data;
             this.setState({ receivable: receivable });
@@ -45,6 +52,10 @@ class ReceivableDetail extends Component {
                 this.setState({ collector: res3.data })
                 this.incrementLoading();
             })
+        }).catch(err => {
+            if (err.response.status === 404) {
+                this.props.history.push('/not-found');
+            }
         })
     }
     edit(e) {
@@ -59,7 +70,7 @@ class ReceivableDetail extends Component {
             if (found) {
                 if (found.Type !== 3) {
                     found.Quantity = found.Quantity + 1;
-                } else if (found.Name.toUppercase() === found.Name.toUppercase()) {
+                } else if (action.Name === found.Name) {
                     //notification but same name
                     found.Quantity = found.Quantity + 1;
                 } else {
@@ -90,7 +101,7 @@ class ReceivableDetail extends Component {
     }
     calculateStage(stages, payableDay) {
         let currentStage = null;
-        let currentDate = dateToInt(new Date());
+        let currentDate = this.state.currentDate;
         let stageStartDay = payableDay;
         //sort stages by sequence
         stages.sort((s1, s2) => s1.Sequence - s2.Sequence);
@@ -147,22 +158,52 @@ class ReceivableDetail extends Component {
             document.title = `${debtor.Name}'s receivable`;
         }
         let stages = receivable.CollectionProgress.Stages;
+        // check progrecess finished
+        let isFinished = false;
+        if (receivable) {
+            isFinished = receivable.ClosedDay !== null;
+        }
+        //get current stage
         let currentStage = this.calculateStage(stages, receivable.PayableDay);
+        //get first date of process
+        let totalDay = 0;
+        let startDate = 0;
+        if (stages.length > 0) {
+            startDate = stages[0].startDate;
+            totalDay = compareIntDate(startDate, this.state.currentDate);
+        }
+
+        // get end date of process
         let endDate = receivable.ClosedDay ? receivable.ClosedDay : null;
         if (!endDate && stages.length > 0) {
             let len = stages.length;
             endDate = stages[len - 1].endDate;
         }
+        let dateNote = '';
+        if (isFinished) {
+            dateNote = `The process last ${compareIntDate(startDate, this.state.currentDate) + 1} day(s)`;
+        } else {
+            dateNote = totalDay < 0 ? `The process will start after ${Math.abs(totalDay)} day(s)` :
+                `The process started ${totalDay + 1} day(s) ago (at ${numAsDate(startDate)})`;
+        }
         return (<div className='col-sm-12 row'>
-            {/* receivable progress */}
+            {/* Progress bar and history */}
             <div className='col-sm-12 receivable-progress'>
+                {/* show current date */}
+                <div style={{ textAlign: 'right' }}><b>Current date</b>: {numAsDate(this.state.currentDate)}</div>
+                {/* receivable progress */}
                 <ReceivableProgress progress={receivable.CollectionProgress} />
-                <ActionHistory stages={receivable.CollectionProgress.Stages} />
+                {/* show date note*/}
+                <div style={{ textAlign: 'center', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>
+                    {dateNote}</div>
+                <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
+                <TaskHistory />
             </div>
             {/* Current stage */}
-            {receivable.ClosedDay == null && currentStage != null ? <div className='col-sm-12'>
+            {/* if current stage not null */}
+            {!isFinished && currentStage != null ? <div className='col-sm-12'>
                 <Divider />
-                <CurrentStage currentStage={currentStage} />
+                <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage} />
                 <Divider />
             </div> : null}
 
@@ -173,7 +214,7 @@ class ReceivableDetail extends Component {
                         <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
                         Receivable Info
                         </Header>
-                    {/* <CardBody> */}
+                    {/* Receivable info */}
                     <Table className='info-table' hover>
                         <Table.Body>
                             <Table.Row>
@@ -217,15 +258,15 @@ class ReceivableDetail extends Component {
                             </Table.Row>
                         </Table.Body>
                     </Table>
-                    {/* </CardBody> */}
                 </Container>
             </div>
             {/* contacts */}
             <div className='col-sm-6'>
                 {/* Debtor */}
                 <Contact style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
-                {/* Relatives */}
-                <Contact title='Relatives' isDebtor={false} contacts={contacts} />
+                {/* Relatives (only visible for collector)*/}
+                {AuthService.isCollector() ? <Contact title='Relatives' isDebtor={false} contacts={contacts} /> : null}
+
             </div>
         </div>);
     }
@@ -236,12 +277,14 @@ export const describeStatus = (status) => {
     switch (status) {
         case 0: rs = 'Cancel';
             break;
-        case 1: rs = 'Collection';
+        case 1: rs = 'Doing';
             break;
         case 2: rs = 'Done';
             break;
         case 3: rs = 'Late';
             break;
+        case 4: rs = 'Wait'; break;
+        case 5: rs = 'Closed'; break;
     }
     return rs;
 }

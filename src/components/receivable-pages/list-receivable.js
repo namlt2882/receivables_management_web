@@ -7,6 +7,7 @@ import Component from '../common/component'
 import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
 import { Button, Container, Header, Table } from 'semantic-ui-react'
+import { describeStatus } from './detail/receivable-detail';
 
 class ReceivableList extends Component {
     constructor(props) {
@@ -46,17 +47,7 @@ class ReceivableList extends Component {
                     </Table.Header>
                     <Table.Body>
                         {receivableList.map((receivable) => {
-                            let status = '';
-                            switch (receivable.CollectionProgressStatus) {
-                                case 0: status = 'Cancel';
-                                    break;
-                                case 1: status = 'Collection';
-                                    break;
-                                case 2: status = 'Done';
-                                    break;
-                                case 3: status = 'Late';
-                                    break;
-                            }
+                            let status = describeStatus(receivable.CollectionProgressStatus);
                             return <Table.Row>
                                 <Table.Cell>{receivable.Id}</Table.Cell>
                                 <Table.Cell>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>

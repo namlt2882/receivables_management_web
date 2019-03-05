@@ -9,7 +9,7 @@ import * as ProcessReducer from '../../reducers/process-reducer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faTrashAlt, faPen } from '@fortawesome/free-solid-svg-icons'
-import { describeActionType } from '../receivable-pages/receivable-detail/receivable-detail';
+import { describeActionType } from '../receivable-pages/detail/receivable-detail';
 library.add(faTrashAlt, faPen);
 
 class Stage extends Component {

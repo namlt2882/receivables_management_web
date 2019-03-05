@@ -59,8 +59,8 @@ class ReceivableProgress extends Component {
 
                     return (<div className={className} id={'rps-' + i} onMouseEnter={() => { this.onMouseIn(i - 1) }}
                         onMouseLeave={() => { this.onMouseOut(i - 1) }}>
-                        <div className='text-center'>{stage.Name}</div>
-                        <Progress value={percent}>{stage.Duration} days</Progress>
+                        <div className='text-center'>{`${stage.Name} (${stage.Duration} days)`}</div>
+                        <Progress value={percent}></Progress>
                         {/* Popover */}
                         <Popover placement="bottom" isOpen={this.state.popoverStatuses[i - 1]} target={'rps-' + i}>
                             <PopoverBody>

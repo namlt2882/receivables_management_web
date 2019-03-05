@@ -9,7 +9,7 @@ import AddProfile from './components/profile-pages/add-profile';
 import ListMessage from './components/message-form-pages/list-message';
 import MessageActionPage from './components/message-form-pages/message-action';
 import ImportReceivable from './components/receivable-pages/import-receivable'
-import ReceivableDetail from './components/receivable-pages/receivable-detail/receivable-detail'
+import ReceivableDetail from './components/receivable-pages/detail/receivable-detail'
 import ReceivableList from './components/receivable-pages/list-receivable'
 
 const routes = [
@@ -75,11 +75,6 @@ const routes = [
     },
     {
         path: '/receivable/:id/view',
-        exact: true,
-        main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
-    },
-    {
-        path: '/receivable/:id/edit',
         exact: true,
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
     },
