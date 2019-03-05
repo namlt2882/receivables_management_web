@@ -18,18 +18,19 @@ import { UtilityService } from '../../../services/utility-service';
 import { AuthService } from '../../../services/auth-service';
 import TaskHistory from './task-history';
 import ChangeStatus from '../edit/change-status';
+import EditReceivable from '../edit/edit-receivable';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 4,
+            maxLoading: 6,
             receivable: null,
-            customer: null,
             currentStage: null,
-            collector: null,
-            currentDate: dateToInt(new Date())
+            currentDate: dateToInt(new Date()),
+            collectorList: [],
+            customerList: []
         }
         this.updateReceivable = this.updateReceivable.bind(this);
     }
@@ -49,12 +50,26 @@ class ReceivableDetail extends Component {
             let receivable = res.data;
             this.setState({ receivable: receivable });
             this.incrementLoading();
+            //get customer info
             CustomerService.get(receivable.CustomerId).then(res2 => {
-                this.setState({ customer: res2.data })
+                receivable.customer = res2.data;
+                this.setState({ receivable: receivable });
                 this.incrementLoading();
             })
+            //[Receivable detail] get collector info
             UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
-                this.setState({ collector: res3.data })
+                receivable.collector = res3.data;
+                this.setState({ receivable: receivable });
+                this.incrementLoading();
+            })
+            //[Update receivable] get list collector
+            UserService.getCollectors().then(res4 => {
+                this.setState({ collectorList: res4.data });
+                this.incrementLoading();
+            })
+            //[Update receivable] get list customer
+            CustomerService.getAll().then(res5 => {
+                this.setState({ customerList: res5.data });
                 this.incrementLoading();
             })
         }).catch(err => {
@@ -153,7 +168,7 @@ class ReceivableDetail extends Component {
             return <PrimaryLoadingPage />;
         }
         let receivable = this.state.receivable;
-        let collector = this.state.collector;
+        let collector = receivable.collector;
         let contacts = receivable != null ? receivable.Contacts : [];
         let debtor = null;
         contacts = contacts.filter((c) => {
@@ -238,7 +253,7 @@ class ReceivableDetail extends Component {
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Customer:</Table.Cell>
-                                <Table.Cell>{this.state.customer.Name}</Table.Cell>
+                                <Table.Cell>{receivable.customer ? receivable.customer.Name : null}</Table.Cell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Start day:</Table.Cell>
@@ -263,7 +278,13 @@ class ReceivableDetail extends Component {
                             <Table.Row>
                                 <Table.Cell></Table.Cell>
                                 <Table.Cell>
-                                    <a href='' onClick={this.edit} style={{ marginRight: '15px' }}>Edit</a>
+                                    {/* Edit info of receivable */}
+                                    {receivable.CollectionProgress.Status === 1 ?
+                                        <EditReceivable updateReceivable={this.updateReceivable}
+                                            receivable={receivable}
+                                            collectorList={this.state.collectorList}
+                                            customerList={this.state.customerList} /> : null}
+                                    {/* Change status of receivable */}
                                     {receivable.CollectionProgress.Status === 1 ?
                                         <ChangeStatus updateReceivable={this.updateReceivable} debtor={debtor} receivable={receivable} /> : null}
                                 </Table.Cell>
