@@ -73,6 +73,10 @@
     top: 10px !important;
 }
 
+.my-profile .btn-secondary {
+    @extend .transparent-button;
+}
+
 .transparent-button {
     background-color: transparent !important;
     border: none !important;

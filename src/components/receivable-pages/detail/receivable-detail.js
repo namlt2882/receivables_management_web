@@ -277,7 +277,7 @@ export const describeStatus = (status) => {
     switch (status) {
         case 0: rs = 'Cancel';
             break;
-        case 1: rs = 'Doing';
+        case 1: rs = 'Collecting';
             break;
         case 2: rs = 'Done';
             break;

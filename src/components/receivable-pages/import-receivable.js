@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Component from '../common/component'
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { ReceivableService } from '../../services/receivable-service';
-import { Container, Header, Table, Divider, Form } from 'semantic-ui-react';
+import { Container, Header, Table, Divider, Form, Button } from 'semantic-ui-react';
 import { UserService } from '../../services/user-service';
 import { ProfileService } from '../../services/profile-service'
 import { CustomerService } from '../../services/customer-service';
@@ -237,9 +237,9 @@ class ImportReceivable extends Component {
                     </div>
                     {/* Action */}
                     <div className='col-sm-8'>
-                        <button className='btn btn-primary' onClick={this.insertReceivables}
-                            disabled={!isValidate}>Save</button>
-                        <button className="btn btn-default"><Link to="/receivable">Cancel</Link></button>
+                        <Button color='primary' onClick={this.insertReceivables}
+                            disabled={!isValidate}>Save</Button>
+                        <Button color='secondary' onClick={() => { this.props.history.push('/receivable') }}>Cancel</Button>
                     </div>
                     {this.state.receivableData === null ? null : <div className='panel panel-primary'>
                         <Container>
