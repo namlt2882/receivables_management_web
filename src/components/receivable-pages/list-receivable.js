@@ -47,14 +47,12 @@ class ReceivableList extends Component {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
         }
-        var receivableList = this.props.receivableList;
-        let len = receivableList.length;
-        let maxItem = 10;
         let data1 = this.pushDataToTable();
         return (<div className='col-sm-12 row justify-content-center align-self-center'>
             <Container>
                 <Header className='text-center'>Receivables</Header>
-                <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button>
+                <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
+                <Link to='/receivable/recent-add'>Recent added receivables</Link><br/>
                 <MDBDataTable
                     striped
                     bordered

@@ -16,12 +16,12 @@ const routes = [
     {
         path: '/',
         exact: true,
-        main: ({ match, history }) => <Dashboard history={history}/>
+        main: ({ match, history }) => <Dashboard history={history} />
     },
     {
         path: '/user-list',
         exact: true,
-        main: ({ match, history }) => <ListUser history={history}/>
+        main: ({ match, history }) => <ListUser history={history} />
     },
     {
         path: '/user/add',
@@ -36,7 +36,7 @@ const routes = [
     {
         path: '/profile',
         exact: true,
-        main: ({ match, history }) => <ProfileList history={history}/>
+        main: ({ match, history }) => <ProfileList history={history} />
     },
     {
         path: '/profile/add',
@@ -56,7 +56,7 @@ const routes = [
     {
         path: '/message-list',
         exact: true,
-        main: ({ match, history }) => <ListMessage history={history}/>
+        main: ({ match, history }) => <ListMessage history={history} />
     },
     {
         path: '/message-list/add',
@@ -72,6 +72,11 @@ const routes = [
         path: '/receivable/add',
         exact: true,
         main: ({ match, history }) => <ImportReceivable match={match} history={history} />
+    },
+    {
+        path: '/receivable/recent-add',
+        exact: true,
+        main: ({ match, history }) => <ImportReceivable showRecent={true} match={match} history={history} />
     },
     {
         path: '/receivable/:id/view',

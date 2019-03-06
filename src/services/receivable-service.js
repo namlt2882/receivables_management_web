@@ -18,5 +18,8 @@ export const ReceivableService = {
     },
     update: (receivable) => {
         return AuthRequest.put('Receivable', receivable);
+    },
+    validate: (list) => {
+        return AuthRequest.post('Receivable/Validate', list);
     }
 }
