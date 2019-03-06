@@ -3,6 +3,7 @@ import { Button, Form, Checkbox } from 'semantic-ui-react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { ReceivableService } from '../../../services/receivable-service';
 import { dateToInt } from '../../../utils/time-converter'
+import { AuthService } from '../../../services/auth-service';
 
 class ChangeStatus extends Component {
     constructor(props) {
@@ -12,7 +13,8 @@ class ChangeStatus extends Component {
             showTodayTask: true,
             receivable: this.props.receivable,
             status: this.props.receivable.CollectionProgress.Status,
-            formLoading: false
+            formLoading: false,
+            isPayed: false
         }
         this.openForm = this.openForm.bind(this);
         this.closeModal = this.closeModal.bind(this);
@@ -27,16 +29,24 @@ class ChangeStatus extends Component {
     closeModal() {
         this.setState({ modal: false });
     }
-    changeStatus() {
-        if (window.confirm('Are you sure? This action can not be rollback!')) {
-            this.setState({ formLoading: true });
-            ReceivableService.closeReceivable(this.state.receivable.Id).then(res => {
-                this.state.receivable.CollectionProgress.Status = 2;
-                let closedDay = dateToInt(new Date());
-                this.state.receivable.ClosedDay = closedDay;
+    changeStatus(isPayed) {
+        let message = 'Money is collected and will close this case?';
+        if (!isPayed) {
+            message = 'Cancel this case?';
+        }
+        if (window.confirm(message)) {
+            // this.setState({ formLoading: true });
+            let data = {
+                Id: this.state.receivable.Id,
+                isPayed: isPayed
+            }
+            ReceivableService.closeReceivable(data).then(res => {
+                let rs = res.data;
+                this.state.receivable.CollectionProgress.Status = rs.Status;
+                this.state.receivable.ClosedDay = rs.ClosedTime;
                 this.props.updateReceivable(this.state.receivable);
-                this.setState({ formLoading: false });
-                this.closeModal();
+                // this.setState({ formLoading: false });
+                // this.closeModal();
             })
         }
     }
@@ -44,23 +54,31 @@ class ChangeStatus extends Component {
         let receivable = this.state.receivable;
         let debtor = this.props.debtor;
         return (<div>
-            <Button color='primary' onClick={this.openForm}>Close</Button>
-            <Modal isOpen={this.state.modal}>
+            {AuthService.isCollector() ?
+                <Button color='green' onClick={() => { this.changeStatus(true) }}>Close</Button> : null}
+            {AuthService.isCollector() ?
+                <Button color='orange' onClick={() => { this.changeStatus(false) }}>Cancel</Button> : null}
+            {/* <Modal isOpen={this.state.modal}>
                 <ModalHeader toggle={this.toggle}>Close {debtor ? ` ${debtor.Name}'s` : ''} receivable</ModalHeader>
                 <ModalBody>
                     <Form onSubmit={this.changeStatus} loading={this.state.formLoading}>
                         <Form.Field>
-                            <b>Debt amount:</b>{` ${receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}`}
+                            <b>Amount need to be collected:</b>{` ${(receivable.DebtAmount - receivable.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 })}`}
                         </Form.Field>
-                        <Form.Field control={Checkbox} label='Money is collected?' />
+                        <Form.Field control={Checkbox} label='Money is collected?'
+                            checked={this.state.isPayed} onChange={() => {
+                                this.setState(pre => ({
+                                    isPayed: !pre.isPayed
+                                }))
+                            }} />
                         <button ref='submit' type='submit' style={{ display: 'none' }}></button>
                     </Form>
                 </ModalBody>
                 <ModalFooter>
                     <Button color="primary" onClick={() => { this.refs.submit.click() }}>OK</Button>
-                    <Button color="secondary" onClick={this.closeModal}>Close</Button>
+                    <Button color="secondary" onClick={this.closeModal}>Cancel</Button>
                 </ModalFooter>
-            </Modal>
+            </Modal> */}
         </div>);
     }
 }

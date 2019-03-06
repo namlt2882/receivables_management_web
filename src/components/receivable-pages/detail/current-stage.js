@@ -18,10 +18,17 @@ class CurrentStage extends Component {
     }
     render() {
         let currentStage = this.props.currentStage;
+        let remainDay = compareIntDate(this.props.currentDate, currentStage.endDate);
+        let dayMark = ` (${remainDay} day left)`;
+        if (remainDay === 0) {
+            dayMark = ' (will end Today)'
+        }
+        
+        
         return (<Container className='row current-stage' style={{ margin: '0px 0px 15px 0px' }}>
             <Header className='text-center'>Current stage
             <span style={{ fontSize: '1rem', fontStyle: 'italic' }}>
-                    {` (${compareIntDate(this.props.currentDate, currentStage.endDate)} day left)`}
+                    {dayMark}
                 </span>
                 <a href='' onClick={this.toggleCollapse}
                     style={{ float: 'right', paddingRight: '20px', fontSize: '1rem' }}>
@@ -39,7 +46,7 @@ class CurrentStage extends Component {
                             </tr>
                             <tr>
                                 <td>Duration:</td>
-                                <td>{currentStage.Duration} days</td>
+                                <td>{currentStage.Duration} day(s)</td>
                             </tr>
                             <tr>
                                 <td>Start day:</td>

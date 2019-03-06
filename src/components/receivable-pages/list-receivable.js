@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { ReceivableAction } from '../../actions/receivable-action'
 import { Link } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { available, PrimaryLoadingPage } from '../common/loading-page'
 import Component from '../common/component'
 import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
-import { Button, Container, Header, Table, Pagination } from 'semantic-ui-react'
+import { Button, Container, Header } from 'semantic-ui-react'
 import { describeStatus } from './detail/receivable-detail';
 import { compareIntDate } from '../../utils/time-converter'
 import { MDBDataTable } from 'mdbreact'

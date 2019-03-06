@@ -128,6 +128,7 @@ class ReceivableDetail extends Component {
         let stageStartDay = payableDay;
         //sort stages by sequence
         stages.sort((s1, s2) => s1.Sequence - s2.Sequence);
+        let processDuration = stages.reduce((acc, s) => { return acc + s.Duration }, 0);
         //calculate progress
         stages.forEach((stage) => {
             let endDay = addDayAsInt(stageStartDay, stage.Duration - 1);
@@ -136,6 +137,7 @@ class ReceivableDetail extends Component {
             let rsEndDay = compareIntDate(nextStartDay, currentDate);
             stage.startDate = stageStartDay;
             stage.endDate = endDay;
+            stage.weight = (stage.Duration / processDuration) * 100;
             if (rsStartDay >= 0 && rsEndDay <= 0) {
                 //in stage
                 stage.isCurrentStage = true;
@@ -204,12 +206,25 @@ class ReceivableDetail extends Component {
         }
         let dateNote = '';
         if (isFinished) {
-            let tmp = compareIntDate(startDate, this.state.currentDate) + 1;
+            let tmp = compareIntDate(startDate, receivable.ClosedDay) + 1;
             tmp = tmp < 0 ? 0 : tmp;
             dateNote = `The process last ${tmp} day(s)`;
+        } else if (totalDay < 0) {
+            let tmp = Math.abs(totalDay);
+            let dayMark = `after ${tmp} day(s)`;
+            if (tmp === 1) {
+                dayMark = 'Tomorrow';
+            }
+            dateNote = `The process will start ${dayMark}`;
         } else {
-            dateNote = totalDay < 0 ? `The process will start after ${Math.abs(totalDay)} day(s)` :
-                `The process started ${totalDay + 1} day(s) ago (at ${numAsDate(startDate)})`;
+            let tmp = totalDay + 1;
+            let dayMark = `${totalDay + 1} day(s) ago (at ${numAsDate(startDate)})`;
+            if (tmp === 1) {
+                dayMark = 'Today';
+            } else if (tmp === 2) {
+                dayMark = `Yesterday (at ${numAsDate(startDate)})`;
+            }
+            dateNote = `The process started ${dayMark} `;
         }
         return (<div className='col-sm-12 row'>
             {/* Progress bar and history */}
@@ -239,7 +254,12 @@ class ReceivableDetail extends Component {
                     <Header>
                         <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
                         Receivable Info
-                        </Header>
+                        {/* Edit info of receivable */}
+                        {receivable.CollectionProgress.Status === 1 ?
+                            <EditReceivable updateReceivable={this.updateReceivable}
+                                receivable={receivable}
+                                collectorList={this.state.collectorList} /> : null}
+                    </Header>
                     {/* Receivable info */}
                     <Table className='info-table' hover>
                         <Table.Body>
@@ -278,12 +298,6 @@ class ReceivableDetail extends Component {
                             <Table.Row>
                                 <Table.Cell></Table.Cell>
                                 <Table.Cell>
-                                    {/* Edit info of receivable */}
-                                    {receivable.CollectionProgress.Status === 1 ?
-                                        <EditReceivable updateReceivable={this.updateReceivable}
-                                            receivable={receivable}
-                                            collectorList={this.state.collectorList}
-                                            customerList={this.state.customerList} /> : null}
                                     {/* Change status of receivable */}
                                     {receivable.CollectionProgress.Status === 1 ?
                                         <ChangeStatus updateReceivable={this.updateReceivable} debtor={debtor} receivable={receivable} /> : null}
