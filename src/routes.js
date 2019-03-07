@@ -11,6 +11,7 @@ import MessageActionPage from './components/message-form-pages/message-action';
 import ImportReceivable from './components/receivable-pages/import-receivable'
 import ReceivableDetail from './components/receivable-pages/detail/receivable-detail'
 import ReceivableList from './components/receivable-pages/list-receivable'
+import TodayTask from './components/task-pages/today-task';
 
 const routes = [
     {
@@ -82,6 +83,11 @@ const routes = [
         path: '/receivable/:id/view',
         exact: true,
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
+    },
+    {
+        path: '/task',
+        exact: true,
+        main: ({ match, history }) => <TodayTask match={match} history={history} />
     },
     {
         path: '/not-found',

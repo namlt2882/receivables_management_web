@@ -7,6 +7,7 @@ import { Button, Container, Header, Table } from 'semantic-ui-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserInjured, faUserFriends } from '@fortawesome/free-solid-svg-icons'
+import { AuthService } from '../../../services/auth-service';
 library.add(faUserInjured, faUserFriends);
 
 class Contact extends Component {
@@ -68,7 +69,8 @@ class Contact extends Component {
                         <Table.Row>
                             <Table.Cell></Table.Cell>
                             <Table.Cell>
-                                <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a>
+                                {AuthService.isCollector() ?
+                                    <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a> : null}
                                 {this.props.isDebtor ? null : <Button color='red'>Delete</Button>}
                             </Table.Cell>
                         </Table.Row>

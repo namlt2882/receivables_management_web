@@ -10,6 +10,7 @@ import { Button, Container, Header } from 'semantic-ui-react'
 import { describeStatus } from './detail/receivable-detail';
 import { compareIntDate } from '../../utils/time-converter'
 import { MDBDataTable } from 'mdbreact'
+import { AuthService } from '../../services/auth-service';
 
 class ReceivableList extends Component {
     constructor(props) {
@@ -49,9 +50,13 @@ class ReceivableList extends Component {
         let data1 = this.pushDataToTable();
         return (<div className='col-sm-12 row justify-content-center align-self-center'>
             <Container>
-                <Header className='text-center'>Receivables</Header>
-                <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
-                <Link to='/receivable/recent-add'>Recent added receivables</Link><br/>
+                <Header className='text-center'>
+                    {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
+                </Header>
+                {AuthService.isManager() ? <div>
+                    <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
+                    <Link to='/receivable/recent-add'>Recent added receivables</Link><br />
+                </div> : null}
                 <MDBDataTable
                     striped
                     bordered
@@ -117,6 +122,10 @@ const mapDispatchToProps = (dispatch, props) => {
         fetchReceivableList: () => {
             return ReceivableService.getAll().then((res) => {
                 let list = res.data;
+                if (AuthService.isCollector()) {
+                    let id = localStorage.getItem('id');
+                    list = list.filter(r => r.AssignedCollectorId === id);
+                }
                 list.sort((a, b) => compareIntDate(a.PayableDay, b.PayableDay));
                 dispatch(ReceivableAction.setReceivableList(list));
             })
