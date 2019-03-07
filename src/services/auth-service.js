@@ -36,9 +36,11 @@ export const AuthService = {
             let token = res.data.access_token;
             let role = res.data.role;
             let username = res.data.username;
+            let id = res.data.id;
             localStorage.setItem('access_token', token);
             localStorage.setItem('role', role);
             localStorage.setItem('username', username);
+            localStorage.setItem('id', id);
         });
     },
     getUserInfo: () => {
@@ -49,6 +51,13 @@ export const AuthService = {
         localStorage.removeItem('access_token');
         localStorage.removeItem('role');
         localStorage.removeItem('username');
+        localStorage.removeItem('id');
         window.location.href = '/login'
+    },
+    isCollector() {
+        return localStorage.getItem('role') === 'Collector';
+    },
+    isManager() {
+        return localStorage.getItem('role') === 'Manager';
     }
 }

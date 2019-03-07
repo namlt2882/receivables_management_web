@@ -52,12 +52,12 @@ export class Stage {
     Duration = 30;
     Actions = [];
 
-    toProfile(stage) {
+    toProfile(stage, sequence) {
         let tmp = new Action();
         let rs = {
             "Name": stage.Name,
             "Duration": stage.Duration,
-            "Sequence": stage.Sequence,
+            "Sequence": sequence,
             "Actions": stage.Actions.map((action) => tmp.toProfile(action))
         }
         if (stage.Id && stage.Id > 0) {
@@ -78,8 +78,8 @@ export class Process {
             "Name": process.Name,
             "DebtAmountFrom": 0,
             "DebtAmountTo": 0,
-            "Stages": process.Stages.map((stage) => {
-                var model = tmp.toProfile(stage);
+            "Stages": process.Stages.map((stage, i) => {
+                var model = tmp.toProfile(stage, i + 1);
                 return model;
             })
         }
@@ -137,11 +137,11 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             }
             return { ...state };
         case Types.DELETE_STAGE:
-            process.Stages = process.Stages.filter((s) => s.Id === stageId);
+            state.Stages = state.Stages.filter((s) => s.Id !== stageId);
             state.Stages.forEach((s, i) => {
                 s.Name = 'Stage ' + (i + 1);
             })
-            return { ...state };
+            return state;
         //ACTION
         case Types.ADD_ACTION:
             let newAction = new Action();

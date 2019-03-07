@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
 import Component from '../../common/component';
-import { Divider } from 'semantic-ui-react';
+import { Button, Divider } from 'semantic-ui-react';
 
 class ActionHistory extends Component {
     constructor(props) {
@@ -27,22 +27,33 @@ class ActionHistory extends Component {
     }
     render() {
         let stages = this.props.stages;
+        let isEmpty = true;
         return (<div>
             <a href='' onClick={this.showHistory} style={{ float: 'right' }}><i>SMS and phone call history</i></a>
             <Modal isOpen={this.state.modal} className='big-modal'>
                 <ModalHeader toggle={this.toggle}>SMS and Phone call history</ModalHeader>
                 <ModalBody>
-                    {stages.map((stage, i) => <div>
-                        {i >= 1 ? <Divider /> : null}
-                        <span><h3>{stage.Name}</h3></span>
-                        <Table className='info-table' striped>
-                            <tbody>
-                                {stage.Actions.map((action, i) => {
-                                    return <ActionRecord action={action} key={i} />
-                                })}
-                            </tbody>
-                        </Table>
-                    </div>)}
+                    {stages.map((stage, i) => {
+                        let actions = stage.Actions.filter(a => a.Status !== 1);
+                        if (isEmpty && actions.length > 0) {
+                            isEmpty = false;
+                        }
+                        if (actions.length <= 0) {
+                            return null;
+                        }
+                        return <div>
+                            {i >= 1 ? <Divider /> : null}
+                            <span><h3>{stage.Name}</h3></span>
+                            <Table className='info-table' striped>
+                                <tbody>
+                                    {actions.map((action, i) => {
+                                        return <ActionRecord action={action} key={i} />
+                                    })}
+                                </tbody>
+                            </Table>
+                        </div>
+                    })}
+                    {isEmpty ? <span>Sorry, SMS and phone call history is empty!</span> : null}
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={this.closeModel}>Close</Button>

@@ -1,18 +1,25 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { ReceivableRequest, ReceivableAction } from '../../actions/receivable-action'
+import { ReceivableAction } from '../../actions/receivable-action'
 import { Link } from 'react-router-dom';
 import { available, PrimaryLoadingPage } from '../common/loading-page'
 import Component from '../common/component'
 import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
-import { Button, Container, Header, Table } from 'semantic-ui-react'
+import { Button, Container, Header } from 'semantic-ui-react'
+import { describeStatus } from './detail/receivable-detail';
+import { compareIntDate } from '../../utils/time-converter'
+import { MDBDataTable } from 'mdbreact'
+import { AuthService } from '../../services/auth-service';
 
 class ReceivableList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 1
+            maxLoading: 1,
+            statusFilter: (rei) => {
+                return 0
+            }
         }
     }
     componentDidMount() {
@@ -22,57 +29,89 @@ class ReceivableList extends Component {
             this.incrementLoading();
         });
     }
-
+    pushDataToTable() {
+        let data1 = { ...data };
+        let rows = this.props.receivableList.map(r => ({
+            Id: r.Id,
+            DebtorName: r.DebtorName,
+            CustomerName: r.CustomerName,
+            DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
+            PayableDay: numAsDate(r.PayableDay),
+            Status: describeStatus(r.CollectionProgressStatus),
+            action: <Link to={`/receivable/${r.Id}/view`}>View</Link>
+        }));
+        data1.rows = rows;
+        return data1;
+    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
         }
-        var receivableList = this.props.receivableList;
-        var index = 0;
+        let data1 = this.pushDataToTable();
         return (<div className='col-sm-12 row justify-content-center align-self-center'>
             <Container>
-                <Header className='text-center'>Receivables</Header>
-                <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button>
-                <Table class="table-hover">
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell>Id</Table.HeaderCell>
-                            <Table.HeaderCell>Prepaid amount</Table.HeaderCell>
-                            <Table.HeaderCell>Debt amount</Table.HeaderCell>
-                            <Table.HeaderCell>Payable day</Table.HeaderCell>
-                            <Table.HeaderCell>Status</Table.HeaderCell>
-                            <Table.HeaderCell>Action</Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        {receivableList.map((receivable) => {
-                            let status = '';
-                            switch (receivable.CollectionProgressStatus) {
-                                case 0: status = 'Cancel';
-                                    break;
-                                case 1: status = 'Collection';
-                                    break;
-                                case 2: status = 'Done';
-                                    break;
-                                case 3: status = 'Late';
-                                    break;
-                            }
-                            return <Table.Row>
-                                <Table.Cell>{receivable.Id}</Table.Cell>
-                                <Table.Cell>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
-                                <Table.Cell>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
-                                <Table.Cell>{numAsDate(receivable.PayableDay)}</Table.Cell>
-                                <Table.Cell>{status}</Table.Cell>
-                                <Table.Cell><Link to={`/receivable/${receivable.Id}/view`}>
-                                    View</Link></Table.Cell>
-                            </Table.Row>
-                        })}
-                    </Table.Body>
-                </Table>
+                <Header className='text-center'>
+                    {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
+                </Header>
+                {AuthService.isManager() ? <div>
+                    <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
+                    <Link to='/receivable/recent-add'>Recent added receivables</Link><br />
+                </div> : null}
+                <MDBDataTable
+                    striped
+                    bordered
+                    data={data1} />
             </Container>
         </div>);
     }
 }
+
+const data = {
+    columns: [
+        {
+            label: 'Id',
+            field: 'Id',
+            width: 150
+        },
+        {
+            label: 'Debtor name',
+            field: 'DebtorName',
+            sort: 'asc',
+            width: 270
+        },
+        {
+            label: 'Customer name',
+            field: 'CustomerName',
+            sort: 'asc',
+            width: 270
+        },
+        {
+            label: 'Debt amount',
+            field: 'DebtAmount',
+            sort: 'asc',
+            width: 270
+        },
+        {
+            label: 'Payable day',
+            field: 'PayableDay',
+            sort: 'asc',
+            width: 200
+        },
+        {
+            label: 'Status',
+            field: 'Status',
+            sort: 'asc',
+            width: 100
+        },
+        {
+            label: 'Action',
+            field: 'action',
+            width: 150
+        }
+    ],
+    rows: []
+}
+
 const mapStateToProps = state => {
     return {
         receivableList: state.receivableList
@@ -82,7 +121,13 @@ const mapDispatchToProps = (dispatch, props) => {
     return {
         fetchReceivableList: () => {
             return ReceivableService.getAll().then((res) => {
-                dispatch(ReceivableAction.setReceivableList(res.data));
+                let list = res.data;
+                if (AuthService.isCollector()) {
+                    let id = localStorage.getItem('id');
+                    list = list.filter(r => r.AssignedCollectorId === id);
+                }
+                list.sort((a, b) => compareIntDate(a.PayableDay, b.PayableDay));
+                dispatch(ReceivableAction.setReceivableList(list));
             })
         }
     }

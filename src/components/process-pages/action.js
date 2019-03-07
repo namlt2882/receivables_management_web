@@ -170,7 +170,7 @@ class Action extends Component {
                         onChange={this.editMessageForm} value={this.state.messageFormId}>
                         <option value='-1'>--</option>
                         {this.props.messageForms
-                            .filter(mf => mf.Type !== action.Type)
+                            .filter(mf => mf.Type === action.Type)
                             .map((mf) =>
                                 <option value={mf.Id}
                                     selected={mf.Id === action.ProfileMessageFormId}>{mf.Name}</option>

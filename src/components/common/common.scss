@@ -73,6 +73,10 @@
     top: 10px !important;
 }
 
+.my-profile .btn-secondary {
+    @extend .transparent-button;
+}
+
 .transparent-button {
     background-color: transparent !important;
     border: none !important;
@@ -91,4 +95,12 @@
 
 .noti-item-icon {
     margin: 0 5 0 5;
+}
+
+.ml-auto {
+    font-size: 1.1rem;
+    line-height: 2rem;
+}
+.ml-auto .nav-link{
+    padding-bottom: 0px;
 }

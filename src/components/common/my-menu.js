@@ -96,13 +96,14 @@ class MyProfile extends React.Component {
     render() {
         return (<NavItem className='nav-icon'>
             <div style={{ paddingTop: '2px' }}>
-                <Dropdown isOpen={this.props.dropdownProfile} toggle={this.props.toggleProfile}>
+                <Dropdown isOpen={this.props.dropdownProfile} toggle={this.props.toggleProfile}
+                    className='my-profile'>
                     <DropdownToggle className='transparent-button'>
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <div className='col-sm-10' style={{cursor:'default'}}>
-                            Hi, <b>{localStorage.getItem('username')}</b><br/>
+                        <div className='col-sm-10' style={{ cursor: 'default' }}>
+                            Hi, <b>{localStorage.getItem('username')}</b><br />
                         </div>
                         <DropdownItem>
                             My profile

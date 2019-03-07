@@ -9,19 +9,20 @@ import AddProfile from './components/profile-pages/add-profile';
 import ListMessage from './components/message-form-pages/list-message';
 import MessageActionPage from './components/message-form-pages/message-action';
 import ImportReceivable from './components/receivable-pages/import-receivable'
-import ReceivableDetail from './components/receivable-pages/receivable-detail/receivable-detail'
+import ReceivableDetail from './components/receivable-pages/detail/receivable-detail'
 import ReceivableList from './components/receivable-pages/list-receivable'
+import TodayTask from './components/task-pages/today-task';
 
 const routes = [
     {
         path: '/',
         exact: true,
-        main: ({ match, history }) => <Dashboard history={history}/>
+        main: ({ match, history }) => <Dashboard history={history} />
     },
     {
         path: '/user-list',
         exact: true,
-        main: ({ match, history }) => <ListUser history={history}/>
+        main: ({ match, history }) => <ListUser history={history} />
     },
     {
         path: '/user/add',
@@ -36,7 +37,7 @@ const routes = [
     {
         path: '/profile',
         exact: true,
-        main: ({ match, history }) => <ProfileList history={history}/>
+        main: ({ match, history }) => <ProfileList history={history} />
     },
     {
         path: '/profile/add',
@@ -56,7 +57,7 @@ const routes = [
     {
         path: '/message-list',
         exact: true,
-        main: ({ match, history }) => <ListMessage history={history}/>
+        main: ({ match, history }) => <ListMessage history={history} />
     },
     {
         path: '/message-list/add',
@@ -74,14 +75,19 @@ const routes = [
         main: ({ match, history }) => <ImportReceivable match={match} history={history} />
     },
     {
+        path: '/receivable/recent-add',
+        exact: true,
+        main: ({ match, history }) => <ImportReceivable showRecent={true} match={match} history={history} />
+    },
+    {
         path: '/receivable/:id/view',
         exact: true,
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
     },
     {
-        path: '/receivable/:id/edit',
+        path: '/task',
         exact: true,
-        main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
+        main: ({ match, history }) => <TodayTask match={match} history={history} />
     },
     {
         path: '/not-found',

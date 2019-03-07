@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { numAsDate } from '../../../utils/time-converter';
+import { numAsDate, compareIntDate } from '../../../utils/time-converter';
 import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 import { Container, Header } from 'semantic-ui-react';
 
@@ -18,8 +18,18 @@ class CurrentStage extends Component {
     }
     render() {
         let currentStage = this.props.currentStage;
+        let remainDay = compareIntDate(this.props.currentDate, currentStage.endDate);
+        let dayMark = ` (${remainDay} day left)`;
+        if (remainDay === 0) {
+            dayMark = ' (will end Today)'
+        }
+        
+        
         return (<Container className='row current-stage' style={{ margin: '0px 0px 15px 0px' }}>
             <Header className='text-center'>Current stage
+            <span style={{ fontSize: '1rem', fontStyle: 'italic' }}>
+                    {dayMark}
+                </span>
                 <a href='' onClick={this.toggleCollapse}
                     style={{ float: 'right', paddingRight: '20px', fontSize: '1rem' }}>
                     {this.state.collapse ? 'Expanse' : 'Collapse'}
@@ -36,7 +46,7 @@ class CurrentStage extends Component {
                             </tr>
                             <tr>
                                 <td>Duration:</td>
-                                <td>{currentStage.Duration} days</td>
+                                <td>{currentStage.Duration} day(s)</td>
                             </tr>
                             <tr>
                                 <td>Start day:</td>

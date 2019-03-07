@@ -9,5 +9,17 @@ export const ReceivableService = {
     },
     create: (list) => {
         return AuthRequest.post(`Receivable`, list);
+    },
+    closeReceivable: (data) => {
+        return AuthRequest.put(`Receivable/CloseReceivable`, data);
+    },
+    changeCollector: (data) => {
+        return AuthRequest.post('Receivable/ChangeAsignedCollector', data);
+    },
+    update: (receivable) => {
+        return AuthRequest.put('Receivable', receivable);
+    },
+    validate: (list) => {
+        return AuthRequest.post('Receivable/Validate', list);
     }
 }
