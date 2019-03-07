@@ -138,7 +138,11 @@
     margin: 0px 10px 0px 10px;
 }
 
-table.table a{
+table.table a {
     color: #1e70bf !important;
     text-decoration: underline;
+}
+
+.hide-last-row thead:last-child {
+    display: none;
 }

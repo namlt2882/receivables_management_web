@@ -226,30 +226,38 @@ class ReceivableDetail extends Component {
             if (tmp === 1) {
                 dayMark = 'Tomorrow';
             }
-            dateNote = `The process will start ${dayMark}`;
+            dateNote = `Process will start ${dayMark}`;
         } else {
             let tmp = totalDay + 1;
-            let dayMark = `${totalDay + 1} day(s) ago (at ${numAsDate(startDate)})`;
+            let dayMark = `${totalDay + 1} day(s) ago`;
             if (tmp === 1) {
                 dayMark = 'Today';
             } else if (tmp === 2) {
-                dayMark = `Yesterday (at ${numAsDate(startDate)})`;
+                dayMark = `Yesterday`;
             }
-            dateNote = `The process started ${dayMark} `;
+            dateNote = `Process started ${dayMark} `;
         }
         return (<div className='col-sm-12 row'>
-            {/* Progress bar and history */}
-            <div className='col-sm-12 receivable-progress'>
-                {/* show current date */}
-                <div style={{ textAlign: 'right' }}><b>Current date</b>: {numAsDate(this.state.currentDate)}</div>
-                {isFinished ? <div style={{ textAlign: 'right' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
+            {/* History */}
+            <div className='col-sm-3 row'>
+                <div className='col-sm-12'>
+                    {/* show current date */}
+                    <div style={{ textAlign: 'left' }}><b>Today</b>: {numAsDate(this.state.currentDate)}</div>
+                    {isFinished ? <div style={{ textAlign: 'right' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
+                </div>
+                <div className='col-sm-12'>
+                    <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
+                    {isFinished ? null : <TaskHistory todayTask={this.state.todayTask} />}
+                </div>
+            </div>
+            {/* Progress bar */}
+            <div className='col-sm-9 receivable-progress row' style={{ padding: '0px' }}>
                 {/* receivable progress */}
                 <ReceivableProgress progress={receivable.CollectionProgress} />
                 {/* show date note*/}
-                <div style={{ textAlign: 'center', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>
+                <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
+                    <span style={{ color: 'red' }}>*</span>
                     {dateNote}</div>
-                <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
-                {isFinished ? null : <TaskHistory todayTask={this.state.todayTask} />}
             </div>
             {/* Current stage */}
             {/* if current stage not null */}
@@ -322,9 +330,10 @@ class ReceivableDetail extends Component {
             <div className='col-sm-6'>
                 {/* Debtor */}
                 <Contact style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+            </div>
+            <div className='col-sm-12' style={{marginTop:'20px'}}>
                 {/* Relatives (only visible for collector)*/}
                 {AuthService.isCollector() ? <Contact title='Relatives' isDebtor={false} contacts={contacts} /> : null}
-
             </div>
         </div>);
     }

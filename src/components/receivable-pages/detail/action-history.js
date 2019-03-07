@@ -29,7 +29,7 @@ class ActionHistory extends Component {
         let stages = this.props.stages;
         let isEmpty = true;
         return (<div>
-            <a href='' onClick={this.showHistory} style={{ float: 'right' }}><i>SMS and phone call history</i></a>
+            <a href='' onClick={this.showHistory} style={{ float: 'left' }}><i>SMS and phone call history</i></a>
             <Modal isOpen={this.state.modal} className='big-modal'>
                 <ModalHeader toggle={this.toggle}>SMS and Phone call history</ModalHeader>
                 <ModalBody>

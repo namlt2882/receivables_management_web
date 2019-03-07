@@ -6,9 +6,9 @@ import {
 import { Button, Container, Header, Table } from 'semantic-ui-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserInjured, faUserFriends } from '@fortawesome/free-solid-svg-icons'
+import { faUserInjured, faUserFriends, faPen, faTrashAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 import { AuthService } from '../../../services/auth-service';
-library.add(faUserInjured, faUserFriends);
+library.add(faUserInjured, faUserFriends, faPen, faTrashAlt, faUserPlus);
 
 class Contact extends Component {
     constructor(props) {
@@ -47,8 +47,9 @@ class Contact extends Component {
                         color='black' size='md' style={{ marginRight: '10px' }} />
                     {this.props.title}
                 </Header>
-                {addable ? <a href='' onClick={this.add}>Add</a> : null}
-                {this.props.contacts.map((contact, i) => (<Table key={i} hover className='info-table'>
+                {addable ? <FontAwesomeIcon icon='user-plus' size='md' color='black' className='icon-btn'
+                    onClick={this.add} /> : null}
+                {this.props.isDebtor ? this.props.contacts.map((contact, i) => (<Table key={i} hover className='info-table'>
                     <Table.Body>
                         <Table.Row>
                             <Table.Cell>Id:</Table.Cell>
@@ -75,7 +76,31 @@ class Contact extends Component {
                             </Table.Cell>
                         </Table.Row>
                     </Table.Body>
-                </Table>))}
+                </Table>)) : <Table>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>#</Table.HeaderCell>
+                                <Table.HeaderCell>Id</Table.HeaderCell>
+                                <Table.HeaderCell>Name</Table.HeaderCell>
+                                <Table.HeaderCell>Phone</Table.HeaderCell>
+                                <Table.HeaderCell>Address</Table.HeaderCell>
+                                <Table.HeaderCell></Table.HeaderCell>
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {this.props.contacts.map((c, i) => (<Table.Row>
+                                <Table.Cell>{i + 1}</Table.Cell>
+                                <Table.Cell>{c.IdNo}</Table.Cell>
+                                <Table.Cell>{c.Name}</Table.Cell>
+                                <Table.Cell>{c.Phone}</Table.Cell>
+                                <Table.Cell>{c.Address}</Table.Cell>
+                                <Table.Cell>
+                                    <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn' />
+                                    <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn' />
+                                </Table.Cell>
+                            </Table.Row>))}
+                        </Table.Body>
+                    </Table>}
             </Container>);
     }
 }

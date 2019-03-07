@@ -58,6 +58,7 @@ class ReceivableList extends Component {
                     <Link to='/receivable/recent-add'>Recent added receivables</Link><br />
                 </div> : null}
                 <MDBDataTable
+                    className='hide-last-row'
                     striped
                     bordered
                     data={data1} />
