@@ -137,11 +137,11 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             }
             return { ...state };
         case Types.DELETE_STAGE:
-            process.Stages = process.Stages.filter((s) => s.Id === stageId);
+            state.Stages = state.Stages.filter((s) => s.Id !== stageId);
             state.Stages.forEach((s, i) => {
                 s.Name = 'Stage ' + (i + 1);
             })
-            return { ...state };
+            return state;
         //ACTION
         case Types.ADD_ACTION:
             let newAction = new Action();

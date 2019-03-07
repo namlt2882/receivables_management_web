@@ -15,6 +15,7 @@ class TodayTask extends Component {
         }
     }
     componentDidMount() {
+        document.title = 'Today task'
         available1();
         TaskService.getCollectorTodayTask(localStorage.getItem('id')).then(res => {
             this.setState({ todayTask: res.data });
@@ -31,7 +32,7 @@ class TodayTask extends Component {
                 <Header className='text-center'>Today task</Header>
             </Container>
             <div>{!hasTask ? 'You have no task today!' : null}</div>
-            <Table fixed style={{ display: hasTask ? 'block' : 'none' }}>
+            <Table fixed style={{ display: hasTask ? 'table' : 'none' }}>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>Task</Table.HeaderCell>
