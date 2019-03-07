@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
 import Component from '../../common/component';
-import { Button, Divider } from 'semantic-ui-react';
+import { Button, Divider, Tab, Table } from 'semantic-ui-react';
+import { describeActionType } from './receivable-detail';
 
 class TaskHistory extends Component {
     constructor(props) {
@@ -27,6 +28,7 @@ class TaskHistory extends Component {
         this.setState({ modal: false });
     }
     render() {
+        let todayTask = this.props.todayTask;
         return (<div>
             <a href='' onClick={this.showHistory} style={{ float: 'right' }}><i>Today task</i></a>
             <Modal isOpen={this.state.modal} className='big-modal'>
@@ -34,7 +36,22 @@ class TaskHistory extends Component {
                     {this.state.showTodayTask ? 'Today task' : 'Task history'}
                 </ModalHeader>
                 <ModalBody>
-
+                    <Table className='info-table' striped>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Task</th>
+                                <th>Start time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {todayTask.map((t, i) => (<tr>
+                                <td>{i + 1}</td>
+                                <td>{describeActionType(t.Name, t.Type)}</td>
+                                <td>{numAsTime(t.StartTime)}</td>
+                            </tr>))}
+                        </tbody>
+                    </Table>
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={this.closeModel}>Close</Button>

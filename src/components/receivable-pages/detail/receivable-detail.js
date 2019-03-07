@@ -19,18 +19,20 @@ import { AuthService } from '../../../services/auth-service';
 import TaskHistory from './task-history';
 import ChangeStatus from '../edit/change-status';
 import EditReceivable from '../edit/edit-receivable';
+import { TaskService } from '../../../services/task-service';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 6,
+            maxLoading: 7,
             receivable: null,
             currentStage: null,
             currentDate: dateToInt(new Date()),
             collectorList: [],
-            customerList: []
+            customerList: [],
+            todayTask: []
         }
         this.updateReceivable = this.updateReceivable.bind(this);
     }
@@ -62,6 +64,15 @@ class ReceivableDetail extends Component {
                 this.setState({ receivable: receivable });
                 this.incrementLoading();
             })
+            //[Receivable detail] get today task of receivable
+            if (!receivable.ClosedDay) {
+                TaskService.getReceivableTodayTask(receivable.Id).then(res6 => {
+                    this.setState({ todayTask: res6.data });
+                    this.incrementLoading();
+                })
+            } else {
+                this.incrementLoading();
+            }
             //[Update receivable] get list collector
             UserService.getCollectors().then(res4 => {
                 this.setState({ collectorList: res4.data });
@@ -238,7 +249,7 @@ class ReceivableDetail extends Component {
                 <div style={{ textAlign: 'center', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>
                     {dateNote}</div>
                 <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
-                <TaskHistory />
+                {isFinished ? null : <TaskHistory todayTask={this.state.todayTask} />}
             </div>
             {/* Current stage */}
             {/* if current stage not null */}
