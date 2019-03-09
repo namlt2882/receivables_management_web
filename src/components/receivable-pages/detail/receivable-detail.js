@@ -331,7 +331,7 @@ class ReceivableDetail extends Component {
                 {/* Debtor */}
                 <Contact style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
             </div>
-            <div className='col-sm-12' style={{marginTop:'20px'}}>
+            <div className='col-sm-12' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
                 {AuthService.isCollector() ? <Contact title='Relatives' isDebtor={false} contacts={contacts} /> : null}
             </div>
@@ -339,19 +339,55 @@ class ReceivableDetail extends Component {
     }
 }
 
+export const compareStatus = (a, b) => {
+    let aWeight = 0, bWeight = 0;
+    switch (a) {
+        case 1:
+            // Collecting
+            aWeight = 2;
+            break;
+        case 4:
+            //Waiting
+            aWeight = 1;
+            break;
+        default:
+    }
+    switch (b) {
+        case 1:
+            // Collecting
+            bWeight = 2;
+            break;
+        case 4:
+            //Waiting
+            bWeight = 1;
+            break;
+        default:
+    }
+    return bWeight - aWeight;
+}
+
 export const describeStatus = (status) => {
     let rs = status;
     switch (status) {
-        case 0: rs = 'Cancel';
+        case 0:
+            // Cancel
+            rs = 'Closed';
             break;
         case 1: rs = 'Collecting';
             break;
-        case 2: rs = 'Done';
+        case 2:
+            //Done
+            rs = 'Closed';
             break;
-        case 3: rs = 'Late';
+        case 3:
+            rs = 'Late';
             break;
-        case 4: rs = 'Wait'; break;
-        case 5: rs = 'Closed'; break;
+        case 4:
+            rs = 'Waiting';
+            break;
+        case 5:
+            //Closed
+            rs = 'Closed'; break;
     }
     return rs;
 }
