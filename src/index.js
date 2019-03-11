@@ -13,6 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'semantic-ui-css/semantic.min.css';
 import '@progress/kendo-theme-bootstrap/dist/all.css';
 import 'hammerjs'
+import 'react-notifications/lib/notifications.css';
 
 const store = createStore(
     appReducers,

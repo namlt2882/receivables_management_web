@@ -349,6 +349,12 @@ const mapDispatchToProps = (dispatch, props) => {
                 }
                 list.sort((a, b) => {
                     if (a.CollectionProgressStatus === b.CollectionProgressStatus) {
+                        if (a.PayableDay === null) {
+                            if (b.PayableDay === null) {
+                                return 0;
+                            }
+                            return 1;
+                        }
                         return compareIntDate(a.PayableDay, b.PayableDay)
                     } else {
                         return compareStatus(a.CollectionProgressStatus, b.CollectionProgressStatus);

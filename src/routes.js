@@ -12,6 +12,7 @@ import ImportReceivable from './components/receivable-pages/import-receivable'
 import ReceivableDetail from './components/receivable-pages/detail/receivable-detail'
 import ReceivableList from './components/receivable-pages/list-receivable'
 import TodayTask from './components/task-pages/today-task';
+import NewAssignedReceivable from './components/receivable-pages/new-assigned-receivable';
 
 const routes = [
     {
@@ -83,6 +84,11 @@ const routes = [
         path: '/receivable/:id/view',
         exact: true,
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
+    },
+    {
+        path: '/receivable/new-assigned',
+        exact: true,
+        main: ({ match, history }) => <NewAssignedReceivable match={match} history={history} />
     },
     {
         path: '/task',

@@ -46,6 +46,7 @@ export const DELETE_ACTION = 'DELETE_ACTION';
 
 //Receivable
 export const SET_RECEIVABLE_LIST = 'SET_RECEIVABLE_LIST';
+export const SET_NEW_RECEIVABLE_LIST = 'SET_NEW_RECEIVABLE_LIST';
 
 //Customer
 export const SET_CUSTOMER_LIST = 'SET_CUSTOMER_LIST'

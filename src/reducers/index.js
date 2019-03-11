@@ -7,7 +7,7 @@ import { customers } from './customer-reducer'
 import { profiles, messageForms } from './profile-reducer'
 import { process, processStatus } from './process-reducer'
 import { messages } from './message-reducer';
-import { receivableList } from './receivable-reducer';
+import { receivableList, newReceiavbleIds } from './receivable-reducer';
 import { contacts } from './contact-reducer'
 import { collectors } from './collector-reducer'
 
@@ -22,6 +22,7 @@ const appReducers = combineReducers({
     processStatus,
     messages,
     receivableList,
+    newReceiavbleIds,
     customers,
     contacts,
     collectors

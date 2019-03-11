@@ -1,6 +1,6 @@
 import { Request, AuthRequest } from '../utils/request'
 
-export const isLoggedIn = (yes, no) => {
+export const isLoggedIn = (yes = () => { }, no = () => { }) => {
     let token = localStorage.getItem('access_token');
     if (token === undefined || token === null) {
         removeJwt();
