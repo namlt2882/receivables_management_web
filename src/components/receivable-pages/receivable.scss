@@ -8,10 +8,12 @@
     max-width: 100px;
     font-weight: bold;
 }
-.deco-table td{
+
+.deco-table td {
     color: black !important;
     font-weight: normal;
 }
+
 .deco-table tr>td:first-child {
     font-weight: bold;
 }
@@ -33,6 +35,21 @@
 
 .r-stage {
     cursor: pointer;
+    position: relative;
+}
+
+.r-stage::after {
+    content: attr(startDate);
+}
+
+.r-stage:last-child {
+    cursor: unset;
+}
+
+.r-stage:last-child::after {
+    position: absolute;
+    left: -50;
+    width: 100px;
 }
 
 .r-stage:hover .text-center {
@@ -45,40 +62,24 @@
     background-color: #b5c0d1;
 }
 
-.receivable-progress .r-stage:first-child .progress {
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-}
-
-.receivable-progress .r-stage:last-child .progress {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
+.receivable-progress .r-stage .progress {
+    border-radius: 0px;
 }
 
 .receivable-progress .r-stage {
     padding: 0px;
 }
 
+.receivable-progress .r-stage .progress {
+    border-left: 2px solid black;
+}
+
 .receivable-progress .r-stage:hover .progress {
     opacity: 0.7;
 }
 
-.receivable-progress .r-stage:not(:first-child):not(:last-child) .progress {
+.receivable-progress .r-stage:nth-last-child(2) .progress {
     border-right: 2px solid black;
-    border-left: 2px solid black;
-    border-radius: 0px;
-}
-
-.receivable-progress .r-stage:first-child .progress {
-    border-right: 2px solid black;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-}
-
-.receivable-progress .r-stage:last-child .progress {
-    border-left: 2px solid black;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
 }
 
 .r-low-stage .progress-bar {
@@ -94,6 +95,7 @@
 .current-stage {
     margin-bottom: 15px;
 }
-.margin-btn{
+
+.margin-btn {
     margin: 10px 10px 10px 0px !important;
 }

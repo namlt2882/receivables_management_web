@@ -14,9 +14,18 @@ import {
     faChalkboardTeacher, faSignOutAlt, faTasks
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { AuthService } from '../../services/auth-service';
+import { AuthService, isLoggedIn } from '../../services/auth-service';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { withRouter } from 'react-router-dom'
+import { HOST_NAME } from '../../constants/config';
+import * as signalR from '@aspnet/signalr'
+import { ReceivableAction } from '../../actions/receivable-action';
+import { connect } from 'react-redux';
+import { NotificationService } from '../../services/notification-service';
+import { ReceivableService } from '../../services/receivable-service';
 library.add(faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks);
+
 
 class MyMenu extends Component {
     constructor(props) {
@@ -74,7 +83,7 @@ class MyMenu extends Component {
                                 />)
                             }
                             )}
-                            <Notification dropdownProfile={this.state.dropdownProfile} />
+                            <ConnectedNotification history={this.props.history} dropdownProfile={this.state.dropdownProfile} />
                             <MyProfile dropdownProfile={this.state.dropdownProfile}
                                 toggleProfile={this.toggleProfile} />
                         </Nav>
@@ -126,15 +135,110 @@ class Notification extends React.Component {
         super(props);
         this.state = {
             dropdownNoti: false,
-            mouseInNoti: false
+            mouseInNoti: false,
+            connection: null,
+            isNotificationLoaded: false,
+            notifications: []
         }
         this.openNoti = this.openNoti.bind(this);
         this.closeNoti = this.closeNoti.bind(this);
         this.checkMouseInNoti = this.checkMouseInNoti.bind(this);
         this.checkMouseOutNoti = this.checkMouseOutNoti.bind(this);
+        this.createNotification = this.createNotification.bind(this);
+        this.type11Action = this.type11Action.bind(this);
+        this.getAction = this.getAction.bind(this);
     }
 
+    componentDidMount() {
+        isLoggedIn(() => {
+            const protocol = new signalR.JsonHubProtocol();
+            // Singalr
+            let connection = new signalR.HubConnectionBuilder()
+                .withUrl(`http://202.78.227.91:6868/centerHub?access_token=${localStorage.getItem('access_token')}`)
+                .configureLogging(signalR.LogLevel.Information)
+                .withHubProtocol(protocol)
+                .build();
+            connection.on('Notify', (notification) => {
+                // this.setState({ isNotificationLoaded: false });
+                notification = JSON.parse(notification);
+                this.state.notifications.unshift(notification);
+                this.setState({ notifications: this.state.notifications })
+                this.createNotification('info', notification.Title, notification.Body, this.getAction(notification));
+            })
+            connection.start({ xdomain: true }).then(() => {
+                this.setState({
+                    connection: connection
+                })
+            }).catch(err => {
+                console.error(err.toString())
+            })
+        })
+    }
+
+    getAction({ Type, NData }) {
+        switch (Type) {
+            case 11:
+                return this.type11Action(JSON.parse(NData));
+            default: return () => { }
+        }
+    }
+
+    type11Action(ids) {
+        return () => {
+            this.props.setNewIds(ids);
+            let list = [];
+            let idList = this.props.newReceiavbleIds;
+            idList.map((id, i) => {
+                ReceivableService.get(id).then(res => {
+                    let receivable = res.data;
+                    list.push(receivable);
+                    if (i === (idList.length - 1)) {
+                        this.props.setReceivables(list);
+                        this.props.history.push('/receivable/new-assigned');
+                    }
+                })
+            })
+        }
+    }
+
+    createNotification = (type, title, message, callback) => {
+        if (callback === undefined) {
+            callback = () => { }
+        }
+        switch (type) {
+            case 'info':
+                NotificationManager.info(message, title, 3000, () => {
+                    callback();
+                });
+                break;
+            case 'success':
+                NotificationManager.success(message, title, 3000, () => {
+                    callback();
+                });
+                break;
+            case 'warning':
+                NotificationManager.warning(message, title, 3000, () => {
+                    callback();
+                });
+                break;
+            case 'error':
+                NotificationManager.error(message, title, 3000, () => {
+                    callback();
+                });
+                break;
+        }
+    };
+
     openNoti() {
+        if (!this.state.isNotificationLoaded) {
+            NotificationService.getMyNotification().then(res => {
+                let notifications = res.data;
+                this.setState({
+                    notifications: notifications,
+                    isNotificationLoaded: true
+                })
+            })
+        }
         this.setState({
             dropdownNoti: true,
             mouseInNoti: true
@@ -165,21 +269,45 @@ class Notification extends React.Component {
                     <FontAwesomeIcon icon='bell' color='white' size='lg' className='noti-item-icon'
                         style={{ opacity: (isOpen ? '1' : '0.7') }} />
                 </button>
+                <NotificationContainer />
                 <Popover placement="bottom" target="popover-noti"
                     isOpen={isOpen}
                     toggle={this.openNoti} onMouseMove={this.checkMouseInNoti}
                     onMouseOut={this.checkMouseOutNoti}>
-                    <PopoverHeader>New</PopoverHeader>
+                    {this.state.notifications.map(n =>
+                        <PopoverBody style={{ cursor: 'pointer' }}
+                            onClick={() => { this.getAction(n)() }}>{n.Body}</PopoverBody>
+                    )}
+                    {/* <PopoverHeader>New</PopoverHeader>
                     <PopoverBody>A process is done!</PopoverBody>
                     <PopoverHeader>Previous</PopoverHeader>
-                    <PopoverBody>A process is done!</PopoverBody>
+                    <PopoverBody>A process is done!</PopoverBody> */}
                 </Popover>
             </div>
         </NavItem>);
     }
 }
 
-export default MyMenu;
+const mapStateToProps = state => {
+    return {
+        newReceiavbleIds: state.newReceiavbleIds
+    }
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        setNewIds: (ids) => {
+            dispatch(ReceivableAction.setNewReceivableIds(ids))
+        },
+        setReceivables: (list) => {
+            dispatch(ReceivableAction.setReceivableList(list));
+        }
+    }
+}
+
+const ConnectedNotification = connect(mapStateToProps, mapDispatchToProps)(Notification)
+
+export default withRouter(MyMenu);
 
 const menus = [
     {

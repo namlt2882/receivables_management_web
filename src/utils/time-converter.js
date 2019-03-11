@@ -17,6 +17,9 @@ export const monthAsString = (num) => {
 }
 
 export const numAsDate = (num) => {
+    if (!num) {
+        return '';
+    }
     num = num.toString();
     let year = num.substring(0, 4);
     let month = num.substring(4, 6);
@@ -47,6 +50,9 @@ export const dateToInt = (date) => {
 }
 
 export const numAsTime = (num) => {
+    if (!num) {
+        return '';
+    }
     let hour;
     let minute;
     if (num < 1000) {

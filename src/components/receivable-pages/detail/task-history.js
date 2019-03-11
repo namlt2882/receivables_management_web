@@ -1,11 +1,10 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Badge } from 'reactstrap';
-import { numAsDate, numAsTime } from '../../../utils/time-converter';
-import Component from '../../common/component';
-import { Button, Divider, Tab, Table } from 'semantic-ui-react';
+import { numAsTime } from '../../../utils/time-converter';
+import { Button, Table } from 'semantic-ui-react';
 import { describeActionType } from './receivable-detail';
 
-class TaskHistory extends Component {
+class TaskHistory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -30,7 +29,7 @@ class TaskHistory extends Component {
     render() {
         let todayTask = this.props.todayTask;
         return (<div>
-            <a href='' onClick={this.showHistory} style={{ float: 'right' }}><i>Today task</i></a>
+            <a href='' onClick={this.showHistory} style={{ float: 'left' }}><i>Today task</i></a>
             <Modal isOpen={this.state.modal} className='big-modal'>
                 <ModalHeader toggle={this.toggle}>
                     {this.state.showTodayTask ? 'Today task' : 'Task history'}

@@ -12,7 +12,7 @@ import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
 import ActionHistory from './action-history';
-import { Button, Container, Header, Table, Divider } from 'semantic-ui-react'
+import { Container, Header, Table, Divider, Label } from 'semantic-ui-react'
 import { UserService } from '../../../services/user-service';
 import { UtilityService } from '../../../services/utility-service';
 import { AuthService } from '../../../services/auth-service';
@@ -226,30 +226,45 @@ class ReceivableDetail extends Component {
             if (tmp === 1) {
                 dayMark = 'Tomorrow';
             }
-            dateNote = `The process will start ${dayMark}`;
+            dateNote = `Process will start ${dayMark}`;
         } else {
             let tmp = totalDay + 1;
-            let dayMark = `${totalDay + 1} day(s) ago (at ${numAsDate(startDate)})`;
+            let dayMark = `${totalDay + 1} day(s) ago`;
             if (tmp === 1) {
                 dayMark = 'Today';
             } else if (tmp === 2) {
-                dayMark = `Yesterday (at ${numAsDate(startDate)})`;
+                dayMark = `Yesterday`;
             }
-            dateNote = `The process started ${dayMark} `;
+            dateNote = `Process started ${dayMark} `;
+        }
+        let status = describeStatus(receivable.CollectionProgress.Status);
+        let statusColor = 'grey';
+        if (status === 'Collecting') {
+            statusColor = 'green'
+        } else if (status === 'Waiting') {
+            statusColor = 'orange'
         }
         return (<div className='col-sm-12 row'>
-            {/* Progress bar and history */}
-            <div className='col-sm-12 receivable-progress'>
-                {/* show current date */}
-                <div style={{ textAlign: 'right' }}><b>Current date</b>: {numAsDate(this.state.currentDate)}</div>
-                {isFinished ? <div style={{ textAlign: 'right' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
+            {/* History */}
+            <div className='col-sm-3 row'>
+                <div className='col-sm-12'>
+                    {/* show current date */}
+                    <div style={{ textAlign: 'left' }}><b>Today</b>: {numAsDate(this.state.currentDate)}</div>
+                    {isFinished ? <div style={{ textAlign: 'left' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
+                </div>
+                <div className='col-sm-12'>
+                    <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
+                    {isFinished ? null : <TaskHistory todayTask={this.state.todayTask} />}
+                </div>
+            </div>
+            {/* Progress bar */}
+            <div className='col-sm-9 receivable-progress row' style={{ padding: '0px' }}>
                 {/* receivable progress */}
                 <ReceivableProgress progress={receivable.CollectionProgress} />
                 {/* show date note*/}
-                <div style={{ textAlign: 'center', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>
+                <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
+                    <span style={{ color: 'red' }}>*</span>
                     {dateNote}</div>
-                <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
-                {isFinished ? null : <TaskHistory todayTask={this.state.todayTask} />}
             </div>
             {/* Current stage */}
             {/* if current stage not null */}
@@ -304,7 +319,7 @@ class ReceivableDetail extends Component {
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Status:</Table.Cell>
-                                <Table.Cell>{describeStatus(receivable.CollectionProgress.Status)}</Table.Cell>
+                                <Table.Cell><Label color={statusColor}>{status}</Label></Table.Cell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell></Table.Cell>
@@ -321,28 +336,65 @@ class ReceivableDetail extends Component {
             {/* contacts */}
             <div className='col-sm-6'>
                 {/* Debtor */}
-                <Contact style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+                <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+            </div>
+            <div className='col-sm-12' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
-                {AuthService.isCollector() ? <Contact title='Relatives' isDebtor={false} contacts={contacts} /> : null}
-
+                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives' isDebtor={false} contacts={contacts} /> : null}
             </div>
         </div>);
     }
 }
 
+export const compareStatus = (a, b) => {
+    let aWeight = 0, bWeight = 0;
+    switch (a) {
+        case 1:
+            // Collecting
+            aWeight = 2;
+            break;
+        case 4:
+            //Waiting
+            aWeight = 1;
+            break;
+        default:
+    }
+    switch (b) {
+        case 1:
+            // Collecting
+            bWeight = 2;
+            break;
+        case 4:
+            //Waiting
+            bWeight = 1;
+            break;
+        default:
+    }
+    return bWeight - aWeight;
+}
+
 export const describeStatus = (status) => {
     let rs = status;
     switch (status) {
-        case 0: rs = 'Cancel';
+        case 0:
+            // Cancel
+            rs = 'Closed';
             break;
         case 1: rs = 'Collecting';
             break;
-        case 2: rs = 'Done';
+        case 2:
+            //Done
+            rs = 'Closed';
             break;
-        case 3: rs = 'Late';
+        case 3:
+            rs = 'Late';
             break;
-        case 4: rs = 'Wait'; break;
-        case 5: rs = 'Closed'; break;
+        case 4:
+            rs = 'Waiting';
+            break;
+        case 5:
+            //Closed
+            rs = 'Closed'; break;
     }
     return rs;
 }

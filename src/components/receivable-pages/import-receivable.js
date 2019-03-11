@@ -325,7 +325,7 @@ class ImportReceivable extends Component {
                 <div className='form-group col-sm-8' style={{ display: this.state.step === 2 ? 'block' : 'none' }}>
                     <label className='bold-text'>Files:</label>
                     <input type='file' onChange={this.handleFile} />
-                    <span className='warning-text'>{this.state.fileWarning}</span>
+                    <span className='warning-text'>{this.state.fileWarning}<br/></span>
                     <Button color='secondary' className='margin-btn' onClick={this.decreaseStep}>Back</Button>
                 </div>
                 {/* END STEP 2 */}
@@ -340,6 +340,7 @@ class ImportReceivable extends Component {
                     <Container>
                         <Divider />
                         <MDBDataTable
+                            className='hide-last-row'
                             striped
                             bordered
                             data={data1} />
@@ -349,6 +350,7 @@ class ImportReceivable extends Component {
                     <Container>
                         <Divider />
                         <MDBDataTable
+                            className='hide-last-row'
                             striped
                             bordered
                             data={data2} />
@@ -362,7 +364,7 @@ const pushData2 = (receivableList, collectorList, customerList) => {
     let rows = [];
     let data1 = { ...tableData2 };
     if (receivableList) {
-        rows = receivableList.map(r => {
+        rows = receivableList.map((r, i) => {
             let debtor = r.Contacts.find(c => c.Type === 0);
             let customer = customerList.find(cu => cu.Id === r.CustomerId);
             let collector = null;
@@ -370,7 +372,7 @@ const pushData2 = (receivableList, collectorList, customerList) => {
                 collector = collectorList.find(co => co.Id === r.AssignedCollectors[0].UserId)
             }
             return {
-                Id: r.Id,
+                No: (i + 1),
                 DebtorName: debtor ? debtor.Name : null,
                 CustomerName: customer ? customer.Name : null,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
@@ -415,8 +417,8 @@ export const pushData1 = (receivableData, collectorList, setCollector) => {
 const tableData2 = {
     columns: [
         {
-            label: 'Id',
-            field: 'Id',
+            label: '',
+            field: 'No',
             width: 150
         },
         {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Progress } from 'reactstrap';
-import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Popover, PopoverBody } from 'reactstrap';
 import { numAsDate } from '../../../utils/time-converter';
 import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 
@@ -35,6 +35,10 @@ class ReceivableProgress extends Component {
         if (size < 1) {
             size = 1;
         }
+        let endDate = 0;
+        if (progress.Stages.length > 0) {
+            endDate = progress.Stages[progress.Stages.length - 1].endDate;
+        }
         try {
             return (<div className='col-sm-12 row justify-content-center align-self-center'>
                 {progress.Stages.map((stage, i) => {
@@ -57,7 +61,7 @@ class ReceivableProgress extends Component {
                         status = 'Finished';
                     }
 
-                    return (<div className={className} id={'rps-' + i} onMouseEnter={() => { this.onMouseIn(i - 1) }}
+                    return (<div className={className} startDate={numAsDate(stage.startDate)} id={'rps-' + i} onMouseEnter={() => { this.onMouseIn(i - 1) }}
                         onMouseLeave={() => { this.onMouseOut(i - 1) }}>
                         <div className='text-center'>{`${stage.Name} (${stage.Duration} days)`}</div>
                         <Progress value={percent}></Progress>
@@ -90,6 +94,10 @@ class ReceivableProgress extends Component {
                         </Popover>
                     </div>)
                 })}
+                <div className='r-stage' startDate={numAsDate(endDate)} style={{ width: '50px' }}>
+                    <div style={{ opacity: '0' }}>abc</div>
+                    <Progress value={100} style={{ opacity: '0' }}></Progress>
+                </div>
                 {/* <div className='col-sm-3 r-stage'>
                 <div className='text-center'>Stage 1</div>
                 <Progress value={100}>30 days</Progress>
