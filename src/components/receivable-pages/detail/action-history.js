@@ -1,10 +1,9 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
-import Component from '../../common/component';
 import { Button, Divider } from 'semantic-ui-react';
 
-class ActionHistory extends Component {
+class ActionHistory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

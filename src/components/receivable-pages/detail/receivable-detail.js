@@ -12,7 +12,7 @@ import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
 import ActionHistory from './action-history';
-import { Button, Container, Header, Table, Divider } from 'semantic-ui-react'
+import { Container, Header, Table, Divider, Label } from 'semantic-ui-react'
 import { UserService } from '../../../services/user-service';
 import { UtilityService } from '../../../services/utility-service';
 import { AuthService } from '../../../services/auth-service';
@@ -237,13 +237,20 @@ class ReceivableDetail extends Component {
             }
             dateNote = `Process started ${dayMark} `;
         }
+        let status = describeStatus(receivable.CollectionProgress.Status);
+        let statusColor = 'grey';
+        if (status === 'Collecting') {
+            statusColor = 'green'
+        } else if (status === 'Waiting') {
+            statusColor = 'orange'
+        }
         return (<div className='col-sm-12 row'>
             {/* History */}
             <div className='col-sm-3 row'>
                 <div className='col-sm-12'>
                     {/* show current date */}
                     <div style={{ textAlign: 'left' }}><b>Today</b>: {numAsDate(this.state.currentDate)}</div>
-                    {isFinished ? <div style={{ textAlign: 'right' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
+                    {isFinished ? <div style={{ textAlign: 'left' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
                 </div>
                 <div className='col-sm-12'>
                     <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
@@ -312,7 +319,7 @@ class ReceivableDetail extends Component {
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Status:</Table.Cell>
-                                <Table.Cell>{describeStatus(receivable.CollectionProgress.Status)}</Table.Cell>
+                                <Table.Cell><Label color={statusColor}>{status}</Label></Table.Cell>
                             </Table.Row>
                             <Table.Row>
                                 <Table.Cell></Table.Cell>
@@ -329,11 +336,11 @@ class ReceivableDetail extends Component {
             {/* contacts */}
             <div className='col-sm-6'>
                 {/* Debtor */}
-                <Contact style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+                <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
             </div>
             <div className='col-sm-12' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
-                {AuthService.isCollector() ? <Contact title='Relatives' isDebtor={false} contacts={contacts} /> : null}
+                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives' isDebtor={false} contacts={contacts} /> : null}
             </div>
         </div>);
     }

@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import {
-    Card, CardBody, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem,
-    CardTitle
-} from 'reactstrap';
 import { Button, Container, Header, Table } from 'semantic-ui-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -32,6 +28,7 @@ class Contact extends Component {
     }
     render() {
         let addable = true;
+        let isFinished = this.props.isFinished;
         if (this.props.isDebtor) {
             // will add if debtor not existed
             if (this.props.contacts == 0) {
@@ -47,7 +44,7 @@ class Contact extends Component {
                         color='black' size='md' style={{ marginRight: '10px' }} />
                     {this.props.title}
                 </Header>
-                {addable ? <FontAwesomeIcon icon='user-plus' size='md' color='black' className='icon-btn'
+                {addable && !isFinished ? <FontAwesomeIcon icon='user-plus' size='md' color='black' className='icon-btn'
                     onClick={this.add} /> : null}
                 {this.props.isDebtor ? this.props.contacts.map((contact, i) => (<Table key={i} hover className='info-table'>
                     <Table.Body>
@@ -70,9 +67,8 @@ class Contact extends Component {
                         <Table.Row>
                             <Table.Cell></Table.Cell>
                             <Table.Cell>
-                                {AuthService.isCollector() ?
+                                {AuthService.isCollector() && !isFinished ?
                                     <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a> : null}
-                                {this.props.isDebtor ? null : <Button color='red'>Delete</Button>}
                             </Table.Cell>
                         </Table.Row>
                     </Table.Body>
@@ -95,8 +91,8 @@ class Contact extends Component {
                                 <Table.Cell>{c.Phone}</Table.Cell>
                                 <Table.Cell>{c.Address}</Table.Cell>
                                 <Table.Cell>
-                                    <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn' />
-                                    <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn' />
+                                    {!isFinished ? <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn' /> : null}
+                                    {!isFinished ? <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn' /> : null}
                                 </Table.Cell>
                             </Table.Row>))}
                         </Table.Body>

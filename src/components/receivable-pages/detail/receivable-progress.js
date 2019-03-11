@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Progress } from 'reactstrap';
-import { Popover, PopoverHeader, PopoverBody } from 'reactstrap';
+import { Popover, PopoverBody } from 'reactstrap';
 import { numAsDate } from '../../../utils/time-converter';
 import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 
