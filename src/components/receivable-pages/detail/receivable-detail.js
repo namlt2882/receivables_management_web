@@ -347,30 +347,18 @@ class ReceivableDetail extends Component {
     }
 }
 
-export const compareStatus = (a, b) => {
-    let aWeight = 0, bWeight = 0;
-    switch (a) {
-        case 1:
-            // Collecting
-            aWeight = 2;
-            break;
-        case 4:
-            //Waiting
-            aWeight = 1;
-            break;
-        default:
-    }
-    switch (b) {
-        case 1:
-            // Collecting
-            bWeight = 2;
-            break;
-        case 4:
-            //Waiting
-            bWeight = 1;
-            break;
-        default:
-    }
+const statusWeight = [
+    { status: 'Collecting', weight: 4 },
+    { status: 'Not confirmed', weight: 3 },
+    { status: 'Pending', weight: 2 },
+    { status: 'Closed', weight: 1 }
+]
+
+export const compareStatus = (a, b, aConfirmed = false, bConfirmed = false) => {
+
+    let aWeight = describeStatus(a, aConfirmed), bWeight = describeStatus(b, bConfirmed);
+    aWeight = statusWeight.find(sw => sw.status === aWeight).weight;
+    bWeight = statusWeight.find(sw => sw.status === bWeight).weight;
     return bWeight - aWeight;
 }
 

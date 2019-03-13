@@ -1,19 +1,28 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
-import { Button, Divider } from 'semantic-ui-react';
+import { Button, Divider, Label } from 'semantic-ui-react';
 
 class ActionHistory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false
+            modal: false,
+            total: 0,
+            stages: this.props.stages
         }
         this.showHistory = this.showHistory.bind(this);
         this.closeModel = this.closeModel.bind(this);
     }
     componentDidMount() {
-
+        let stages = this.state.stages;
+        stages.forEach(stage => {
+            stage.history_actions = stage.Actions.filter(a => a.Status !== 1);
+            this.setState(pre => ({
+                total: pre.total + stage.history_actions.length
+            }))
+        })
+        this.setState({ stages: stages });
     }
     showHistory(e) {
         e.preventDefault();
@@ -25,15 +34,18 @@ class ActionHistory extends React.Component {
         this.setState({ modal: false });
     }
     render() {
-        let stages = this.props.stages;
+        let stages = this.state.stages;
         let isEmpty = true;
         return (<div>
-            <a href='' onClick={this.showHistory} style={{ float: 'left' }}><i>SMS and phone call history</i></a>
+            <a href='' onClick={this.showHistory} style={{ float: 'left' }}><i>{`SMS and Phone call history (${this.state.total})`}</i></a>
             <Modal isOpen={this.state.modal} className='big-modal'>
-                <ModalHeader toggle={this.toggle}>SMS and Phone call history</ModalHeader>
+                <ModalHeader toggle={this.toggle}>{`SMS and Phone call history (${this.state.total})`}</ModalHeader>
                 <ModalBody>
                     {stages.map((stage, i) => {
-                        let actions = stage.Actions.filter(a => a.Status !== 1);
+                        let actions = stage.history_actions;
+                        if (!actions) {
+                            return null;
+                        }
                         if (isEmpty && actions.length > 0) {
                             isEmpty = false;
                         }
@@ -73,13 +85,13 @@ class ActionRecord extends React.Component {
         let action = this.props.action;
         let date = numAsDate(action.ExcutionDay);
         let time = numAsTime(action.StartTime);
-        let color = 'warning';
+        let color = 'orange';
         switch (action.Status) {
             case 1:
-                color = 'secondary'
+                color = 'gray'
                 break;
             case 2:
-                color = 'success'
+                color = 'green'
                 break;
         }
         return (<tr>
@@ -87,7 +99,7 @@ class ActionRecord extends React.Component {
             <td>
                 <span>At{` ${date} ${time}`}</span>
                 <span style={{ float: 'right' }}>
-                    <Badge color={color}>{describeActionStatus(action.Status)}</Badge>
+                    <Label color={color}>{describeActionStatus(action.Status)}</Label>
                 </span>
             </td>
         </tr>);

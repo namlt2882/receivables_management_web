@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { numAsDate, compareIntDate } from '../../../utils/time-converter';
 import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
 import { Container, Header, Segment, Grid, Divider } from 'semantic-ui-react';
+import { AuthService } from '../../../services/auth-service';
 
 class CurrentStage extends Component {
     constructor(props) {
@@ -25,7 +26,7 @@ class CurrentStage extends Component {
             </Header>
             <div className='col-sm-12 row justify-content-center align-self-center'>
                 <Segment className='col-sm-12'>
-                    <Grid columns={2} relaxed='very'>
+                    <Grid columns={AuthService.isManager() ? 1 : 2} relaxed='very'>
                         <Grid.Column>
                             <table className='deco-table' style={{ marginLeft: '20px' }}>
                                 <tbody>
@@ -38,21 +39,21 @@ class CurrentStage extends Component {
                                         <td>{currentStage.Duration} day(s)</td>
                                     </tr>
                                     <tr>
-                                        <td>Start day:</td>
+                                        <td>Start at:</td>
                                         <td>{numAsDate(currentStage.startDate)}</td>
                                     </tr>
                                     <tr>
-                                        <td>End day:</td>
+                                        <td>End at:</td>
                                         <td>{numAsDate(currentStage.endDate)}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </Grid.Column>
-                        <Grid.Column>
+                        {AuthService.isManager() ? null : <Grid.Column>
                             {this.props.children}
-                        </Grid.Column>
+                        </Grid.Column>}
                     </Grid>
-                    <Divider vertical/>
+                    {AuthService.isManager() ? null : <Divider vertical />}
                 </Segment>
                 {/* <div className='col-sm-3'><b>Actions:</b></div>
                     <table className='col-sm-8'>
