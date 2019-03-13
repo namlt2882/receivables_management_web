@@ -8,8 +8,7 @@ class TaskHistory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false,
-            showTodayTask: true
+            modal: false
         }
         this.showHistory = this.showHistory.bind(this);
         this.closeModel = this.closeModel.bind(this);
@@ -29,13 +28,13 @@ class TaskHistory extends React.Component {
     render() {
         let todayTask = this.props.todayTask;
         return (<div>
-            <a href='' onClick={this.showHistory} style={{ float: 'left' }}><i>Today task</i></a>
+            <a href='' onClick={this.showHistory} style={{ float: 'left' }}><i>{`Today tasks (${todayTask.length})`}</i></a>
             <Modal isOpen={this.state.modal} className='big-modal'>
                 <ModalHeader toggle={this.toggle}>
-                    {this.state.showTodayTask ? 'Today task' : 'Task history'}
+                    {`Today tasks (${todayTask.length})`}
                 </ModalHeader>
                 <ModalBody>
-                    <Table className='info-table' striped>
+                    {todayTask.length > 0 ? <Table className='info-table' striped>
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -50,7 +49,8 @@ class TaskHistory extends React.Component {
                                 <td>{numAsTime(t.StartTime)}</td>
                             </tr>))}
                         </tbody>
-                    </Table>
+                    </Table> : null}
+                    {todayTask.length == 0 ? <i>No task need to be done today!</i> : null}
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={this.closeModel}>Close</Button>

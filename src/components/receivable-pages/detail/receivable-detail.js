@@ -12,7 +12,7 @@ import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
 import ActionHistory from './action-history';
-import { Container, Header, Table, Divider, Label } from 'semantic-ui-react'
+import { Container, Header, Table, Divider, Label, Button } from 'semantic-ui-react'
 import { UserService } from '../../../services/user-service';
 import { UtilityService } from '../../../services/utility-service';
 import { AuthService } from '../../../services/auth-service';
@@ -35,6 +35,7 @@ class ReceivableDetail extends Component {
             todayTask: []
         }
         this.updateReceivable = this.updateReceivable.bind(this);
+        this.confirm = this.confirm.bind(this);
     }
     updateReceivable(receivable) {
         this.setState({ receivable: receivable });
@@ -84,10 +85,18 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
         }).catch(err => {
-            if (err.response.status === 404) {
-                this.props.history.push('/not-found');
-            }
+            this.props.history.push('/not-found');
         })
+    }
+    confirm() {
+        if (window.confirm('This case will be closed?')) {
+            ReceivableService.confirm(this.state.receivable.Id).then(res => {
+                this.state.receivable.IsConfirmed = true;
+                this.setState(pre => ({
+                    receivable: pre.receivable
+                }))
+            })
+        }
     }
     edit(e) {
         e.preventDefault();
@@ -237,20 +246,14 @@ class ReceivableDetail extends Component {
             }
             dateNote = `Process started ${dayMark} `;
         }
-        let status = describeStatus(receivable.CollectionProgress.Status);
-        let statusColor = 'grey';
-        if (status === 'Collecting') {
-            statusColor = 'green'
-        } else if (status === 'Waiting') {
-            statusColor = 'orange'
-        }
+        let status = describeStatus(receivable.CollectionProgress.Status, receivable.IsConfirmed);
+        let statusColor = getStatusColor(receivable.CollectionProgress.Status, receivable.IsConfirmed);
         return (<div className='col-sm-12 row'>
             {/* History */}
             <div className='col-sm-3 row'>
                 <div className='col-sm-12'>
                     {/* show current date */}
-                    <div style={{ textAlign: 'left' }}><b>Today</b>: {numAsDate(this.state.currentDate)}</div>
-                    {isFinished ? <div style={{ textAlign: 'left' }}><b>Closed day</b>: {numAsDate(receivable.ClosedDay)}</div> : null}
+                    <div style={{ textAlign: 'left' }}>{`Today is ${numAsDate(this.state.currentDate)}`}</div>
                 </div>
                 <div className='col-sm-12'>
                     <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
@@ -260,26 +263,19 @@ class ReceivableDetail extends Component {
             {/* Progress bar */}
             <div className='col-sm-9 receivable-progress row' style={{ padding: '0px' }}>
                 {/* receivable progress */}
-                <ReceivableProgress progress={receivable.CollectionProgress} />
+                <ReceivableProgress isFinished={isFinished} progress={receivable.CollectionProgress} />
                 {/* show date note*/}
                 <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
                     <span style={{ color: 'red' }}>*</span>
                     {dateNote}</div>
             </div>
-            {/* Current stage */}
-            {/* if current stage not null */}
-            {!isFinished && currentStage != null ? <div className='col-sm-12'>
-                <Divider />
-                <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage} />
-                <Divider />
-            </div> : null}
 
             {/* receivable information */}
             <div className='col-sm-6'>
                 <Container>
                     <Header>
                         <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
-                        Receivable Info
+                        Receivable Info <Label color={statusColor}>{status}</Label>
                         {/* Edit info of receivable */}
                         {receivable.CollectionProgress.Status === 1 ?
                             <EditReceivable updateReceivable={this.updateReceivable}
@@ -317,28 +313,33 @@ class ReceivableDetail extends Component {
                                     {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
                                 </Table.Cell>
                             </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>Status:</Table.Cell>
-                                <Table.Cell><Label color={statusColor}>{status}</Label></Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell></Table.Cell>
-                                <Table.Cell>
-                                    {/* Change status of receivable */}
-                                    {receivable.CollectionProgress.Status === 1 ?
-                                        <ChangeStatus updateReceivable={this.updateReceivable} debtor={debtor} receivable={receivable} /> : null}
-                                </Table.Cell>
-                            </Table.Row>
+                            {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?
+                                <Table.Row>
+                                    <Table.Cell></Table.Cell>
+                                    <Table.Cell>
+                                        <Button color='green' onClick={this.confirm}>Confirm</Button>
+                                    </Table.Cell>
+                                </Table.Row> : null}
                         </Table.Body>
                     </Table>
                 </Container>
             </div>
+
+            {/* Current stage */}
+            {/* if current stage not null */}
+            {!isFinished && currentStage != null ? <div className='col-sm-6'>
+                <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage}>
+                    {/* Change status of receivable */}
+                    {receivable.CollectionProgress.Status === 1 ?
+                        <ChangeStatus updateReceivable={this.updateReceivable} receivable={receivable} /> : null}
+                </CurrentStage>
+            </div> : null}
             {/* contacts */}
-            <div className='col-sm-6'>
+            <div className='col-sm-6' style={{ marginTop: '20px' }}>
                 {/* Debtor */}
                 <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
             </div>
-            <div className='col-sm-12' style={{ marginTop: '20px' }}>
+            <div className='col-sm-6' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
                 {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives' isDebtor={false} contacts={contacts} /> : null}
             </div>
@@ -346,39 +347,43 @@ class ReceivableDetail extends Component {
     }
 }
 
-export const compareStatus = (a, b) => {
-    let aWeight = 0, bWeight = 0;
-    switch (a) {
-        case 1:
-            // Collecting
-            aWeight = 2;
-            break;
-        case 4:
-            //Waiting
-            aWeight = 1;
-            break;
-        default:
-    }
-    switch (b) {
-        case 1:
-            // Collecting
-            bWeight = 2;
-            break;
-        case 4:
-            //Waiting
-            bWeight = 1;
-            break;
-        default:
-    }
+const statusWeight = [
+    { status: 'Collecting', weight: 4 },
+    { status: 'Not confirmed', weight: 3 },
+    { status: 'Pending', weight: 2 },
+    { status: 'Closed', weight: 1 }
+]
+
+export const compareStatus = (a, b, aConfirmed = false, bConfirmed = false) => {
+
+    let aWeight = describeStatus(a, aConfirmed), bWeight = describeStatus(b, bConfirmed);
+    aWeight = statusWeight.find(sw => sw.status === aWeight).weight;
+    bWeight = statusWeight.find(sw => sw.status === bWeight).weight;
     return bWeight - aWeight;
 }
 
-export const describeStatus = (status) => {
+export const getStatusColor = (status, confirm = false) => {
+    let statusColor = 'grey';
+    status = describeStatus(status, confirm);
+    if (status === 'Collecting') {
+        statusColor = 'green'
+    } else if (status === 'Pending') {
+        statusColor = 'yellow'
+    } else if (status === 'Not confirmed') {
+        statusColor = 'red'
+    }
+    return statusColor;
+}
+
+export const describeStatus = (status, confirm = false) => {
     let rs = status;
     switch (status) {
         case 0:
             // Cancel
             rs = 'Closed';
+            if (!confirm) {
+                rs = 'Not confirmed'
+            }
             break;
         case 1: rs = 'Collecting';
             break;
@@ -390,11 +395,16 @@ export const describeStatus = (status) => {
             rs = 'Late';
             break;
         case 4:
-            rs = 'Waiting';
+            //change from Waiting to Pending
+            rs = 'Pending';
             break;
         case 5:
             //Closed
-            rs = 'Closed'; break;
+            rs = 'Closed';
+            if (!confirm) {
+                rs = 'Not confirmed'
+            }
+            break;
     }
     return rs;
 }

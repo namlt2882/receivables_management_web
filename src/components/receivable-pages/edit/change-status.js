@@ -13,7 +13,6 @@ class ChangeStatus extends Component {
             showTodayTask: true,
             receivable: this.props.receivable,
             status: this.props.receivable.CollectionProgress.Status,
-            formLoading: false,
             isPayed: false
         }
         this.openForm = this.openForm.bind(this);
@@ -32,10 +31,9 @@ class ChangeStatus extends Component {
     changeStatus(isPayed) {
         let message = 'Money is collected and will close this case?';
         if (!isPayed) {
-            message = 'Cancel this case?';
+            message = 'Stop this case?';
         }
         if (window.confirm(message)) {
-            // this.setState({ formLoading: true });
             let data = {
                 Id: this.state.receivable.Id,
                 isPayed: isPayed
@@ -45,40 +43,20 @@ class ChangeStatus extends Component {
                 this.state.receivable.CollectionProgress.Status = rs.Status;
                 this.state.receivable.ClosedDay = rs.ClosedTime;
                 this.props.updateReceivable(this.state.receivable);
-                // this.setState({ formLoading: false });
-                // this.closeModal();
             })
         }
     }
     render() {
-        let receivable = this.state.receivable;
-        let debtor = this.props.debtor;
         return (<div>
             {AuthService.isCollector() ?
-                <Button color='green' onClick={() => { this.changeStatus(true) }}>Close</Button> : null}
+                <div style={{ marginBottom: '10px', marginLeft: '20%' }}>
+                    <Button color='blue' onClick={() => { this.changeStatus(true) }}>Finish</Button>
+                </div> : null}
+
             {AuthService.isCollector() ?
-                <Button color='orange' onClick={() => { this.changeStatus(false) }}>Cancel</Button> : null}
-            {/* <Modal isOpen={this.state.modal}>
-                <ModalHeader toggle={this.toggle}>Close {debtor ? ` ${debtor.Name}'s` : ''} receivable</ModalHeader>
-                <ModalBody>
-                    <Form onSubmit={this.changeStatus} loading={this.state.formLoading}>
-                        <Form.Field>
-                            <b>Amount need to be collected:</b>{` ${(receivable.DebtAmount - receivable.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 })}`}
-                        </Form.Field>
-                        <Form.Field control={Checkbox} label='Money is collected?'
-                            checked={this.state.isPayed} onChange={() => {
-                                this.setState(pre => ({
-                                    isPayed: !pre.isPayed
-                                }))
-                            }} />
-                        <button ref='submit' type='submit' style={{ display: 'none' }}></button>
-                    </Form>
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="primary" onClick={() => { this.refs.submit.click() }}>OK</Button>
-                    <Button color="secondary" onClick={this.closeModal}>Cancel</Button>
-                </ModalFooter>
-            </Modal> */}
+                <div style={{marginLeft: '20%' }}>
+                    <Button color='red' onClick={() => { this.changeStatus(false) }}>Stop</Button>
+                </div> : null}
         </div>);
     }
 }

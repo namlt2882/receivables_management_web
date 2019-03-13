@@ -86,11 +86,6 @@ const routes = [
         main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
     },
     {
-        path: '/receivable/new-assigned',
-        exact: true,
-        main: ({ match, history }) => <NewAssignedReceivable match={match} history={history} />
-    },
-    {
         path: '/task',
         exact: true,
         main: ({ match, history }) => <TodayTask match={match} history={history} />

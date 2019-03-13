@@ -6,25 +6,12 @@ import { available, PrimaryLoadingPage } from '../common/loading-page'
 import Component from '../common/component'
 import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
-import { Button, Container, Header, Label, Icon } from 'semantic-ui-react'
-import { describeStatus, compareStatus } from './detail/receivable-detail';
+import { Button, Container, Header, Label, Icon, Checkbox } from 'semantic-ui-react'
+import { describeStatus, compareStatus, getStatusColor } from './detail/receivable-detail';
 import { compareIntDate } from '../../utils/time-converter'
 import { MDBDataTable } from 'mdbreact'
 import { AuthService } from '../../services/auth-service';
 import { CollectorAction } from '../../actions/collector-action'
-import {
-    Chart,
-    ChartTitle,
-    ChartSeries,
-    ChartSeriesItem,
-    ChartCategoryAxis,
-    ChartCategoryAxisTitle,
-    ChartCategoryAxisItem,
-    ChartSeriesLabels,
-    SeriesClickEvent,
-    ChartSeriesItemTooltip,
-    ChartTooltip
-} from '@progress/kendo-react-charts';
 import { UserService } from '../../services/user-service';
 import { MultiSelect } from '@progress/kendo-react-dropdowns';
 import { CustomerAction } from '../../actions/customer-action'
@@ -36,40 +23,39 @@ class ReceivableList extends Component {
             maxLoading: 2,
             receivableList: [],
             series: [
-                { category: 'Collecting', value: 0, color: 'green' },
-                { category: 'Waiting', value: 0, color: 'orange' },
-                { category: 'Closed', value: 0, color: 'gray' }
+                { category: 'Collecting', value: 0, color: 'green', checked: true },
+                { category: 'Not confirmed', value: 0, color: 'red', checked: true },
+                { category: 'Pending', value: 0, color: 'yellow', checked: true },
+                { category: 'Closed', value: 0, color: 'gray', checked: true }
+
             ],
-            selectedStatus: ['Collecting', 'Waiting', 'Closed'],
             selectedCollector: [],
-            selectedCustomer: []
+            selectedCustomer: [],
         }
         this.calculateSeries = this.calculateSeries.bind(this);
         this.filterReceivable = this.filterReceivable.bind(this);
-        this.removeStatus = this.removeStatus.bind(this);
-        this.chooseStatus = this.chooseStatus.bind(this);
         this.onChangeSelectedCollector = this.onChangeSelectedCollector.bind(this);
         this.onChangeSelectedCustomer = this.onChangeSelectedCustomer.bind(this);
-        this.addStatus = this.addStatus.bind(this);
+        this.toggleStatus = this.toggleStatus.bind(this);
     }
     onChangeSelectedCollector(e) {
         let selectedCollector = [...e.target.value];
         this.setState({ selectedCollector: selectedCollector });
-        this.filterReceivable(this.state.selectedStatus, selectedCollector, this.state.selectedCustomer);
+        this.filterReceivable(undefined, selectedCollector, this.state.selectedCustomer);
     }
     onChangeSelectedCustomer(e) {
         let selectedCustomer = [...e.target.value];
         this.setState({ selectedCustomer: selectedCustomer });
-        this.filterReceivable(this.state.selectedStatus, this.state.selectedCollector, selectedCustomer);
+        this.filterReceivable(undefined, this.state.selectedCollector, selectedCustomer);
     }
-    filterReceivable(selectedStatus, collectors, customers) {
+    filterReceivable(selectedStatus = this.state.series.filter(s => s.checked).map(s => s.category), collectors = this.state.selectedCollector, customers = this.state.selectedCustomer) {
         let list = this.props.receivableList;
         let mapCollector = new Map();
         collectors.forEach(c => { mapCollector.set(c.Id, c); });
         let mapCustomer = new Map();
         customers.forEach(c => { mapCustomer.set(c.Name, c); });
         list = list.filter(r => {
-            let status = describeStatus(r.CollectionProgressStatus);
+            let status = describeStatus(r.CollectionProgressStatus, r.IsConfirmed);
             // Filter status
             if (selectedStatus.find(s => s === status)) {
                 r.Display = true;
@@ -89,6 +75,7 @@ class ReceivableList extends Component {
             }
             return rs;
         })
+        this.calculateSeries(list);
         this.setState({ receivableList: list });
     }
     getNotChoosenCustomer() {
@@ -124,7 +111,7 @@ class ReceivableList extends Component {
         available(resolve => setTimeout(resolve, 400));
         this.props.fetchReceivableList().then(res => {
             this.incrementLoading();
-            this.filterReceivable(this.state.selectedStatus, this.state.selectedCollector, this.state.selectedCustomer);
+            this.filterReceivable(undefined, this.state.selectedCollector, this.state.selectedCustomer);
         });
         this.props.getCollectors().then(res => {
             this.incrementLoading();
@@ -133,72 +120,52 @@ class ReceivableList extends Component {
     pushDataToTable() {
         let data1 = { ...data };
         let rows = this.state.receivableList.filter(r => r.Display).map((r, i) => {
-            let status = describeStatus(r.CollectionProgressStatus);
-            let statusColor = 'grey';
-            if (status === 'Collecting') {
-                statusColor = 'green'
-            } else if (status === 'Waiting') {
-                statusColor = 'orange'
-            }
+            let status = describeStatus(r.CollectionProgressStatus, r.IsConfirmed);
+            let statusColor = getStatusColor(r.CollectionProgressStatus, r.IsConfirmed);
             let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),
                 DebtorName: r.DebtorName,
                 CustomerName: r.CustomerName,
-                CollectorName: collector ? collector.FullName : null,
+                CollectorName: collector ? `${collector.FullName} (${collector.Username})` : null,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Status: <Label color={statusColor}>{status}</Label>,
-                action: [<Icon name='eye' style={{ cursor: 'pointer' }}
-                    onClick={e => { this.props.history.push(`/receivable/${r.Id}/view`) }} />]
+                action: <Link target='_blank' to={`receivable/${r.Id}/view`}>Detail</Link>
             }
         });
         data1.rows = rows;
         return data1;
     }
-    calculateSeries() {
+    calculateSeries(list = this.state.receivableList) {
         let series = this.state.series;
         series.forEach(s => { s.value = 0 })
-        series = this.state.receivableList.reduce((acc, rei) => {
-            let status = describeStatus(rei.CollectionProgressStatus);
+        series = list.reduce((acc, r) => {
+            let status = describeStatus(r.CollectionProgressStatus, r.IsConfirmed);
             let tmp = acc.find(obj => obj.category === status);
             if (tmp) {
                 tmp.value++;
             }
             return acc;
         }, series);
-    }
-    removeStatus(status) {
-        let selectedStatus = this.state.selectedStatus.filter(s => s !== status);
-        this.setState(pre => ({
-            selectedStatus: selectedStatus
-        }))
-        this.filterReceivable(selectedStatus, this.state.selectedCollector, this.state.selectedCustomer);
+        this.setState({ series: series });
     }
 
-    addStatus(status) {
-        let statuses = this.state.selectedStatus;
-        if (!statuses.find(s => s === status)) {
-            statuses.push(status);
-            this.setState(pre => ({
-                selectedStatus: statuses
-            }))
-            this.filterReceivable(statuses, this.state.selectedCollector, this.state.selectedCustomer);
+    toggleStatus(category, checked) {
+        let series = this.state.series;
+        let found = series.find(s => s.category === category);
+        if (found) {
+            found.checked = checked;
         }
+        this.setState({ series: series });
+        this.filterReceivable(series.filter(s => s.checked).map(s => s.category))
     }
 
-    chooseStatus(status) {
-        this.setState({
-            selectedStatus: [status]
-        })
-        this.filterReceivable([status], this.state.selectedCollector, this.state.selectedCustomer);
-    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
         }
         let data1 = this.pushDataToTable();
-        this.calculateSeries();
         return (
             <Container className='col-sm-12 row justify-content-center align-self-center'>
                 <Header className='text-center'>
@@ -227,24 +194,20 @@ class ReceivableList extends Component {
                                 value={this.state.selectedCustomer}
                                 textField='Name' />
                         </div> : null}
-                        <br />
+                    </div>
+                    <div className='col-sm-3'>
                         <div>
-                            <div><b>Status</b>:</div>
-                            {this.state.selectedStatus.map(s => {
-                                let color = 'grey';
-                                if (s === 'Collecting') {
-                                    color = 'green'
-                                } else if (s === 'Waiting') {
-                                    color = 'orange'
-                                }
-                                return <Label color={color}>
-                                    {s}
-                                    <Icon name='delete' onClick={() => { this.removeStatus(s) }} />
-                                </Label>
-                            })}
+                            <div>{`Sum: ${this.state.receivableList.length}`}</div>
+                            {this.state.series.map(s => <div style={{ padding: '5px' }}>
+                                <Checkbox checked={s.checked}
+                                    onChange={(e, data) => {
+                                        this.toggleStatus(s.category, data.checked);
+                                    }} />
+                                <Label color={s.color}>{`${s.category} (${s.value})`}</Label>
+                            </div>)}
                         </div>
                     </div>
-                    <div className='col-sm-8'>
+                    {/* <div className='col-sm-8'>
                         <Chart pannable={{ lock: 'x' }} zoomable={{
                             mousewheel: { lock: 'x' },
                             selection: { lock: 'x' }
@@ -264,8 +227,7 @@ class ReceivableList extends Component {
                                 </ChartSeriesItem>
                             </ChartSeries>
                         </Chart>
-                        <div><b>Sum</b>:{` ${this.state.receivableList.length}`}</div>
-                    </div>
+                    </div> */}
                 </div>
                 <div id='receivable-list'>
                     {data1.rows.length > 0 ? <MDBDataTable
@@ -348,7 +310,7 @@ const mapDispatchToProps = (dispatch, props) => {
                     list = list.filter(r => r.AssignedCollectorId === id);
                 }
                 list.sort((a, b) => {
-                    if (a.CollectionProgressStatus === b.CollectionProgressStatus) {
+                    if (describeStatus(a.CollectionProgressStatus, a.IsConfirmed) === describeStatus(b.CollectionProgressStatus, b.IsConfirmed)) {
                         if (a.PayableDay === null) {
                             if (b.PayableDay === null) {
                                 return 0;
@@ -357,7 +319,7 @@ const mapDispatchToProps = (dispatch, props) => {
                         }
                         return compareIntDate(a.PayableDay, b.PayableDay)
                     } else {
-                        return compareStatus(a.CollectionProgressStatus, b.CollectionProgressStatus);
+                        return compareStatus(a.CollectionProgressStatus, b.CollectionProgressStatus, a.IsConfirmed, b.IsConfirmed);
                     }
                 });
                 dispatch(ReceivableAction.setReceivableList(list));

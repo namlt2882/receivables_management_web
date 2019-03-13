@@ -15,12 +15,12 @@ class Component extends React.Component {
     componentWillUnmount() {
         loading(resolve => setTimeout(resolve, 0));
     }
-    incrementLoading() {
+    incrementLoading(step = 1) {
         let loading = this.state.loading;
         if (loading === undefined) {
             loading = 0;
         }
-        this.setState({ loading: ++loading });
+        this.setState({ loading: loading + step });
     }
     isLoading() {
         let loading = this.state.loading;
