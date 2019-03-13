@@ -17,7 +17,7 @@ class NewAssignedReceivable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 2
+            maxLoading: 1
         }
     }
 
@@ -39,28 +39,23 @@ class NewAssignedReceivable extends Component {
         this.props.getCollectors().then(res => {
             this.incrementLoading();
         })
-        this.props.getCustomers().then(res => {
-            this.incrementLoading();
-        })
     }
 
     pushDataToTable() {
         let data1 = { ...data };
         let rows = this.props.receivableList.map((r, i) => {
-            let status = describeStatus(r.CollectionProgress.Status);
+            let status = describeStatus(r.CollectionProgressStatus);
             let statusColor = 'grey';
             if (status === 'Collecting') {
                 statusColor = 'green'
             } else if (status === 'Waiting') {
                 statusColor = 'orange'
             }
-            let collector = this.props.collectors.find(c => c.Id === r.assignedCollector.CollectorId);
-            let debtor = r.Contacts.find(c => c.Type == 1);
-            let customer = this.props.customers.find(c => c.Id === r.CustomerId)
+            let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),
-                DebtorName: debtor ? debtor.Name : '',
-                CustomerName: customer ? customer.Name : '',
+                DebtorName: r.DebtorName,
+                CustomerName: r.CustomerName,
                 CollectorName: collector ? collector.FullName : null,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
@@ -74,7 +69,7 @@ class NewAssignedReceivable extends Component {
     }
 
     render() {
-        if (this.isLoading()) {
+        if (this.isLoading() || this.props.newReceiavbleIds.length !== this.props.receivableList.length) {
             return <PrimaryLoadingPage />;
         }
         let data1 = this.pushDataToTable();
@@ -167,12 +162,6 @@ const mapDispatchToProps = (dispatch, props) => {
                     c.FullName = `${c.FirstName} ${c.LastName}`
                 })
                 dispatch(CollectorAction.setCollectors(list));
-            })
-        },
-        getCustomers: () => {
-            return CustomerService.getAll().then(res => {
-                let list = res.data;
-                dispatch(CustomerAction.setCustomers(list));
             })
         }
     }

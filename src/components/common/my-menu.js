@@ -23,6 +23,7 @@ import { ReceivableAction } from '../../actions/receivable-action';
 import { connect } from 'react-redux';
 import { NotificationService } from '../../services/notification-service';
 import { ReceivableService } from '../../services/receivable-service';
+import { Message } from 'semantic-ui-react';
 library.add(faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks);
 
@@ -175,28 +176,43 @@ class Notification extends React.Component {
         })
     }
 
-    getAction({ Type, NData }) {
+    getAction({ Id, Type, NData, IsSeen }) {
+        let action = () => { };
         switch (Type) {
             case 11:
-                return this.type11Action(JSON.parse(NData));
-            default: return () => { }
+                action = this.type11Action(JSON.parse(NData));
+                break;
+        }
+        return () => {
+            action();
+            this.setState({ dropdownNoti: false, mouseInNoti: false });
+            //send IsSeen = true
+            if (!IsSeen) {
+                NotificationService.toggleSeen(Id).then(res => {
+                    let noti = this.state.notifications.find(n => n.Id === Id);
+                    if (noti) {
+                        noti.IsSeen = true;
+                    }
+                })
+            }
         }
     }
 
     type11Action(ids) {
         return () => {
             this.props.setNewIds(ids);
-            let list = [];
-            let idList = this.props.newReceiavbleIds;
-            idList.map((id, i) => {
-                ReceivableService.get(id).then(res => {
-                    let receivable = res.data;
-                    list.push(receivable);
-                    if (i === (idList.length - 1)) {
-                        this.props.setReceivables(list);
-                        this.props.history.push('/receivable/new-assigned');
+            this.props.setReceivables([]);
+            this.props.history.push('/receivable/new-assigned');
+            ReceivableService.getAll().then(res => {
+                let list = res.data;
+                list = list.reduce((acc, r) => {
+                    let foundR = ids.find(id => id === r.Id);
+                    if (foundR) {
+                        acc.push(r);
                     }
-                })
+                    return acc;
+                }, []);
+                this.props.setReceivables(list);
             })
         }
     }
@@ -207,22 +223,22 @@ class Notification extends React.Component {
         }
         switch (type) {
             case 'info':
-                NotificationManager.info(message, title, 3000, () => {
+                NotificationManager.info(message, title, 7000, () => {
                     callback();
                 });
                 break;
             case 'success':
-                NotificationManager.success(message, title, 3000, () => {
+                NotificationManager.success(message, title, 7000, () => {
                     callback();
                 });
                 break;
             case 'warning':
-                NotificationManager.warning(message, title, 3000, () => {
+                NotificationManager.warning(message, title, 7000, () => {
                     callback();
                 });
                 break;
             case 'error':
-                NotificationManager.error(message, title, 3000, () => {
+                NotificationManager.error(message, title, 7000, () => {
                     callback();
                 });
                 break;
@@ -230,19 +246,23 @@ class Notification extends React.Component {
     };
 
     openNoti() {
-        if (!this.state.isNotificationLoaded) {
-            NotificationService.getMyNotification().then(res => {
-                let notifications = res.data;
-                this.setState({
-                    notifications: notifications,
-                    isNotificationLoaded: true
+        if (this.state.dropdownNoti) {
+            this.setState({ dropdownNoti: false, mouseInNoti: false });
+        } else {
+            if (!this.state.isNotificationLoaded) {
+                NotificationService.getMyNotification().then(res => {
+                    let notifications = res.data;
+                    this.setState({
+                        notifications: notifications,
+                        isNotificationLoaded: true
+                    })
                 })
-            })
+            }
+            this.setState({
+                dropdownNoti: true,
+                mouseInNoti: true
+            });
         }
-        this.setState({
-            dropdownNoti: true,
-            mouseInNoti: true
-        });
     }
 
     closeNoti() {
@@ -274,14 +294,19 @@ class Notification extends React.Component {
                     isOpen={isOpen}
                     toggle={this.openNoti} onMouseMove={this.checkMouseInNoti}
                     onMouseOut={this.checkMouseOutNoti}>
-                    {this.state.notifications.map(n =>
-                        <PopoverBody style={{ cursor: 'pointer' }}
-                            onClick={() => { this.getAction(n)() }}>{n.Body}</PopoverBody>
-                    )}
-                    {/* <PopoverHeader>New</PopoverHeader>
-                    <PopoverBody>A process is done!</PopoverBody>
-                    <PopoverHeader>Previous</PopoverHeader>
-                    <PopoverBody>A process is done!</PopoverBody> */}
+                    <PopoverBody>
+                        {this.state.notifications.map(n =>
+                            <div style={{ marginBottom: '5px' }}>
+                                <Message attached size='small' header={n.Title} content={n.Body}
+                                    onClick={() => { this.getAction(n)() }}
+                                    style={{
+                                        cursor: 'pointer',
+                                        backgroundColor: n.IsSeen ? 'white' : '#afc6ea'
+                                    }} />
+                                <span><i></i></span>
+                            </div>
+                        )}
+                    </PopoverBody>
                 </Popover>
             </div>
         </NavItem>);
