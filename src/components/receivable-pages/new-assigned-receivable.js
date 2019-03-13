@@ -3,15 +3,11 @@ import { connect } from 'react-redux';
 import { ReceivableAction } from '../../actions/receivable-action'
 import { available, PrimaryLoadingPage } from '../common/loading-page'
 import Component from '../common/component'
-import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
-import { Container, Header, Label, Icon } from 'semantic-ui-react'
+import { Container, Header, Label } from 'semantic-ui-react'
 import { describeStatus } from './detail/receivable-detail';
 import { MDBDataTable } from 'mdbreact'
-import { CollectorAction } from '../../actions/collector-action'
-import { UserService } from '../../services/user-service';
-import { CustomerService } from '../../services/customer-service';
-import { CustomerAction } from '../../actions/customer-action';
+import { Link } from 'react-router-dom';
 
 class NewAssignedReceivable extends Component {
     constructor(props) {
@@ -24,18 +20,10 @@ class NewAssignedReceivable extends Component {
     componentDidMount() {
         document.title = 'New assigned receivable';
         available(resolve => setTimeout(resolve, 400));
-        // let list = [];
-        // let idList = this.props.newReceiavbleIds;
-        // idList.map((id, i) => {
-        //     ReceivableService.get(id).then(res => {
-        //         let receivable = res.data;
-        //         list.push(receivable);
-        //         if (i === (idList.length - 1)) {
-        //             this.props.setReceivables(list);
-        //         }
-        //         this.incrementLoading();
-        //     })
-        // })
+    }
+
+    componentWillUnmount() {
+        
     }
 
     pushDataToTable() {
@@ -55,8 +43,7 @@ class NewAssignedReceivable extends Component {
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Status: <Label color={statusColor}>{status}</Label>,
-                action: [<Icon name='eye' style={{ cursor: 'pointer' }}
-                    onClick={e => { this.props.history.push(`/receivable/${r.Id}/view`) }} />]
+                action: <Link target='_blank' to={`/receivable/${r.Id}/view`}>Detail</Link>
             }
         });
         data1.rows = rows;
