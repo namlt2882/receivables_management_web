@@ -373,12 +373,15 @@ export const compareStatus = (a, b) => {
     return bWeight - aWeight;
 }
 
-export const describeStatus = (status) => {
+export const describeStatus = (status, confirm = false) => {
     let rs = status;
     switch (status) {
         case 0:
             // Cancel
             rs = 'Closed';
+            if (!confirm) {
+                rs = 'Not confirm'
+            }
             break;
         case 1: rs = 'Collecting';
             break;
@@ -390,11 +393,16 @@ export const describeStatus = (status) => {
             rs = 'Late';
             break;
         case 4:
-            rs = 'Waiting';
+            //change from Waiting to Pending
+            rs = 'Pending';
             break;
         case 5:
             //Closed
-            rs = 'Closed'; break;
+            rs = 'Closed';
+            if (!confirm) {
+                rs = 'Not confirm'
+            }
+            break;
     }
     return rs;
 }

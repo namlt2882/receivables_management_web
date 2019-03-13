@@ -145,7 +145,7 @@ class ReceivableList extends Component {
                 No: (i + 1),
                 DebtorName: r.DebtorName,
                 CustomerName: r.CustomerName,
-                CollectorName: collector ? collector.FullName : null,
+                CollectorName: collector ? `${collector.FullName} (${collector.Username})` : null,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Status: <Label color={statusColor}>{status}</Label>,

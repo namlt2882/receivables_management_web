@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Component from '../common/component'
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { ReceivableService } from '../../services/receivable-service';
-import { Container, Header, Divider, Form, Button, Step, Icon } from 'semantic-ui-react';
+import { Container, Header, Divider, Form, Button, Step, Icon, Checkbox, Table } from 'semantic-ui-react';
 import { UserService } from '../../services/user-service';
 import { ProfileService } from '../../services/profile-service'
 import { CustomerService } from '../../services/customer-service';
@@ -18,7 +18,8 @@ import { dateToInt } from '../../utils/time-converter';
 import { UtilityService } from '../../services/utility-service';
 import { numAsDate } from '../../utils/time-converter';
 import { describeStatus } from './detail/receivable-detail';
-
+import { ComboBox } from '@progress/kendo-react-dropdowns';
+import { DatePicker } from '@progress/kendo-react-dateinputs';
 class ImportReceivable extends Component {
     constructor(props) {
         super(props);
@@ -44,6 +45,7 @@ class ImportReceivable extends Component {
         this.increaseStep = this.increaseStep.bind(this);
         this.decreaseStep = this.decreaseStep.bind(this);
         this.insertReceivable = this.insertReceivable.bind(this);
+        this.setPayableDay = this.setPayableDay.bind(this);
     }
 
     increaseStep() {
@@ -64,15 +66,19 @@ class ImportReceivable extends Component {
             this.props.fetchCollectors(res.data);
             this.incrementLoading();
         })
-        ProfileService.getAll().then(res => {
-            this.props.fetchProfiles(res.data);
-            this.incrementLoading();
-        })
-        UtilityService.getServerDate().then(res => {
-            let currentDate = parseInt(res.data);
-            this.setState({ currentDate: currentDate });
-            this.incrementLoading();
-        })
+        if (!this.props.showRecent) {
+            ProfileService.getAll().then(res => {
+                this.props.fetchProfiles(res.data);
+                this.incrementLoading();
+            })
+            UtilityService.getServerDate().then(res => {
+                let currentDate = parseInt(res.data);
+                this.setState({ currentDate: currentDate });
+                this.incrementLoading();
+            })
+        } else {
+            this.incrementLoading(2);
+        }
     }
 
     handleFile = (e) => {
@@ -152,6 +158,21 @@ class ImportReceivable extends Component {
         this.setState({ validatedData: validatedData })
     }
 
+    setPayableDay(no, value) {
+        var validatedData = this.state.validatedData;
+        validatedData.map((rei, i) => {
+            if (i === no) {
+                if (value === null) {
+                    rei.PayableDay = null;
+                    rei.CollectorId = null;
+                } else {
+                    rei.PayableDay = value;
+                }
+            }
+        });
+        this.setState({ validatedData: validatedData })
+    }
+
     validateReceivables() {
         this.setLoadingForm(true);
         let currentDate = this.state.currentDate.toString();
@@ -186,7 +207,7 @@ class ImportReceivable extends Component {
                         "Address": address
                     }
                 }),
-                "PayableDay": payableDay,
+                "PayableDay": currentDate,
                 "ProfileId": this.state.profileId == '-1' ? null : parseInt(this.state.profileId),
                 "CollectorId": rei.CollectorId,
                 "PrepaidAmount": rei.PrepaidAmount,
@@ -202,7 +223,9 @@ class ImportReceivable extends Component {
                     delete c.ReceivableId;
                 })
             })
-            this.setState({ validatedData: resData })
+            this.setState({
+                validatedData: resData
+            })
             this.setLoadingForm(false);
         }).catch(err => {
             alert('Service unavailable!');
@@ -241,8 +264,13 @@ class ImportReceivable extends Component {
         if (this.state.validatedData === null) {
             return false;
         } else {
-            var validateCollector = !this.state.validatedData.some((rei) => rei.CollectorId === null);
-            return validateCollector;
+            var isValidated = !this.state.validatedData
+                .some((r) => {
+                    if (r.PayableDay) {
+                        return r.CollectorId === null;
+                    } else return false;
+                });
+            return isValidated;
         }
     }
 
@@ -253,11 +281,7 @@ class ImportReceivable extends Component {
         var customers = this.props.customers;
         var profiles = this.props.profiles;
         var isValidate = this.IsValidate();
-        let data1 = tableData1;
         let data2 = tableData2;
-        if (this.state.validatedData !== null) {
-            data1 = pushData1(this.state.validatedData, this.props.collectors, this.setCollector);
-        }
         if (this.state.insertedData !== null && this.state.step === 4) {
             data2 = pushData2(this.state.insertedData, this.props.collectors, this.props.customers);
         }
@@ -325,7 +349,7 @@ class ImportReceivable extends Component {
                 <div className='form-group col-sm-8' style={{ display: this.state.step === 2 ? 'block' : 'none' }}>
                     <label className='bold-text'>Files:</label>
                     <input type='file' onChange={this.handleFile} />
-                    <span className='warning-text'>{this.state.fileWarning}<br/></span>
+                    <span className='warning-text'>{this.state.fileWarning}<br /></span>
                     <Button color='secondary' className='margin-btn' onClick={this.decreaseStep}>Back</Button>
                 </div>
                 {/* END STEP 2 */}
@@ -339,11 +363,52 @@ class ImportReceivable extends Component {
                 {this.state.validatedData !== null && this.state.step === 3 ?
                     <Container>
                         <Divider />
-                        <MDBDataTable
-                            className='hide-last-row'
-                            striped
-                            bordered
-                            data={data1} />
+                        <Table>
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.HeaderCell>No</Table.HeaderCell>
+                                    <Table.HeaderCell>Debtor</Table.HeaderCell>
+                                    <Table.HeaderCell>Debt Amount</Table.HeaderCell>
+                                    <Table.HeaderCell>Prepaid Amount</Table.HeaderCell>
+                                    <Table.HeaderCell>Start date</Table.HeaderCell>
+                                    <Table.HeaderCell>Collector</Table.HeaderCell>
+                                    <Table.HeaderCell>Pending</Table.HeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
+                                {this.state.validatedData.map((r, i) => {
+                                    let debtor = r.Contacts.find(c => c.Type === 0);
+                                    let isWaiting = r.PayableDay === undefined || r.PayableDay === null;
+                                    let date = null;
+                                    let min = new Date(numAsDate(this.state.currentDate));
+                                    if (!isWaiting) {
+                                        date = new Date(numAsDate(r.PayableDay));
+                                    }
+                                    return <Table.Row>
+                                        <Table.Cell>{i + 1}</Table.Cell>
+                                        <Table.Cell>{debtor ? debtor.Name : null}</Table.Cell>
+                                        <Table.Cell>{r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                                        <Table.Cell>{r.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
+                                        <Table.Cell>
+                                            {!isWaiting ? <DatePicker min={min} value={date} onChange={(e) => {
+                                                let value = e.target.value;
+                                                this.setPayableDay(i, dateToInt(value));
+                                            }} /> : null}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {!isWaiting ? <ConnectedSelectCollector
+                                                reiNo={i}
+                                                collectorId={r.CollectorId}
+                                                setCollector={this.setCollector} /> : null}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <PendingCheckbox no={i} currentDate={this.state.currentDate} isWaiting={isWaiting}
+                                                setPayableDay={this.setPayableDay} />
+                                        </Table.Cell>
+                                    </Table.Row>
+                                })}
+                            </Table.Body>
+                        </Table>
                     </Container> : null}
                 {/* START STEP 4 */}
                 {this.state.insertedData !== null && this.state.step === 4 ?
@@ -360,9 +425,64 @@ class ImportReceivable extends Component {
     }
 }
 
+class PendingCheckbox extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isWaiting: this.props.isWaiting
+        }
+    }
+    render() {
+
+        return (<div>
+            <Checkbox label='Is Pending?' checked={this.state.isWaiting}
+                onChange={(e, data) => {
+                    if (data.checked) {
+                        this.props.setPayableDay(this.props.no, null);
+                    } else {
+                        this.props.setPayableDay(this.props.no, this.props.currentDate);
+                    }
+                    this.setState({ isWaiting: data.checked });
+                }} />
+        </div>);
+    }
+}
+
+class SelectCollector extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {}
+        this.onChangeCollector = this.onChangeCollector.bind(this);
+        this.setCollector = this.setCollector.bind(this);
+    }
+
+    onChangeCollector = (e) => {
+        var collector = e.target.value;
+        if (collector != undefined && collector != null) {
+            this.setCollector(collector.Id);
+        } else {
+            this.setCollector(null);
+        }
+    }
+
+    setCollector = (id) => {
+        this.props.setCollector(this.props.reiNo, id);
+    }
+
+    render() {
+        return (<div className='full-combobox-holder'>
+            <ComboBox data={this.props.collectors} allowCustom={false}
+                textField='DisplayName2'
+                placeholder='Collector'
+                onChange={this.onChangeCollector} />
+        </div>)
+    }
+}
+
 const pushData2 = (receivableList, collectorList, customerList) => {
     let rows = [];
-    let data1 = { ...tableData2 };
+    let data = { ...tableData2 };
     if (receivableList) {
         rows = receivableList.map((r, i) => {
             let debtor = r.Contacts.find(c => c.Type === 0);
@@ -377,41 +497,14 @@ const pushData2 = (receivableList, collectorList, customerList) => {
                 CustomerName: customer ? customer.Name : null,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
-                Collector: collector ? collector.FirstName + collector.LastName : null,
+                Collector: collector ? collector.DisplayName : null,
                 Status: describeStatus(r.CollectionProgress.Status),
                 action: <Link target='_blank' to={`/receivable/${r.Id}/view`}>View</Link>
             }
         });
     }
-    data1.rows = rows;
-    return data1;
-}
-
-export const pushData1 = (receivableData, collectorList, setCollector) => {
-    let rows = [];
-    if (receivableData) {
-        rows = receivableData.map((r, i) => {
-            let debtor = r.Contacts.find(c => c.Type === 0);
-            return {
-                No: (i + 1),
-                DebtAmount: r.DebtAmount,
-                PrepaidAmount: r.PrepaidAmount,
-                Debtor: debtor ? debtor.Name : null,
-                Contacts: r.Contacts.filter(c => c.Type !== 0).map((contact, i) => {
-                    if (i > 0) {
-                        return ', ' + contact.Name;
-                    }
-                    return contact.Name;
-                }),
-                Collector: <SelectCollector collectors={collectorList}
-                    reiNo={i}
-                    collectorId={r.CollectorId}
-                    setCollector={setCollector} />
-            }
-        })
-    }
-    tableData1.rows = rows;
-    return tableData1;
+    data.rows = rows;
+    return data;
 }
 
 const tableData2 = {
@@ -466,92 +559,6 @@ const tableData2 = {
     rows: []
 }
 
-const tableData1 = {
-    columns: [
-        {
-            label: 'No',
-            field: 'No',
-            width: 150
-        },
-        {
-            label: 'Debt amount',
-            field: 'DebtAmount',
-            width: 150
-        },
-        {
-            label: 'Prepaid amount',
-            field: 'PrepaidAmount',
-            width: 150
-        },
-        {
-            label: 'Debtor',
-            field: 'Id',
-            width: 150
-        },
-        {
-            label: 'Contacts',
-            field: 'Contacts',
-            width: 150
-        },
-        {
-            label: 'Collector',
-            field: 'Collector',
-            width: 150
-        }
-    ],
-    rows: []
-}
-
-class SelectCollector extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            collectorId: this.props.collectorId
-        }
-        this.setCollector = this.setCollector.bind(this);
-    }
-
-    onChangeCollector = (e) => {
-        var id = e.target.value;
-        if (id === '-1') {
-            this.setState({
-                collectorId: '-1'
-            })
-            this.setCollector(null);
-        } else {
-            this.props.collectors.some((collector) => {
-                if (collector.Id === id) {
-                    this.setState({
-                        collectorId: collector.Id
-                    });
-                    return true;
-                }
-                return false;
-            })
-            this.setCollector(id);
-        }
-    }
-
-    setCollector = (id) => {
-        this.props.setCollector(this.props.reiNo, id);
-    }
-
-    render() {
-        var collectorId = this.state.collectorId;
-        return (<div className='form-group'>
-            <select className='form-control' value={collectorId}
-                onChange={this.onChangeCollector}>
-                <option value='-1'>--</option>
-                {this.props.collectors.map((collector) =>
-                    <option value={collector.Id}>
-                        {`${collector.FirstName} ${collector.LastName}`}
-                    </option>)}
-            </select>
-        </div>)
-    }
-}
-
 const mapStateToProps = state => {
     return {
         customers: state.customers,
@@ -569,8 +576,14 @@ const mapDispatchToProps = (dispatch, props) => {
             dispatch(ProfileAction.setProfiles(profiles))
         },
         fetchCollectors: (collectors) => {
+            collectors.forEach(c => {
+                c.DisplayName = `${c.FirstName} ${c.LastName} (${c.Username})`;
+                c.DisplayName2 = `${c.FirstName} ${c.LastName} (${c.Username}) (Cases: ${c.NumberOfAssignedReceivables})`;
+            })
+            collectors.sort((c1, c2) => -(c2.NumberOfAssignedReceivables - c1.NumberOfAssignedReceivables))
             dispatch(CollectorAction.setCollectors(collectors));
         }
     }
 }
+const ConnectedSelectCollector = connect(mapStateToProps)(SelectCollector);
 export default connect(mapStateToProps, mapDispatchToProps)(ImportReceivable);

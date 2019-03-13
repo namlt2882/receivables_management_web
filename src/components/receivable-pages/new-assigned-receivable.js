@@ -17,7 +17,7 @@ class NewAssignedReceivable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 1
+            maxLoading: 0
         }
     }
 
@@ -36,9 +36,6 @@ class NewAssignedReceivable extends Component {
         //         this.incrementLoading();
         //     })
         // })
-        this.props.getCollectors().then(res => {
-            this.incrementLoading();
-        })
     }
 
     pushDataToTable() {
@@ -51,12 +48,10 @@ class NewAssignedReceivable extends Component {
             } else if (status === 'Waiting') {
                 statusColor = 'orange'
             }
-            let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),
                 DebtorName: r.DebtorName,
                 CustomerName: r.CustomerName,
-                CollectorName: collector ? collector.FullName : null,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Status: <Label color={statusColor}>{status}</Label>,
@@ -110,12 +105,6 @@ const data = {
             width: 270
         },
         {
-            label: 'Collector',
-            field: 'CollectorName',
-            sort: 'asc',
-            width: 270
-        },
-        {
             label: 'Debt amount',
             field: 'DebtAmount',
             sort: 'asc',
@@ -154,15 +143,6 @@ const mapDispatchToProps = (dispatch, props) => {
     return {
         setReceivables: (list) => {
             dispatch(ReceivableAction.setReceivableList(list));
-        },
-        getCollectors: () => {
-            return UserService.getCollectors().then(res => {
-                let list = res.data;
-                list.forEach(c => {
-                    c.FullName = `${c.FirstName} ${c.LastName}`
-                })
-                dispatch(CollectorAction.setCollectors(list));
-            })
         }
     }
 }
