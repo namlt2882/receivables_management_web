@@ -21,5 +21,8 @@ export const ReceivableService = {
     },
     validate: (list) => {
         return AuthRequest.post('Receivable/Validate', list);
+    },
+    confirm: (id) => {
+        return AuthRequest.put('Receivable/Confirm', { Id: id });
     }
 }

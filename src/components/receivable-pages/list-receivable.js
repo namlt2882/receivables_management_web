@@ -7,7 +7,7 @@ import Component from '../common/component'
 import { ReceivableService } from '../../services/receivable-service';
 import { numAsDate } from '../../utils/time-converter';
 import { Button, Container, Header, Label, Icon } from 'semantic-ui-react'
-import { describeStatus, compareStatus } from './detail/receivable-detail';
+import { describeStatus, compareStatus, getStatusColor } from './detail/receivable-detail';
 import { compareIntDate } from '../../utils/time-converter'
 import { MDBDataTable } from 'mdbreact'
 import { AuthService } from '../../services/auth-service';
@@ -134,12 +134,7 @@ class ReceivableList extends Component {
         let data1 = { ...data };
         let rows = this.state.receivableList.filter(r => r.Display).map((r, i) => {
             let status = describeStatus(r.CollectionProgressStatus);
-            let statusColor = 'grey';
-            if (status === 'Collecting') {
-                statusColor = 'green'
-            } else if (status === 'Waiting') {
-                statusColor = 'orange'
-            }
+            let statusColor = getStatusColor(r.CollectionProgressStatus);
             let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),

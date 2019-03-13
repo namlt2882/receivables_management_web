@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Component from '../common/component'
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { ReceivableService } from '../../services/receivable-service';
-import { Container, Header, Divider, Form, Button, Step, Icon, Checkbox, Table } from 'semantic-ui-react';
+import { Container, Header, Divider, Form, Button, Step, Icon, Checkbox, Table, Label } from 'semantic-ui-react';
 import { UserService } from '../../services/user-service';
 import { ProfileService } from '../../services/profile-service'
 import { CustomerService } from '../../services/customer-service';
@@ -17,7 +17,7 @@ import { MDBDataTable } from 'mdbreact'
 import { dateToInt } from '../../utils/time-converter';
 import { UtilityService } from '../../services/utility-service';
 import { numAsDate } from '../../utils/time-converter';
-import { describeStatus } from './detail/receivable-detail';
+import { describeStatus, getStatusColor } from './detail/receivable-detail';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { DatePicker } from '@progress/kendo-react-dateinputs';
 class ImportReceivable extends Component {
@@ -491,6 +491,8 @@ const pushData2 = (receivableList, collectorList, customerList) => {
             if (r.AssignedCollectors && r.AssignedCollectors.length > 0) {
                 collector = collectorList.find(co => co.Id === r.AssignedCollectors[0].UserId)
             }
+            let status = describeStatus(r.CollectionProgress.Status);
+            let statusColor = getStatusColor(r.CollectionProgress.Status);
             return {
                 No: (i + 1),
                 DebtorName: debtor ? debtor.Name : null,
@@ -498,7 +500,7 @@ const pushData2 = (receivableList, collectorList, customerList) => {
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Collector: collector ? collector.DisplayName : null,
-                Status: describeStatus(r.CollectionProgress.Status),
+                Status: <Label color={statusColor}>{status}</Label>,
                 action: <Link target='_blank' to={`/receivable/${r.Id}/view`}>View</Link>
             }
         });

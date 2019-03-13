@@ -60,6 +60,9 @@ class ReceivableProgress extends Component {
                         //finished stage
                         status = 'Finished';
                     }
+                    if (this.props.isFinished) {
+                        className+=' end-progress'
+                    }
 
                     return (<div className={className} startDate={numAsDate(stage.startDate)} id={'rps-' + i} onMouseEnter={() => { this.onMouseIn(i - 1) }}
                         onMouseLeave={() => { this.onMouseOut(i - 1) }}>
@@ -98,18 +101,6 @@ class ReceivableProgress extends Component {
                     <div style={{ opacity: '0' }}>abc</div>
                     <Progress value={100} style={{ opacity: '0' }}></Progress>
                 </div>
-                {/* <div className='col-sm-3 r-stage'>
-                <div className='text-center'>Stage 1</div>
-                <Progress value={100}>30 days</Progress>
-            </div>
-            <div className='col-sm-3 r-stage progress-current-stage'>
-                <div className='text-center'>Stage 2</div>
-                <Progress value={50} >30 days</Progress>
-            </div>
-            <div className='col-sm-3 r-stage r-low-stage'>
-                <div className='text-center'>Stage 1</div>
-                <Progress value={0}>30 days</Progress>
-            </div> */}
             </div>);
         } catch (e) {
             return null;
