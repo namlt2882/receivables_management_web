@@ -580,7 +580,7 @@ const mapDispatchToProps = (dispatch, props) => {
         fetchCollectors: (collectors) => {
             collectors.forEach(c => {
                 c.DisplayName = `${c.FirstName} ${c.LastName} (${c.Username})`;
-                c.DisplayName2 = `${c.FirstName} ${c.LastName} (${c.Username}) (Cases: ${c.NumberOfAssignedReceivables})`;
+                c.DisplayName2 = `${c.FirstName} ${c.LastName} (${c.Username} - ${c.NumberOfAssignedReceivables})`;
             })
             collectors.sort((c1, c2) => -(c2.NumberOfAssignedReceivables - c1.NumberOfAssignedReceivables))
             dispatch(CollectorAction.setCollectors(collectors));

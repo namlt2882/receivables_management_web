@@ -60,80 +60,29 @@ class ListUser extends Component {
         }
 
         return (
-            <div>
-                {/* <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 mgb-15">
-                        <div className="input-group">
-                            <input
-                                name="keyword"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter keyword ..."
-                            />
-                            <span className="input-group-btn">
-                                <button
-                                    type="button"
-                                    className="btn btn-info"
-                                >
-                                    <span className="fa fa-search mr-5"></span>Tìm kiếm
-                                </button>
-                            </span>
-                        </div>
-                </div> */}
+            <div style={{
+                width: "100%"
+            }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <Link to="/user/add"> Add New Account</Link>
-
-                    <div className="dropdown flr">
-                        <button
-                            className="btn btn-primary dropdown-toggle mb-15"
-                            type="button"
-                            id="dropdownMenu1"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="true"
-                        >
-                            <span className="fas fa-filter mr-5"></span> Sort
-                        </button>
-                        <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-                            <li onClick={() => this.onClick('username', 1)}>
-                                <a
-                                    role="button"
-                                    className={(sortTable.by === 'username' && sortTable.value === 1)
-                                        ? 'sort_selected fas fa-check-circle' : ''}>
-                                    <span className="fas fa-sort-alpha-down pl-5"> A-Z</span>
-                                </a>
-                            </li>
-                            <li onClick={() => this.onClick('username', -1)}>
-                                <a
-                                    role="button"
-                                    className={(sortTable.by === 'username' && sortTable.value === -1)
-                                        ? 'sort_selected fas fa-check-circle' : ''}>
-                                    <span className="fas fa-sort-alpha-up pl-5"> Z-A</span>
-                                </a>
-                            </li>
-                            <li role="separator" className="divider"></li>
-                            <li onClick={() => this.onClick('status', 1)}>
-                                <a
-                                    role="button"
-                                    className={(sortTable.by === 'status' && sortTable.value === 1)
-                                        ? 'sort_selected fas fa-check-circle' : ''}>
-                                    <span className="pl-5">Unban</span>
-                                </a>
-                            </li>
-                            <li onClick={() => this.onClick('status', -1)}>
-                                <a
-                                    role="button"
-                                    className={(sortTable.by === 'status' && sortTable.value === -1)
-                                        ? 'sort_selected fas fa-check-circle' : ''}>
-                                    <span className="pl-5">Ban</span>
-                                </a>
-                            </li>
-                        </ul>
+                    <div className="hungdtq-header">
+                        <h1>User management</h1>
                     </div>
+                    <div className="hungdtq-Wrapper">
+                        <div className="hungdtq-Container">
+                            <div className="hungdtq-headerbtn-container">
+                                <div className="btn btn-success">
+                                    <Link to="/user/add"> Add New User</Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <UserList>
+                            {/* props nay goi la props chilren */}
+                            {this.showUsers(users)}
 
-                    <UserList>
-                        {/* props nay goi la props chilren */}
-                        {this.showUsers(users)}
-                    </UserList>
+                        </UserList>
+                    </div>
                 </div>
             </div>
         );
