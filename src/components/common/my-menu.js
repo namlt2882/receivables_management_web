@@ -25,6 +25,7 @@ import { NotificationService } from '../../services/notification-service';
 import { ReceivableService } from '../../services/receivable-service';
 import { Message, Button, Divider } from 'semantic-ui-react';
 import NewAssignedReceivable from '../receivable-pages/new-assigned-receivable';
+import { SERVER_IP } from '../../constants/config';
 library.add(faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks);
 
@@ -172,7 +173,7 @@ class Notification extends React.Component {
             const protocol = new signalR.JsonHubProtocol();
             // Singalr
             let connection = new signalR.HubConnectionBuilder()
-                .withUrl(`http://202.78.227.91:6868/centerHub?access_token=${localStorage.getItem('access_token')}`)
+                .withUrl(`${SERVER_IP}/centerHub?access_token=${localStorage.getItem('access_token')}`)
                 .configureLogging(signalR.LogLevel.Information)
                 .withHubProtocol(protocol)
                 .build();
