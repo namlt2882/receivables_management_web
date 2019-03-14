@@ -8,23 +8,21 @@ class UserItem extends Component {
     }
     render() {
         var { user, index } = this.props;
-        var statusName = user.status ? 'Unban' : 'Ban';
+        var statusName = user.status ? 'Banned' : 'Active';
         var statusClass = user.status ? 'success' : 'default';
         return (
             <tr>
-                <td>{index + 1}</td>
-                <td>{user.id}</td>
-                <td>{user.username}</td>
-                <td>{user.password}</td>
-                <td>
-                    <span className={`label label-${statusClass}`}>
-                        {statusName}
-                    </span>
-                </td>
-                <td>
-                    <Link to={`/user/${user.id}/edit`}>Update</Link>
-                    <button onClick={() => this.onDelete(user.id)}>Delete</button>
-                </td>
+                    <td>{index + 1}</td>
+                    <td>{user.username}</td>
+                    <td>Dang Tran Quoc Hung</td>
+                    <td>
+                        <span className={`label label-${statusClass}`}>
+                            {statusName}
+                        </span>
+                    </td>
+                    <td>
+                        <button className="hungdtq-btn-cancel btn btn-warning" onClick={() => this.onDelete(user.id)}>Ban</button>
+                    </td>
             </tr>
         );
     }

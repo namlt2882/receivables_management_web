@@ -27,7 +27,8 @@ class App extends Component {
               padding: '20px',
               zIndex: '0',
               backgroundColor: 'white',
-              minHeight: '85%',
+              overflow: 'auto',
+              display: 'block',
               borderRadius: '5px',
               border: '1px solid #dddfe2'
             }}>

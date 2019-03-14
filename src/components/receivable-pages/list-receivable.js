@@ -168,9 +168,11 @@ class ReceivableList extends Component {
         let data1 = this.pushDataToTable();
         return (
             <Container className='col-sm-12 row justify-content-center align-self-center'>
-                <Header className='text-center'>
-                    {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
-                </Header>
+                <div className="hungdtq-header">
+                    <h1>
+                        {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
+                    </h1>
+                </div>
                 {AuthService.isManager() ? <div>
                     <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
                     <Link to='/receivable/recent-add'>Recent added receivables</Link><br />

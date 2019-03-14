@@ -146,6 +146,23 @@ table.table a {
 .hide-last-row thead:last-child {
     display: none;
 }
-.full-combobox-holder>.k-combobox{
+
+.full-combobox-holder>.k-combobox {
     width: 100%;
+}
+
+.hungdtq-header {
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    background-color: rgb(255, 99, 71);
+    text-transform: uppercase;
+    color: white;
+}
+
+.table .thead-blue th {
+    color: #fff;
+    background-color: rgb(0, 191, 255);
+    border-color: rgb(0, 191, 255);
+    font-weight: bold;
 }
