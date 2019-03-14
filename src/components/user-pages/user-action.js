@@ -5,14 +5,18 @@ import { connect } from 'react-redux';
 import Component from '../common/component'
 import { available } from '../common/loading-page';
 
+import './user.scss';
+
 class UserActionPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             id: '',
-            txtName: '',
             txtPassword: '',
-            chkbStatus: ''
+            txtConfirm: '',
+            txtUsername: '',
+            txtLastname: '',
+            txtFirstName: '',
         };
     }
     // Dispatch action và lưu itemEditing vào store
@@ -26,13 +30,15 @@ class UserActionPage extends Component {
     }
     // Nhận lại props sau khi mapStateToProps
     componentWillReceiveProps(nextProps) {
-        if(nextProps && nextProps.itemEditing) {
-            var {itemEditing} = nextProps;
+        if (nextProps && nextProps.itemEditing) {
+            var { itemEditing } = nextProps;
             this.setState({
-                id : itemEditing.id,
-                txtName : itemEditing.username,
-                txtPassword : itemEditing.password,
-                chkbStatus : itemEditing.status
+                id: itemEditing.id,
+                txtUsername: itemEditing.username,
+                txtPassword: itemEditing.password,
+                txtConfirm: itemEditing.txtConfirm,
+                txtFirstName: itemEditing.txtFirstName,
+                txtLastname: itemEditing.txtLastname
             });
         }
     }
@@ -67,50 +73,73 @@ class UserActionPage extends Component {
     render() {
         var { txtName, txtPassword, chkbStatus } = this.state;
         return (
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div className="hungdtq-header">
+                    <h1>Add new user</h1>
+                </div>
+                <div className="hungdtq-Wrapper">
+                    <div className="hungdtq-Container">
+                        <form onSubmit={this.onSave} className="hungdtq-FromControl">
 
-                <form onSubmit={this.onSave}>
-                    <div className="form-group">
-                        <label>Username: </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="txtName"
-                            value={txtName}
-                            onChange={this.onChange}
-                        />
+                            <div className="form-group">
+                                <label>First Name: </label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="txtFirstName"
+                                    value={txtPassword}
+                                    onChange={this.onChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Last Name: </label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="txtLastname"
+                                    value={txtPassword}
+                                    onChange={this.onChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Username: </label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="txtUsername"
+                                    value={txtName}
+                                    onChange={this.onChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Password: </label>
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    name="txtPassword"
+                                    value={txtPassword}
+                                    onChange={this.onChange}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Password: </label>
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    name="txtConfirm"
+                                    value={txtPassword}
+                                    onChange={this.onChange}
+                                />
+                            </div>
+                            <div className="hungdtq-btn-holder">
+                                <button className="btn btn-primary hungdtq-btn-submit">Submit</button>
+                            </div>
+                            <div className="hungdtq-btn-holder">
+                                <button className="btn btn-warning hungdtq-btn-cancel">Clear</button>
+                            </div>
+                        </form>
                     </div>
-                    <div className="form-group">
-                        <label>Password: </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="txtPassword"
-                            value={txtPassword}
-                            onChange={this.onChange}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Status: </label>
-
-                    </div>
-                    <div className="checkbox">
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="chkbStatus"
-                                value={chkbStatus}
-                                onChange={this.onChange}
-                                checked={chkbStatus}
-                            />
-                            Unban
-                        </label>
-                    </div>
-
-                    <button>Save</button>&nbsp;&nbsp;&nbsp;
-                    <Link to="/user-list">Cancel</Link>
-
-                </form>
+                </div>
             </div>
         );
     }

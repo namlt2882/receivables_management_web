@@ -69,12 +69,12 @@ class MyMenu extends Component {
                                         var clazz = active ? 'choosen-nav-item' : '';
                                         return (<NavItem className={clazz}>
                                             <NavLink>
-                                                <FontAwesomeIcon icon={icon} color='white' size='md'
-                                                    style={{
-                                                        margin: '0 5 0 5',
-                                                        opacity: active ? '1' : '0.7'
-                                                    }} />
                                                 <Link to={to}>
+                                                    <FontAwesomeIcon icon={icon} color='white' size='md'
+                                                        style={{
+                                                            margin: '0 5 0 5',
+                                                            opacity: active ? '1' : '0.7'
+                                                        }} />
                                                     {name}
                                                 </Link>
                                             </NavLink>
@@ -111,9 +111,9 @@ class MyProfile extends React.Component {
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <div className='col-sm-10' style={{ cursor: 'default' }}>
+                        <DropdownItem style={{cursor:"default"}}>
                             Hi, <b>{localStorage.getItem('username')}</b><br />
-                        </div>
+                        </DropdownItem>
                         <DropdownItem>
                             My profile
                             </DropdownItem>

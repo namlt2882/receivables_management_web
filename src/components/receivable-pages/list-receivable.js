@@ -12,19 +12,6 @@ import { compareIntDate } from '../../utils/time-converter'
 import { MDBDataTable } from 'mdbreact'
 import { AuthService } from '../../services/auth-service';
 import { CollectorAction } from '../../actions/collector-action'
-import {
-    Chart,
-    ChartTitle,
-    ChartSeries,
-    ChartSeriesItem,
-    ChartCategoryAxis,
-    ChartCategoryAxisTitle,
-    ChartCategoryAxisItem,
-    ChartSeriesLabels,
-    SeriesClickEvent,
-    ChartSeriesItemTooltip,
-    ChartTooltip
-} from '@progress/kendo-react-charts';
 import { UserService } from '../../services/user-service';
 import { MultiSelect } from '@progress/kendo-react-dropdowns';
 import { CustomerAction } from '../../actions/customer-action'
@@ -201,9 +188,11 @@ class ReceivableList extends Component {
         this.calculateSeries();
         return (
             <Container className='col-sm-12 row justify-content-center align-self-center'>
-                <Header className='text-center'>
-                    {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
-                </Header>
+                <div className="hungdtq-header">
+                    <h1>
+                        {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
+                    </h1>
+                </div>
                 {AuthService.isManager() ? <div>
                     <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
                     <Link to='/receivable/recent-add'>Recent added receivables</Link><br />
@@ -228,43 +217,6 @@ class ReceivableList extends Component {
                                 textField='Name' />
                         </div> : null}
                         <br />
-                        <div>
-                            <div><b>Status</b>:</div>
-                            {this.state.selectedStatus.map(s => {
-                                let color = 'grey';
-                                if (s === 'Collecting') {
-                                    color = 'green'
-                                } else if (s === 'Waiting') {
-                                    color = 'orange'
-                                }
-                                return <Label color={color}>
-                                    {s}
-                                    <Icon name='delete' onClick={() => { this.removeStatus(s) }} />
-                                </Label>
-                            })}
-                        </div>
-                    </div>
-                    <div className='col-sm-8'>
-                        <Chart pannable={{ lock: 'x' }} zoomable={{
-                            mousewheel: { lock: 'x' },
-                            selection: { lock: 'x' }
-                        }} style={{ width: 600, height: 250 }}
-                            onSeriesClick={(e) => {
-                                if (e.nativeEvent.event.ctrlKey) {
-                                    this.addStatus(e.category);
-                                } else this.chooseStatus(e.category);
-                            }}>
-                            <ChartTitle text="Quantity of receivables" />
-                            <ChartTooltip />
-                            <ChartSeries>
-                                <ChartSeriesItem type="bar" gap={3} data={this.state.series}
-                                    field='value' categoryField='category' colorField='color'
-                                    style='smooth'>
-                                    <ChartSeriesItemTooltip background='gray' />
-                                </ChartSeriesItem>
-                            </ChartSeries>
-                        </Chart>
-                        <div><b>Sum</b>:{` ${this.state.receivableList.length}`}</div>
                     </div>
                 </div>
                 <div id='receivable-list'>

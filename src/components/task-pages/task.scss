@@ -1,0 +1,16 @@
+.task-table{
+    margin-top: 20px;
+}
+
+tr > td:nth-child(3){
+    width: 10%;
+    text-align: center;
+}
+
+tr > td:nth-child(2){
+    width: 40%;
+}
+
+.task-table > tbody > tr > td:hover {
+    cursor: pointer;
+}

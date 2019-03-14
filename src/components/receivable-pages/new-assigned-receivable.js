@@ -80,9 +80,9 @@ class NewAssignedReceivable extends Component {
         let data1 = this.pushDataToTable();
         return (
             <Container className='col-sm-12 row justify-content-center align-self-center'>
-                <Header className='text-center'>
-                    You have just been assigned for {this.props.newReceiavbleIds.length} receivable(s)
-                </Header>
+                <div className="hungdtq-header">
+                    <h1> You have just been assigned for {this.props.newReceiavbleIds.length} receivable(s)</h1>
+                </div>
                 <div id='receivable-list'>
                     {data1.rows.length > 0 ? <MDBDataTable
                         className='hide-last-row'

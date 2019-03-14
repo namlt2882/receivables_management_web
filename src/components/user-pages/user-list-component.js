@@ -7,8 +7,9 @@ class UserList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filterName : '',
-            filterStatus : -1
+            filterName: '',
+            filterUsername: '',
+            filterStatus: -1
         };
     }
 
@@ -18,8 +19,9 @@ class UserList extends Component {
         var name = target.name;
         var value = target.type === 'checkbox' ? target.checked : target.value;
         var filter = {
-            name : name === 'filterName' ? value : this.state.filterName,
-            status : name === 'filterStatus' ? value : this.state.filterStatus
+            name: name === 'filterName' ? value : this.state.filterName,
+            username: name === "filterUsername" ? value : this.state.filterUsername,
+            status: name === 'filterStatus' ? value : this.state.filterStatus
         };
         this.props.onFilterTable(filter);
         this.setState({
@@ -29,48 +31,55 @@ class UserList extends Component {
 
     render() {
         return (
-            <div className="panel panel-primary">
-                <div className="panel-heading">
-                    <h3 className="panel-title text-center">User List</h3>
-                </div>
-                <div className="panel-body">
-                    <table className="table table-bordered table-hover">
-                        <thead>
+            <div className="hungdtq-Wrapper">
+                <div className="hungdtq-Container">
+                    <table className="table table-hover userlist">
+                        <thead className="thead-blue">
                             <tr>
-                                <th>ID</th>
-                                <th>User Code</th>
-                                <th>Username</th>
-                                <th>Password</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <th>No.</th>
+                                <th>
+                                    Username
+                                </th>
+                                <th>Full Name</th>
+                                <th>
+                                    Status
+                                </th>
+                                <th>Delete</th>
                             </tr>
                             <tr>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="filterName"
-                                onChange = {this.onChange}
-                                value = {this.state.filterName}
-                            />
-                        </td>
-                        <td></td>
-                        <td>
-                            <select
-                                className="form-control"
-                                name="filterStatus"
-                                onChange = {this.onChange}
-                                value = {this.state.filterStatus}
-                            >
-                                <option value={-1}>All</option>
-                                <option value={0}>Ban</option>
-                                <option value={1}>Unban</option>
-                            </select>
-                        </td>
-                        <td></td>
-                    </tr>
+                                <td></td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="filterName"
+                                        onChange={this.onChange}
+                                        value={this.state.filterName}
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="filterUsername"
+                                        onChange={this.onChange}
+                                        value={this.state.filterUsername}
+                                    />
+                                </td>
+                                <td>
+                                    <select
+                                        className="form-control"
+                                        name="filterStatus"
+                                        onChange={this.onChange}
+                                        value={this.state.filterStatus}
+                                    >
+                                        <option value={-1}>All</option>
+                                        <option value={0}>Active</option>
+                                        <option value={1}>Banned</option>
+                                    </select>
+                                </td>
+                                <td></td>
+                            </tr>
                         </thead>
                         <tbody>
                             {this.props.children}
@@ -85,7 +94,7 @@ class UserList extends Component {
 const mapStateToProps = state => {
     return {
         users: state.users,
-        filterTable : state.filterTable,
+        filterTable: state.filterTable,
         sort: state.sort
     }
 }
