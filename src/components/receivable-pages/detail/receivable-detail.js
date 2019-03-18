@@ -60,11 +60,15 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
             //[Receivable detail] get collector info
-            UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
-                receivable.collector = res3.data;
-                this.setState({ receivable: receivable });
+            if (receivable.assignedCollector) {
+                UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
+                    receivable.collector = res3.data;
+                    this.setState({ receivable: receivable });
+                    this.incrementLoading();
+                })
+            } else {
                 this.incrementLoading();
-            })
+            }
             //[Receivable detail] get today task of receivable
             if (!receivable.ClosedDay) {
                 TaskService.getReceivableTodayTask(receivable.Id).then(res6 => {
@@ -85,7 +89,6 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
         }).catch(err => {
-            this.props.history.push('/not-found');
         })
     }
     confirm() {
@@ -236,7 +239,7 @@ class ReceivableDetail extends Component {
                 dayMark = 'Tomorrow';
             }
             dateNote = `Process will start ${dayMark}`;
-        } else {
+        } else if (receivable.PayableDay !== null) {
             let tmp = totalDay + 1;
             let dayMark = `${totalDay + 1} day(s) ago`;
             if (tmp === 1) {
@@ -265,9 +268,9 @@ class ReceivableDetail extends Component {
                 {/* receivable progress */}
                 <ReceivableProgress isFinished={isFinished} progress={receivable.CollectionProgress} />
                 {/* show date note*/}
-                <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
+                {receivable.PayableDay !== null ? <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
                     <span style={{ color: 'red' }}>*</span>
-                    {dateNote}</div>
+                    {dateNote}</div> : null}
             </div>
 
             {/* receivable information */}
@@ -304,7 +307,7 @@ class ReceivableDetail extends Component {
                             <Table.Row>
                                 <Table.Cell>End day:</Table.Cell>
                                 <Table.Cell>
-                                    {`${(endDate ? numAsDate(endDate) : '')}${(!receivable.ClosedDay ? ' (Expectation)' : '')}`}
+                                    {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row>
