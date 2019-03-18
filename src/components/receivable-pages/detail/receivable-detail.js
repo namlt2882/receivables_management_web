@@ -80,7 +80,11 @@ class ReceivableDetail extends Component {
             }
             //[Update receivable] get list collector
             UserService.getCollectors().then(res4 => {
-                this.setState({ collectorList: res4.data });
+                let list = res4.data;
+                list.forEach(c => {
+                    c.DisplayName = `${c.FirstName} ${c.LastName} (${c.Username})`;
+                })
+                this.setState({ collectorList: list });
                 this.incrementLoading();
             })
             //[Update receivable] get list customer
@@ -280,7 +284,7 @@ class ReceivableDetail extends Component {
                         <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
                         Receivable Info <Label color={statusColor}>{status}</Label>
                         {/* Edit info of receivable */}
-                        {receivable.CollectionProgress.Status === 1 ?
+                        {receivable.CollectionProgress.Status === 1 || receivable.CollectionProgress.Status === 4 ?
                             <EditReceivable updateReceivable={this.updateReceivable}
                                 receivable={receivable}
                                 collectorList={this.state.collectorList} /> : null}

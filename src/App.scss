@@ -166,3 +166,19 @@ table.table a {
     border-color: rgb(0, 191, 255);
     font-weight: bold;
 }
+
+.k-animation-container {
+    position: relative;
+    z-index: 10003 !important;
+}
+
+.normal-modal {
+    width: 60% !important;
+    max-width: none !important;
+}
+
+.normal-modal .modal-body {
+    max-height: 30rem !important;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
