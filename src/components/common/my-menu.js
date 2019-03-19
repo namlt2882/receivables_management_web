@@ -11,7 +11,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
     faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt,
-    faChalkboardTeacher, faSignOutAlt, faTasks
+    faChalkboardTeacher, faSignOutAlt, faTasks,
+    faAddressBook
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AuthService, isLoggedIn } from '../../services/auth-service';
@@ -27,7 +28,7 @@ import { Message, Button, Divider } from 'semantic-ui-react';
 import NewAssignedReceivable from '../receivable-pages/new-assigned-receivable';
 import { SERVER_IP } from '../../constants/config';
 library.add(faBell, faUserCircle, faCreditCard,
-    faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks);
+    faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks, faAddressBook);
 
 
 class MyMenu extends Component {
@@ -87,7 +88,7 @@ class MyMenu extends Component {
                             }
                             )}
                             <ConnectedNotification history={this.props.history} dropdownProfile={this.state.dropdownProfile} />
-                            <MyProfile dropdownProfile={this.state.dropdownProfile}
+                            <MyProfileWithRouter dropdownProfile={this.state.dropdownProfile}
                                 toggleProfile={this.toggleProfile} />
                         </Nav>
                     </Collapse>
@@ -98,11 +99,16 @@ class MyMenu extends Component {
     }
 }
 
+
 class MyProfile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
         }
+    }
+
+    viewProfile() {
+
     }
 
     render() {
@@ -114,10 +120,10 @@ class MyProfile extends React.Component {
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <DropdownItem style={{cursor:"default"}}>
+                        <DropdownItem style={{ cursor: "default" }}>
                             Hi, <b>{localStorage.getItem('username')}</b><br />
                         </DropdownItem>
-                        <DropdownItem>
+                        <DropdownItem onClick={() => { this.props.history.push(`/users/${localStorage.id}/view`) }}>
                             My profile
                             </DropdownItem>
                         <DropdownItem onClick={() => {
@@ -132,6 +138,9 @@ class MyProfile extends React.Component {
         </NavItem>);
     }
 }
+
+const MyProfileWithRouter = withRouter(MyProfile)
+
 
 class Notification extends React.Component {
     constructor(props) {
@@ -391,7 +400,7 @@ const menus = [
     },
     {
         name: 'User',
-        to: '/user-list',
+        to: '/users',
         exact: false,
         icon: 'users',
         roles: ['Admin']
@@ -405,9 +414,16 @@ const menus = [
     },
     {
         name: 'Message Form',
-        to: '/message-list',
+        to: '/messages',
         exact: false,
         icon: 'comment-alt',
+        roles: ['Manager']
+    },
+    {
+        name: 'Customer',
+        to: '/customers',
+        exact: false,
+        icon: 'address-book',
         roles: ['Manager']
     }
 ];

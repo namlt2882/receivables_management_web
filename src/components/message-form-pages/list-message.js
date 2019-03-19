@@ -4,9 +4,13 @@ import { connect } from 'react-redux';
 import MessageItem from './message-item';
 import MessageList from './message-list';
 import { Link } from 'react-router-dom';
-import { actFetchMessageRequest } from '../../actions/message-form-action';
-import Component from '../common/component'
-import { available } from '../common/loading-page'
+import { MessageFormAction } from '../../actions/message-form-action';
+import Component from '../common/component';
+import { ProfileMessageFormService } from '../../services/profile-message-form-service';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
+
+import './message.scss';
+
 
 class ListMessage extends Component {
 
@@ -19,35 +23,51 @@ class ListMessage extends Component {
 
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {
-        document.title = 'Message forms';
-        available(resolve => setTimeout(resolve, 400));
-        this.props.fetchAllMessages();
+        document.title = 'Message Forms';
+        ProfileMessageFormService.getAll().then(res => {
+            this.props.fetchAllMessages(res.data);
+            this.incrementLoading();
+        });
+        available1();
     }
 
     render() {
-        var { messages } = this.props;
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
+
+        var messages = this.props.messages;
         return (
-            <div>
-                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 mgb-15">
-                    <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        <Link to="/message-list/add">Add</Link>
+            <div style={{
+                width: "100%"
+            }}>
+                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div className="hungdtq-header">
+                        <h1>Message form management</h1>
                     </div>
-                    <div className="input-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        <input
-                            name="keyword"
-                            type="text"
-                            className="form-control"
-                            placeholder="Enter keyword ..."
-                        />
-                        <button className="btn btn-info">Search</button>
+                    <div className="hungdtq-Wrapper">
+                        <div className="hungdtq-Container">
+                            <div className="hungdtq-headerbtn-container">
+                                <div className="btn btn-success">
+                                    <Link to="/messages/add"><i className="fas fa-plus"></i></Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+
+                        <MessageList>
+                            {/* props nay goi la props chilren */}
+                            {this.showMessages(messages)}
+                        </MessageList>
 
                     </div>
-                </div>
-                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <MessageList>
-                        {/* props nay goi la props chilren */}
-                        {this.showMessages(messages)}
-                    </MessageList>
+
+                    <div className="hungdtq-Wrapper" style={{ display: (messages == null || messages.length === 0) ? 'block' : 'none' }}>
+                        <div className="hungdtq-Container">
+                            <p>There is no message form.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -78,8 +98,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchAllMessages: () => {
-            dispatch(actFetchMessageRequest());
+        fetchAllMessages: (messages) => {
+            dispatch(MessageFormAction.setMessages(messages));
         }
     }
 }

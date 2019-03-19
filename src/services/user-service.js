@@ -6,5 +6,11 @@ export const UserService = {
     },
     getCollectorDetail: (id) => {
         return AuthRequest.get(`User/GetCollectorById/${id}`);
+    },
+    updateCollector: (collector) => {
+        return  AuthRequest.put(`User/`, collector);
+    },
+    addCollector: (collector) => {
+        return AuthRequest.post('User/', collector)
     }
 }

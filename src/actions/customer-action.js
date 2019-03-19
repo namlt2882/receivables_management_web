@@ -6,5 +6,11 @@ export const CustomerAction = {
             type: Types.SET_CUSTOMER_LIST,
             customers
         }
+    },
+    setCustomer: (customer) => {
+        return {
+            type: Types.SET_CUSTOMER,
+            customer
+        }
     }
 }

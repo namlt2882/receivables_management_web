@@ -1,135 +1,277 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { actAddMessageRequest } from '../../actions/message-form-action';
 import { connect } from 'react-redux';
-import Component from '../common/component'
+import Component from '../common/component';
+import { available1 } from '../common/loading-page';
+import { ProfileMessageFormService } from '../../services/profile-message-form-service';
+import { MessageFormAction } from '../../actions/message-form-action';
+import ConfirmModal from '../modal/ConfirmModal';
+import Textarea from 'react-textarea-autosize';
 
 class MessageActionPage extends Component {
+
     constructor(props) {
         super(props);
-        this.state = {
-            id: '',
-            txtName: '',
-            selCustomer: '',
-            selType: '',
-            txtContent: ''
-        };
-    }
-    // Dispatch action và lưu itemEditing vào store
-    // componentDidMount() {
-    //     var { match } = this.props;
-    //     if (match) {
-    //         var id = match.params.id;
-    //         this.props.onEditUser(id);
-    //     }
-    // }
-    // Nhận lại props sau khi mapStateToProps
-    // componentWillReceiveProps(nextProps) {
-    //     if (nextProps) {
-    //         var { message } = nextProps;
-    //         this.setState({
-    //             id: message.id,
-    //             txtName: message.name,              
-    //             selCustomer: message.customer,
-    //             selType: message.type,
-    //             txtContent: message.content
-    //         });
-    //     }
-    // }
 
-    onChange = (event) => {
-        var target = event.target;
-        var name = target.name;
-        //var value = target.type === 'select' ? target.selected : target.value;
-        var value = target.value;
+        this.state = {
+            modalShow: false,
+            message: '',
+            profileMessageForm: {
+                Name: '',
+                Content: '',
+                Type: 0,
+                id: null,
+            },
+            Name: '',
+            Content: '',
+            Type: 0,
+            id: null,
+            viewMode: 2,
+            title: 'Add new form',
+        }
+
+        this.callbackFromModal = this.callbackFromModal.bind(this);
+        this.openModal = this.openModal.bind(this);
+        this.onTypeChange = this.onTypeChange.bind(this);
+        this.onContentChange = this.onContentChange.bind(this);
+        this.onNameChange = this.onNameChange.bind(this);
+        this.onClear = this.onClear.bind(this);
+        this.changeMode = this.changeMode.bind(this);
+    }
+
+    changeMode() {
         this.setState({
-            [name]: value
+            viewMode: 1
+        })
+    }
+
+    callbackFromModal() {
+        this.setState({ modalShow: false });
+        if (this.state.Id) {
+            ProfileMessageFormService.update(this.state.profileMessageForm).then(res => {
+                if (res.status === 200) {
+                    this.setState({
+                        viewMode: 0
+                    });
+                    this.props.history.push(`/messages/${this.props.match.params.id}/view`);
+                } else {
+                    prompt('Failed to execute action');
+                }
+            });
+        } else {
+            ProfileMessageFormService.create(this.state.profileMessageForm).then(res => {
+                if (res.status === 200) {
+                    this.props.history.push(`/messages/`);
+                } else if (res.status) {
+                    prompt('Failed to execuaction');
+                }
+            });
+        }
+
+    }
+
+    openModal() {
+        var { match } = this.props;
+        let tmpMes = 'Are you sure want add new message form?';
+        if (match) {
+            if (match.params.id) {
+                tmpMes = 'Are you sure want edit?';
+            }
+        }
+
+        let form = this.state.profileMessageForm;
+        form.Name = this.state.Name;
+        form.Id = this.state.Id;
+        form.Content = this.state.Content;
+        form.Type = this.state.Type;
+
+        this.setState({
+            profileMessageForm: form,
+            message: tmpMes,
+            modalShow: true
         });
     }
 
-    onSave = (event) => {
-        event.preventDefault();
-        var { id, txtName, txtContent, selCustomer, selType } = this.state;
-        var { history } = this.props;
-        var message = {
-            id: id,
-            name: txtName,
+    onNameChange(e) {
+        this.setState({
+            Name: e.target.value
+        })
+    }
 
-            customer: selCustomer,
-            type: selType,
-            content: txtContent
-        };
-        this.props.onAddMessage(message);
-        history.goBack();
+    onContentChange(e) {
+        this.setState({
+            Content: e.target.value
+        })
+    }
+
+    onTypeChange(e) {
+        this.setState({
+            Type: e.target.value
+        })
+    }
+
+    onClear() {
+        let message = this.props.message;
+        if (message.Id) {
+            this.setState({
+                Name: message.Name,
+                Content: message.Content,
+                Type: message.Type,
+            });
+        } else {
+            this.setState({
+                Name: '',
+                Content: '',
+                Type: 0,
+            });
+        }
+
+    }
+
+    // Dispatch action và lưu itemEditing vào store
+    componentDidMount() {
+        document.title = "Add new form"
+        available1();
+        var { match } = this.props;
+        if (match) {
+            var id = match.params.id;
+            if (id) {
+                document.title = "Form detail";
+                this.setState({
+                    messageId: id,
+                    title: 'Form Detail',
+                    viewMode: 0
+                });
+
+                ProfileMessageFormService.getDetail(id).then(res => {
+                    this.props.setMessage(res.data);
+                    this.incrementLoading();
+                    console.log(res.data);
+                    this.setState({
+                        Id: res.data.Id,
+                        Name: res.data.Name,
+                        Content: res.data.Content,
+                        Type: res.data.Type,
+                        profileMessageForm: res.data
+                    });
+                });
+            }
+        }
     }
 
     render() {
-        var { txtName, txtContent, selCustomer, selType } = this.state;
+        var viewMode = this.state.viewMode;
+        let modalClose = () => {
+            this.setState({
+                modalShow: false
+            });
+            window.event.stopPropagation();
+        };
         return (
-            <div>
-
-                <div className="panel panel-primary col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <div className="panel-heading">
-                        <h3 className="panel-title text-center">Messages List</h3>
+            <div style={{
+                width: "100%", paddingTop: "10px"
+            }}>
+                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+                    <div className="hungdtq-header">
+                        <h1>{this.state.title}</h1>
                     </div>
-                    <div className="panel-body">
-                        <form onSubmit={this.onSave} className="form-row">
-                            <div className="form-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <label>Name:</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    name="txtName"
-                                    value={txtName}
-                                    onChange={this.onChange}
-                                />
-                            </div>
-                            <div className="form-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <label>Content: </label>
-                                <textarea
-                                    type="text"
-                                    className="form-control"
-                                    name="txtContent"
-                                    value={txtContent}
-                                    onChange={this.onChange}
-                                />
-                            </div>
-                            <div className="form-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <label>Customer:</label>
-                                <select
-                                    className="form-control"
-                                    type="select"
-                                    name="selCustomer"
-                                    value={selCustomer}
-                                    onChange={this.onChange}
-                                    selected={selCustomer}
-                                >
-                                    <option>NG ACB</option>
-                                    <option>NG VIETCOM</option>
-                                </select>
-                            </div>
-                            <div className="form-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <label>Type:</label>
-                                <select
-                                    className="form-control"
-                                    type="select"
-                                    name="selType"
-                                    value={selType}
-                                    onChange={this.onChange}
-                                    checked={selType}
-                                >
-                                    <option>Call</option>
-                                    <option>SMS</option>
-                                </select>
-                            </div>
-                            <div className="mb-15 col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <button>Save</button>&nbsp;&nbsp;&nbsp;
-                    <Link to="/message-list">Cancel</Link>
-                            </div>
-                        </form>
+                    <div className="hungdtq-Wrapper">
+                        <div className="hungdtq-Container" style={{ paddingTop: "2rem" }}>
+                            <table className="UserDetailTable">
+                                <tbody>
+                                    <tr>
+                                        <td className="UserDetailTable-Col1">Name</td>
+                                        <td className="UserDetailTable-Col2">:</td>
+                                        <td className="UserDetailTable-Col3">
+                                            <input
+                                                style={{ display: viewMode === 0 ? 'block' : 'none' }}
+                                                disabled
+                                                type="text"
+                                                className="form-control disabled"
+                                                value={this.state.Name}
+                                                onChange={this.onNameChange}
+                                            />
+                                            <input
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
+                                                type="text"
+                                                className="form-control"
+                                                value={this.state.Name}
+                                                onChange={this.onNameChange}
+                                            />
+
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td className="UserDetailTable-Col1">Content</td>
+                                        <td className="UserDetailTable-Col2">:</td>
+                                        <td className="UserDetailTable-Col3">
+                                            <Textarea
+                                                style={{ display: viewMode === 0 ? 'block' : 'none' }}
+                                                disabled
+                                                type="text"
+                                                minRows={3}
+                                                className="form-control detailTextArea disabled"
+                                                value={this.state.Content}
+                                                onChange={this.onContentChange}
+                                            />
+                                            <Textarea
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
+                                                type="text"
+                                                className="form-control detailTextArea"
+                                                value={this.state.Content}
+                                                onChange={this.onContentChange}
+                                            />
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td className="UserDetailTable-Col1">Type</td>
+                                        <td className="UserDetailTable-Col2">:</td>
+                                        <td className="UserDetailTable-Col3">
+                                            <div style={{ paddingTop: '0.5rem', display: viewMode != 0 ? 'block' : 'none' }}>
+                                                <div className="d-inline" style={{paddingRight: '5px'}}>
+                                                    <input type="radio" value='0' checked={this.state.Type == 0} onChange={this.onTypeChange} />
+                                                    <label>SMS</label>
+                                                </div>
+                                                <div className="d-inline">
+                                                    <input type="radio" value='1' checked={this.state.Type == 1} onChange={this.onTypeChange} />
+                                                    <label>Call</label>
+                                                </div>
+                                            </div>
+                                            <div style={{ paddingTop: '0.5rem', display: viewMode != 0 ? 'none' : 'block'}}>
+                                                <div className="d-inline">
+                                                    <label>{this.state.Type == 0 ? 'SMS' : 'Call'}</label>
+                                                </div>
+                                                
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr></tr>
+                                    <tr>
+                                        <td className="UserDetailTable-Col1"></td>
+                                        <td className="UserDetailTable-Col2"></td>
+                                        <td className="UserDetailTable-Col3">
+                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
+                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
+                                            <button style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
+                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem' }} className="btn btn-basic" onClick={this.onClear}>Reset</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
+                <ConfirmModal
+                    show={this.state.modalShow}
+                    onHide={modalClose}
+                    header={'Add new form'}
+                    body={this.state.message}
+                    object={this.state.profileMessageForm}
+                    callback={this.callbackFromModal}
+                />
             </div>
         );
     }
@@ -137,14 +279,14 @@ class MessageActionPage extends Component {
 
 const mapStateToProps = state => {
     return {
-
+        message: state.message
     }
 }
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        onAddMessage: (message) => {
-            dispatch(actAddMessageRequest(message));
+        setMessage: (message) => {
+            dispatch(MessageFormAction.setMessage(message));
         }
     }
 }
