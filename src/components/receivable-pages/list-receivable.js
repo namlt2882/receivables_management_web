@@ -199,7 +199,6 @@ class ReceivableList extends Component {
                     </div>
                     <div className='col-sm-3'>
                         <div>
-                            <div>{`Sum: ${this.state.receivableList.length}`}</div>
                             {this.state.series.map(s => <div style={{ padding: '5px' }}>
                                 <Checkbox checked={s.checked}
                                     onChange={(e, data) => {

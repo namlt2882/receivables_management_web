@@ -33,7 +33,7 @@ const routes = [
     {
         path: '/user/:id/edit',
         exact: true,
-        main: ({ match, history }) => <UserActionPage match={match} history={history} /> //Đối tượng match dùng để lấy cái id để edit
+        main: ({ match, history }) => <UserActionPage key={match.params.id} match={match} history={history} /> //Đối tượng match dùng để lấy cái id để edit
     },
     {
         path: '/profile',
@@ -48,7 +48,7 @@ const routes = [
     {
         path: '/profile/:id/view',
         exact: true,
-        main: ({ match, history }) => <EditProfile match={match} history={history} />
+        main: ({ match, history }) => <EditProfile key={match.params.id} match={match} history={history} />
     },
     {
         path: '/profile/:id/edit',
@@ -83,7 +83,7 @@ const routes = [
     {
         path: '/receivable/:id/view',
         exact: true,
-        main: ({ match, history }) => <ReceivableDetail match={match} history={history} />
+        main: ({ match, history }) => <ReceivableDetail key={match.params.id} match={match} history={history} />
     },
     {
         path: '/task',

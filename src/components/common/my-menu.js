@@ -114,7 +114,7 @@ class MyProfile extends React.Component {
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <DropdownItem style={{cursor:"default"}}>
+                        <DropdownItem style={{ cursor: "default" }}>
                             Hi, <b>{localStorage.getItem('username')}</b><br />
                         </DropdownItem>
                         <DropdownItem>
@@ -151,6 +151,7 @@ class Notification extends React.Component {
         this.checkMouseOutNoti = this.checkMouseOutNoti.bind(this);
         this.createNotification = this.createNotification.bind(this);
         this.type11Action = this.type11Action.bind(this);
+        this.type12Action = this.type12Action.bind(this);
         this.getAction = this.getAction.bind(this);
     }
 
@@ -197,20 +198,26 @@ class Notification extends React.Component {
     getAction({ Id, Type, NData, IsSeen }) {
         let action = () => { };
         let modalContent = null;
+        let openModal = true;
         switch (Type) {
             case 11:
                 action = this.type11Action(JSON.parse(NData));
                 modalContent = <NewAssignedReceivable history={this.props.history} />
                 break;
+            case 12:
+                action = this.type12Action(parseInt(NData));
+                openModal = false;
         }
         return () => {
             action();
-            this.setState({
-                dropdownNoti: false,
-                mouseInNoti: false,
-                modalContent: modalContent,
-                openModal: true
-            });
+            if (openModal) {
+                this.setState({
+                    dropdownNoti: false,
+                    mouseInNoti: false,
+                    modalContent: modalContent,
+                    openModal: true
+                });
+            }
             //send IsSeen = true
             if (!IsSeen) {
                 NotificationService.toggleSeen(Id).then(res => {
@@ -220,6 +227,12 @@ class Notification extends React.Component {
                     }
                 })
             }
+        }
+    }
+
+    type12Action(id) {
+        return () => {
+            this.props.history.push(`/receivable/${id}/view`);
         }
     }
 
