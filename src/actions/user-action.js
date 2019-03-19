@@ -91,3 +91,18 @@ export const actSort = (sort) => {
         sort // Bao gồm sortBy và sortValue
     }
 }
+
+export const UserAction = {
+    setUsers: (users) => {
+        return {
+            type: Types.FETCH_USERS,
+            users
+        }
+    },
+    setUser: (user) => {
+        return {
+            type: Types.FETCH_USER,
+            user
+        }
+    }
+}

@@ -4,17 +4,24 @@ import UserList from './user-list-component';
 import UserItem from './user-item';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { actFetchUsersRequest, actDeleteUsersRequest, actFilter, actSort } from '../../actions/user-action';
-import { available } from '../common/loading-page'
-import Component from '../common/component'
+import { available1 } from '../common/loading-page'
+import Component from '../common/component';
+import { UserService } from '../../services/user-service';
+import { UserAction } from '../../actions/user-action';
+
+import './user.scss';
 
 class ListUser extends Component {
 
+    
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {
-        document.title = 'Users';
-        available(resolve => setTimeout(resolve, 400));
-        this.props.fetchAllUsers();
+        document.title = 'User management';
+        UserService.getCollectors().then(res => {
+            this.props.fetchAllUsers(res.data);
+            this.incrementLoading();
+        });
+        available1();
     }
 
     onDelete = (id) => {
@@ -28,37 +35,6 @@ class ListUser extends Component {
         });
     }
     render() {
-        var { users, filterTable, sortTable } = this.props;
-
-        // filter on table
-        if (filterTable.name) {
-            users = users.filter((user) => {
-                return user.username.toLowerCase().indexOf(filterTable.name.toLowerCase()) !== -1
-            });
-        }
-        users = users.filter((user) => {
-            if (filterTable.status === -1) {
-                return user;
-            } else {
-                return user.status === (filterTable.status === 1 ? true : false);
-            }
-        });
-
-        // sort table
-        if (sortTable.by === 'username') {
-            users.sort((a, b) => {
-                if (a.username > b.username) return sortTable.value;
-                else if (a.username < b.username) return -sortTable.value;
-                else return 0;
-            });
-        } else {
-            users.sort((a, b) => {
-                if (a.status > b.status) return -sortTable.value;
-                else if (a.status < b.status) return sortTable.value;
-                else return 0;
-            });
-        }
-
         return (
             <div style={{
                 width: "100%"
@@ -71,16 +47,14 @@ class ListUser extends Component {
                         <div className="hungdtq-Container">
                             <div className="hungdtq-headerbtn-container">
                                 <div className="btn btn-success">
-                                    <Link to="/user/add"> Add New User</Link>
+                                    <Link to="/users/add"> <i class="fas fa-plus"></i></Link>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div>
                         <UserList>
-                            {/* props nay goi la props chilren */}
-                            {this.showUsers(users)}
-
+                            {this.showUsers(this.props.users)}
                         </UserList>
                     </div>
                 </div>
@@ -109,25 +83,14 @@ class ListUser extends Component {
 const mapStateToProps = state => {
     return {
         users: state.users,
-        filterTable: state.filterTable,
-        sortTable: state.sortTable
     }
 }
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchAllUsers: () => {
-            dispatch(actFetchUsersRequest());
+        fetchAllUsers: (users) => {
+            dispatch(UserAction.setUsers(users));
         },
-        onDeleteUser: (id) => {
-            dispatch(actDeleteUsersRequest(id));
-        },
-        onFilterTable: (filter) => {
-            dispatch(actFilter(filter));
-        },
-        onSortTable: (sort) => {
-            dispatch(actSort(sort));
-        }
     }
 }
 

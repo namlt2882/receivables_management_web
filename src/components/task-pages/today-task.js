@@ -2,9 +2,7 @@ import React from 'react';
 import Component from '../common/component';
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { TaskService } from '../../services/task-service';
-import { Container, Header, Table } from 'semantic-ui-react';
 import { numAsTime } from '../../utils/time-converter';
-import { Link } from 'react-router-dom';
 
 import "./task.scss";
 
@@ -37,48 +35,46 @@ class TodayTask extends Component {
             return <PrimaryLoadingPage />
         }
         let hasTask = this.state.todayTask && this.state.todayTask.length > 0;
-        return (<div className='col-sm-12 row justify-content-center align-self-center'>
-            <div className="hungdtq-header">
-                <h1>Today task</h1>
-            </div>
-            <div className="hungdtq-Wrapper">
-                <div className="hungdtq-Container">
-                    <div>{!hasTask ? 'You have no task today!' : null}</div>
-                    <table fixed style={{ display: hasTask ? 'table' : 'none' }} className="table table-hover task-table">
-                        <thead className="thead-blue">
-                            <tr>
-                                <th>No.</th>
-                                <th>Task Name</th>
-                                <th>Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.todayTask.map(t => <tr onClick={this.handleClick.bind(this, t.ReceivableId)}>
-                                <td>{index++}</td>
-                                <td>{t.Name}</td>
-                                <td>{numAsTime(t.StartTime)}</td>
-                                <td style={{ display: t.Status === 3 ? 'block' : 'none' }}>
-                                    <p className="btn btn-warning">
-                                        {t.Status === 3 ? 'Late' : ""}
-                                    </p>
-                                </td>
-                                <td style={{ display: t.Status === 1 ? 'block' : 'none' }}>
-                                    <p className="btn btn-primary">
-                                        {t.Status === 1 ? 'In order' : ""}
-                                    </p>
-                                </td>
-                                <td style={{ display: t.Status === 0 ? 'block' : 'none' }}>
-                                    <p className="btn btn-success">
-                                        {t.Status === 0 ? 'Cancel' : ""}
-                                    </p>
-                                </td>
-                            </tr>)}
-                        </tbody>
-                    </table>
+        return (
+            <div className='col-sm-12 row justify-content-center align-self-center'>
+                <div className="hungdtq-header">
+                    <h1>Today task</h1>
                 </div>
-            </div>
-        </div>);
+                <div className="hungdtq-Wrapper">
+                    <div className="hungdtq-Container">
+                        <div>{!hasTask ? 'You have no task today!' : null}</div>
+                        <table fixed style={{ display: hasTask ? 'table' : 'none' }} className="table table-hover task-table">
+                            <thead className="thead-blue">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Task Name</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.state.todayTask.map(t =>
+                                    <tr onClick={this.handleClick.bind(this, t.ReceivableId)}>
+                                        <td>{index++}</td>
+                                        <td>{t.Name}</td>
+                                        <td>{numAsTime(t.StartTime)}</td>
+                                        <td>
+                                            <p style={{ display: t.Status === 3 ? 'block' : 'none' }} className="btn btn-warning">
+                                                {t.Status === 3 ? 'Late' : ""}
+                                            </p>
+                                            <p style={{ display: t.Status === 1 ? 'block' : 'none' }} className="btn btn-primary">
+                                                {t.Status === 1 ? 'In order' : ""}
+                                            </p>
+                                            <p style={{ display: t.Status === 0 ? 'block' : 'none' }} className="btn btn-success">
+                                                {t.Status === 0 ? 'Cancel' : ""}
+                                            </p>
+                                        </td>
+                                    </tr>)}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>);
     }
 }
 

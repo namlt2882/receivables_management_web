@@ -37,14 +37,17 @@ class UserList extends Component {
                         <thead className="thead-blue">
                             <tr>
                                 <th>No.</th>
-                                <th>
+                                <th className="userNameCol">
                                     Username
                                 </th>
-                                <th>Full Name</th>
-                                <th>
+                                <th className="fullNameCol">Full Name</th>
+                                <th className="noOfAssignedReceivableCol">
+                                    No. Of Assigned Receivable
+                                </th>
+                                <th className="userStatusCol">
                                     Status
                                 </th>
-                                <th>Delete</th>
+
                             </tr>
                             <tr>
                                 <td></td>
@@ -66,19 +69,9 @@ class UserList extends Component {
                                         value={this.state.filterUsername}
                                     />
                                 </td>
-                                <td>
-                                    <select
-                                        className="form-control"
-                                        name="filterStatus"
-                                        onChange={this.onChange}
-                                        value={this.state.filterStatus}
-                                    >
-                                        <option value={-1}>All</option>
-                                        <option value={0}>Active</option>
-                                        <option value={1}>Banned</option>
-                                    </select>
-                                </td>
                                 <td></td>
+                                <td></td>
+
                             </tr>
                         </thead>
                         <tbody>

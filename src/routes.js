@@ -13,6 +13,8 @@ import ReceivableDetail from './components/receivable-pages/detail/receivable-de
 import ReceivableList from './components/receivable-pages/list-receivable'
 import TodayTask from './components/task-pages/today-task';
 import NewAssignedReceivable from './components/receivable-pages/new-assigned-receivable';
+import UserList from './components/customer-pages/customer-list';
+import CustomerActionPage from './components/customer-pages/customer-action';
 
 const routes = [
     {
@@ -21,19 +23,24 @@ const routes = [
         main: ({ match, history }) => <Dashboard history={history} />
     },
     {
-        path: '/user-list',
+        path: '/users',
         exact: true,
         main: ({ match, history }) => <ListUser history={history} />
     },
     {
-        path: '/user/add',
+        path: '/users/add',
         exact: true,
         main: ({ history }) => <UserActionPage history={history} />
     },
     {
-        path: '/user/:id/edit',
+        path: '/users/:id/edit',
         exact: true,
         main: ({ match, history }) => <UserActionPage match={match} history={history} /> //Đối tượng match dùng để lấy cái id để edit
+    },
+    {
+        path: '/users/:id/view',
+        exact: true,
+        main: ({ match, history }) => <UserActionPage match={match} history={history} />
     },
     {
         path: '/profile',
@@ -56,14 +63,19 @@ const routes = [
         main: ({ match, history }) => <EditProfile match={match} history={history} />
     },
     {
-        path: '/message-list',
+        path: '/messages',
         exact: true,
         main: ({ match, history }) => <ListMessage history={history} />
     },
     {
-        path: '/message-list/add',
+        path: '/messages/add',
         exact: true,
         main: ({ match, history }) => <MessageActionPage history={history} />
+    },
+    {
+        path: '/messages/:id/view',
+        exact: true,
+        main: ({ match, history }) => <MessageActionPage match={match} history={history} />
     },
     {
         path: '/receivable',
@@ -99,6 +111,21 @@ const routes = [
         path: '/not-found',
         exact: true,
         main: ({ match, history }) => <NotFoundPage match={match} history={history} />
+    },
+    {
+        path: '/customers',
+        exact: true,
+        main: ({ match, history }) => <UserList history={history} />
+    },
+    {
+        path: '/customers/add',
+        exact: true,
+        main: ({ match, history }) => <CustomerActionPage history={history} />
+    },
+    {
+        path: '/customers/:id/view',
+        exact: true,
+        main: ({ match, history }) => <CustomerActionPage match={match} history={history} />
     }
 ];
 
