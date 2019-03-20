@@ -253,8 +253,8 @@ class ReceivableDetail extends Component {
             }
             dateNote = `Process started ${dayMark} `;
         }
-        let status = describeStatus(receivable.CollectionProgress.Status, receivable.IsConfirmed);
-        let statusColor = getStatusColor(receivable.CollectionProgress.Status, receivable.IsConfirmed);
+        let status = describeStatus(receivable.CollectionProgress.Status);
+        let statusColor = getStatusColor(receivable.CollectionProgress.Status);
         return (<div className='col-sm-12 row'>
             {/* History */}
             <div className='col-sm-3 row'>
@@ -355,62 +355,61 @@ class ReceivableDetail extends Component {
 }
 
 const statusWeight = [
-    { status: 'Collecting', weight: 4 },
-    { status: 'Not confirmed', weight: 3 },
-    { status: 'Pending', weight: 2 },
-    { status: 'Closed', weight: 1 }
+    { status: 'Collecting', weight: 5 },
+    { status: 'Pending', weight: 4 },
+    { status: 'Done', weight: 3 },
+    { status: 'Closed', weight: 2 },
+    { status: 'Cancel', weight: 1 }
 ]
 
-export const compareStatus = (a, b, aConfirmed = false, bConfirmed = false) => {
-
-    let aWeight = describeStatus(a, aConfirmed), bWeight = describeStatus(b, bConfirmed);
+export const compareStatus = (a, b) => {
+    let aWeight = describeStatus(a), bWeight = describeStatus(b);
     aWeight = statusWeight.find(sw => sw.status === aWeight).weight;
     bWeight = statusWeight.find(sw => sw.status === bWeight).weight;
     return bWeight - aWeight;
 }
 
-export const getStatusColor = (status, confirm = false) => {
+export const getStatusColor = (status) => {
     let statusColor = 'grey';
-    status = describeStatus(status, confirm);
-    if (status === 'Collecting') {
-        statusColor = 'green'
-    } else if (status === 'Pending') {
-        statusColor = 'yellow'
-    } else if (status === 'Not confirmed') {
-        statusColor = 'red'
+    switch (status) {
+        case 0:
+            // Cancel
+            statusColor = 'red';
+            break;
+        case 1: statusColor = 'green';
+            break;
+        case 2:
+            // Done
+            statusColor = 'blue';
+            break;
+        case 4:
+            // Pending
+            statusColor = 'orange';
+            break;
     }
     return statusColor;
 }
 
-export const describeStatus = (status, confirm = false) => {
+export const describeStatus = (status) => {
     let rs = status;
     switch (status) {
         case 0:
             // Cancel
-            rs = 'Closed';
-            if (!confirm) {
-                rs = 'Not confirmed'
-            }
+            rs = 'Cancel';
             break;
         case 1: rs = 'Collecting';
             break;
         case 2:
-            //Done
-            rs = 'Closed';
-            break;
-        case 3:
-            rs = 'Late';
+            // Done
+            rs = 'Done';
             break;
         case 4:
-            //change from Waiting to Pending
+            // Pending
             rs = 'Pending';
             break;
         case 5:
-            //Closed
+            // Closed
             rs = 'Closed';
-            if (!confirm) {
-                rs = 'Not confirmed'
-            }
             break;
     }
     return rs;

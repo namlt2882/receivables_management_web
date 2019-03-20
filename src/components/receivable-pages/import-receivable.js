@@ -288,7 +288,7 @@ class ImportReceivable extends Component {
         return (<Container>
             <Header className='text-center'>Import receivable</Header>
             <Form loading={this.state.loadingForm} onSubmit={() => { }} className='col-sm-12 row justify-content-center align-self-center'>
-                <Step.Group className='col-sm-12' style={{ display: this.state.step === 4 ? 'none' : 'flex' }}>
+                <Step.Group size='mini' className='col-sm-10' style={{ display: this.state.step === 4 ? 'none' : 'flex' }}>
                     <Step active={this.state.step === 1}>
                         <Icon name='info' />
                         <Step.Content>

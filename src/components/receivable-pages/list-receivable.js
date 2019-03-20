@@ -15,6 +15,12 @@ import { CollectorAction } from '../../actions/collector-action'
 import { UserService } from '../../services/user-service';
 import { MultiSelect } from '@progress/kendo-react-dropdowns';
 import { CustomerAction } from '../../actions/customer-action'
+import classnames from 'classnames';
+import { TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCheck, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+library.add(faCheck, faExclamationCircle);
 
 class ReceivableList extends Component {
     constructor(props) {
@@ -23,12 +29,18 @@ class ReceivableList extends Component {
             maxLoading: 2,
             receivableList: [],
             series: [
-                { category: 'Collecting', value: 0, color: 'green', checked: true },
-                { category: 'Not confirmed', value: 0, color: 'red', checked: true },
-                { category: 'Pending', value: 0, color: 'yellow', checked: true },
-                { category: 'Closed', value: 0, color: 'gray', checked: true }
-
+                { category: 'Collecting', value: 0, color: getStatusColor(1), checked: true, isConfirmed: false },
+                { category: 'Pending', value: 0, color: getStatusColor(4), checked: true, isConfirmed: false },
+                { category: 'Done', value: 0, color: getStatusColor(2), checked: true, isConfirmed: true },
+                { category: 'Closed', value: 0, color: getStatusColor(5), checked: true, isConfirmed: true },
+                { category: 'Cancel', value: 0, color: getStatusColor(0), checked: true, isConfirmed: true }
             ],
+            series2: [
+                { category: 'Done', value: 0, color: getStatusColor(2), checked: true, isConfirmed: false },
+                { category: 'Closed', value: 0, color: getStatusColor(5), checked: true, isConfirmed: false },
+                { category: 'Cancel', value: 0, color: getStatusColor(0), checked: true, isConfirmed: false }
+            ],
+            getConfirmed: true,
             selectedCollector: [],
             selectedCustomer: [],
         }
@@ -37,27 +49,53 @@ class ReceivableList extends Component {
         this.onChangeSelectedCollector = this.onChangeSelectedCollector.bind(this);
         this.onChangeSelectedCustomer = this.onChangeSelectedCustomer.bind(this);
         this.toggleStatus = this.toggleStatus.bind(this);
+        this.currentSeries = this.currentSeries.bind(this);
+        this.currentSeriesName = this.currentSeriesName.bind(this);
+        this.setSeriesState = this.setSeriesState.bind(this);
+        this.statusFilterComp = this.statusFilterComp.bind(this);
+        this.managerFilterComp = this.managerFilterComp.bind(this);
+        this.toggleConfirmed = this.toggleConfirmed.bind(this);
+    }
+    setSeriesState(series, getConfirmed = this.state.getConfirmed) {
+        let state = {};
+        state[this.currentSeriesName(getConfirmed)] = series;
+        this.setState(state);
+    }
+    currentSeries(getConfirmed = this.state.getConfirmed) {
+        return getConfirmed ? this.state.series : this.state.series2;
+    }
+    currentSeriesName(getConfirmed = this.state.getConfirmed) {
+        return getConfirmed ? 'series' : 'series2';
     }
     onChangeSelectedCollector(e) {
         let selectedCollector = [...e.target.value];
         this.setState({ selectedCollector: selectedCollector });
-        this.filterReceivable(undefined, selectedCollector, this.state.selectedCustomer);
+        this.filterReceivable(undefined, selectedCollector, undefined);
     }
     onChangeSelectedCustomer(e) {
         let selectedCustomer = [...e.target.value];
         this.setState({ selectedCustomer: selectedCustomer });
-        this.filterReceivable(undefined, this.state.selectedCollector, selectedCustomer);
+        this.filterReceivable(undefined, undefined, selectedCustomer);
     }
-    filterReceivable(selectedStatus = this.state.series.filter(s => s.checked).map(s => s.category), collectors = this.state.selectedCollector, customers = this.state.selectedCustomer) {
+    filterReceivable(selectedSeries,
+        collectors = this.state.selectedCollector, customers = this.state.selectedCustomer,
+        getConfirmed = this.state.getConfirmed) {
+        if (!selectedSeries) {
+            selectedSeries = this.currentSeries(getConfirmed).filter(s => s.checked);
+        }
         let list = this.props.receivableList;
         let mapCollector = new Map();
         collectors.forEach(c => { mapCollector.set(c.Id, c); });
         let mapCustomer = new Map();
         customers.forEach(c => { mapCustomer.set(c.Name, c); });
         list = list.filter(r => {
-            let status = describeStatus(r.CollectionProgressStatus, r.IsConfirmed);
+            let status = describeStatus(r.CollectionProgressStatus);
             // Filter status
-            if (selectedStatus.find(s => s === status)) {
+            let series = selectedSeries.find(s => s.category === status);
+            if (series) {
+                if (r.IsConfirmed !== series.isConfirmed) {
+                    return false;
+                }
                 r.Display = true;
             } else {
                 r.Display = false;
@@ -75,7 +113,7 @@ class ReceivableList extends Component {
             }
             return rs;
         })
-        this.calculateSeries(list);
+        this.calculateSeries(list, getConfirmed);
         this.setState({ receivableList: list });
     }
     getNotChoosenCustomer() {
@@ -111,7 +149,7 @@ class ReceivableList extends Component {
         available(resolve => setTimeout(resolve, 400));
         this.props.fetchReceivableList().then(res => {
             this.incrementLoading();
-            this.filterReceivable(undefined, this.state.selectedCollector, this.state.selectedCustomer);
+            this.filterReceivable();
         });
         this.props.getCollectors().then(res => {
             this.incrementLoading();
@@ -120,15 +158,15 @@ class ReceivableList extends Component {
     pushDataToTable() {
         let data1 = { ...data };
         let rows = this.state.receivableList.filter(r => r.Display).map((r, i) => {
-            let status = describeStatus(r.CollectionProgressStatus, r.IsConfirmed);
-            let statusColor = getStatusColor(r.CollectionProgressStatus, r.IsConfirmed);
+            let status = describeStatus(r.CollectionProgressStatus);
+            let statusColor = getStatusColor(r.CollectionProgressStatus);
             let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),
                 DebtorName: r.DebtorName,
                 CustomerName: r.CustomerName,
                 CollectorName: collector ? `${collector.FullName} (${collector.Username})` : null,
-                DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
+                DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Status: <Label color={statusColor}>{status}</Label>,
                 action: <Link target='_blank' to={`receivable/${r.Id}/view`}>Detail</Link>
@@ -137,30 +175,73 @@ class ReceivableList extends Component {
         data1.rows = rows;
         return data1;
     }
-    calculateSeries(list = this.state.receivableList) {
-        let series = this.state.series;
+    calculateSeries(list = this.state.receivableList, getConfirmed = this.state.getConfirmed) {
+        let series = this.currentSeries(getConfirmed);
         series.forEach(s => { s.value = 0 })
         series = list.reduce((acc, r) => {
-            let status = describeStatus(r.CollectionProgressStatus, r.IsConfirmed);
+            let status = describeStatus(r.CollectionProgressStatus);
             let tmp = acc.find(obj => obj.category === status);
-            if (tmp) {
+            if (tmp && r.IsConfirmed === tmp.isConfirmed) {
                 tmp.value++;
             }
             return acc;
         }, series);
-        this.setState({ series: series });
+        this.setSeriesState(series, getConfirmed);
     }
 
     toggleStatus(category, checked) {
-        let series = this.state.series;
+        let series = this.currentSeries();
         let found = series.find(s => s.category === category);
         if (found) {
             found.checked = checked;
         }
-        this.setState({ series: series });
-        this.filterReceivable(series.filter(s => s.checked).map(s => s.category))
+        this.setSeriesState(series)
+        this.filterReceivable(series.filter(s => s.checked))
     }
 
+    statusFilterComp() {
+        return <div className='col-sm-3'>
+            <div>
+                {this.currentSeries().map(s => <div style={{ padding: '5px' }}>
+                    <Checkbox checked={s.checked}
+                        onChange={(e, data) => {
+                            this.toggleStatus(s.category, data.checked);
+                        }} />
+                    <Label color={s.color}>{`${s.category} (${s.value})`}</Label>
+                </div>)}
+            </div>
+        </div>
+    }
+    managerFilterComp() {
+        return <div className='col-sm-4' style={{ paddingTop: '20px' }}>
+            {/* Collector filter */}
+            {AuthService.isManager() ? <div>
+                <div><b>Collector</b>:</div>
+                <MultiSelect
+                    data={this.getNotChoosenCollector()}
+                    onChange={this.onChangeSelectedCollector}
+                    value={this.state.selectedCollector}
+                    textField='FullName' />
+            </div> : null}
+            <br />
+            {/* Customer filter */}
+            {AuthService.isManager() ? <div>
+                <div><b>Customer</b>:</div>
+                <MultiSelect
+                    data={this.getNotChoosenCustomer()}
+                    onChange={this.onChangeSelectedCustomer}
+                    value={this.state.selectedCustomer}
+                    textField='Name' />
+            </div> : null}
+        </div>
+    }
+    toggleConfirmed() {
+        let getConfirmed = !this.state.getConfirmed;
+        this.setState({
+            getConfirmed: getConfirmed
+        })
+        this.filterReceivable(undefined, undefined, undefined, getConfirmed);
+    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
@@ -178,36 +259,31 @@ class ReceivableList extends Component {
                     <Link to='/receivable/recent-add'>Recent added receivables</Link><br />
                 </div> : null}
                 <div className='col-sm-12 row justify-content-center align-self-center'>
-                    <div className='col-sm-4' style={{ paddingTop: '20px' }}>
-                        {AuthService.isManager() ? <div>
-                            <div><b>Collector</b>:</div>
-                            <MultiSelect
-                                data={this.getNotChoosenCollector()}
-                                onChange={this.onChangeSelectedCollector}
-                                value={this.state.selectedCollector}
-                                textField='FullName' />
-                        </div> : null}
-                        <br />
-                        {AuthService.isManager() ? <div>
-                            <div><b>Customer</b>:</div>
-                            <MultiSelect
-                                data={this.getNotChoosenCustomer()}
-                                onChange={this.onChangeSelectedCustomer}
-                                value={this.state.selectedCustomer}
-                                textField='Name' />
-                        </div> : null}
-                    </div>
-                    <div className='col-sm-3'>
-                        <div>
-                            {this.state.series.map(s => <div style={{ padding: '5px' }}>
-                                <Checkbox checked={s.checked}
-                                    onChange={(e, data) => {
-                                        this.toggleStatus(s.category, data.checked);
-                                    }} />
-                                <Label color={s.color}>{`${s.category} (${s.value})`}</Label>
-                            </div>)}
-                        </div>
-                    </div>
+                    <Nav tabs className='col-sm-7'>
+                        <NavItem>
+                            <NavLink className={classnames({ active: this.state.getConfirmed })}
+                                onClick={this.toggleConfirmed}>
+                                <FontAwesomeIcon icon='check' size='md' color='green'
+                                    className='icon-btn' />Confirmed
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink className={classnames({ active: !this.state.getConfirmed })}
+                                onClick={this.toggleConfirmed}>
+                                <FontAwesomeIcon icon='exclamation-circle' size='md' color='orange'
+                                    className='icon-btn' />Not confirmed
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                    <TabContent activeTab='1' className='col-sm-12 row justify-content-center align-self-center'>
+                        <TabPane tabId='1' className='col-sm-12 row justify-content-center align-self-center'>
+                            <div className='col-sm-12 row justify-content-center align-self-center'>
+                                {this.managerFilterComp()}
+                                {this.statusFilterComp()}
+                            </div>
+                        </TabPane>
+                    </TabContent>
+
                     {/* <div className='col-sm-8'>
                         <Chart pannable={{ lock: 'x' }} zoomable={{
                             mousewheel: { lock: 'x' },
@@ -229,7 +305,7 @@ class ReceivableList extends Component {
                             </ChartSeries>
                         </Chart>
                     </div> */}
-                </div>
+                </div >
                 <div id='receivable-list'>
                     {data1.rows.length > 0 ? <MDBDataTable
                         className='hide-last-row'
@@ -238,7 +314,7 @@ class ReceivableList extends Component {
                         data={data1} /> :
                         <div>No receivable found!</div>}
                 </div>
-            </Container>);
+            </Container >);
     }
 }
 
@@ -311,7 +387,7 @@ const mapDispatchToProps = (dispatch, props) => {
                     list = list.filter(r => r.AssignedCollectorId === id);
                 }
                 list.sort((a, b) => {
-                    if (describeStatus(a.CollectionProgressStatus, a.IsConfirmed) === describeStatus(b.CollectionProgressStatus, b.IsConfirmed)) {
+                    if (describeStatus(a.CollectionProgressStatus) === describeStatus(b.CollectionProgressStatus)) {
                         if (a.PayableDay === null) {
                             if (b.PayableDay === null) {
                                 return 0;
@@ -320,7 +396,7 @@ const mapDispatchToProps = (dispatch, props) => {
                         }
                         return compareIntDate(a.PayableDay, b.PayableDay)
                     } else {
-                        return compareStatus(a.CollectionProgressStatus, b.CollectionProgressStatus, a.IsConfirmed, b.IsConfirmed);
+                        return compareStatus(a.CollectionProgressStatus, b.CollectionProgressStatus);
                     }
                 });
                 dispatch(ReceivableAction.setReceivableList(list));
