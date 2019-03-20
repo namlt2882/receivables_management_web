@@ -20,6 +20,8 @@ import { numAsDate } from '../../utils/time-converter';
 import { describeStatus, getStatusColor } from './detail/receivable-detail';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { DatePicker } from '@progress/kendo-react-dateinputs';
+import { NotificationManager } from 'react-notifications';
+
 class ImportReceivable extends Component {
     constructor(props) {
         super(props);
@@ -30,13 +32,13 @@ class ImportReceivable extends Component {
             fileWarning: '',
             selectCollector: null,
             profileId: '-1',
-            customerId: '-1',
             loadingForm: false,
             maxLoading: 4,
             step: showRecent ? 4 : 1,
             currentDate: dateToInt(new Date()),
             validatedData: null,
-            insertedData: showRecent ? JSON.parse(localStorage.getItem('recent_inserted_data')) : null
+            insertedData: showRecent ? JSON.parse(localStorage.getItem('recent_inserted_data')) : null,
+            customer: null
         }
         this.setCollector = this.setCollector.bind(this);
         this.updateProfile = this.updateProfile.bind(this);
@@ -46,6 +48,10 @@ class ImportReceivable extends Component {
         this.decreaseStep = this.decreaseStep.bind(this);
         this.insertReceivable = this.insertReceivable.bind(this);
         this.setPayableDay = this.setPayableDay.bind(this);
+        this.isNewCustomer = this.isNewCustomer.bind(this);
+        this.changeNewCustomerCode = this.changeNewCustomerCode.bind(this);
+        this.isCustomerCodeValid = this.isCustomerCodeValid.bind(this);
+        this.createCustomerThenIncreaseStep = this.createCustomerThenIncreaseStep.bind(this);
     }
 
     increaseStep() {
@@ -212,7 +218,7 @@ class ImportReceivable extends Component {
                 "CollectorId": rei.CollectorId,
                 "PrepaidAmount": rei.PrepaidAmount,
                 "DebtAmount": rei.DebtAmount,
-                "CustomerId": this.state.customerId == '-1' ? null : parseInt(this.state.customerId),
+                "CustomerId": this.state.customer.Id,
                 "LocationId": null
             };
         })
@@ -237,7 +243,7 @@ class ImportReceivable extends Component {
         ReceivableService.create(this.state.validatedData).then(res => {
             let insertedData = res.data;
             let currentDate = this.state.currentDate;
-            let customer = this.props.customers.filter(c => c.Id === parseInt(this.state.customerId)).map(c => c.Name);
+            let customer = this.state.customer;
             let profile = this.props.profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name);
             localStorage.setItem('recent_customer', customer);
             localStorage.setItem('recent_profile', profile);
@@ -256,8 +262,56 @@ class ImportReceivable extends Component {
         this.setState({ profileId: e.target.value });
     }
 
-    updateCustomer(e) {
-        this.setState({ customerId: e.target.value });
+    updateCustomer(val) {
+        this.setState({
+            customer: val
+        });
+    }
+
+    changeNewCustomerCode(e) {
+        let val = e.target.value;
+        let customer = this.state.customer;
+        if (val) {
+            val = val.replace(/\s/g, '');
+            val = val.toUpperCase();
+            e.target.value = val;
+        }
+        customer.Code = val;
+        this.setState({ customer: customer });
+    }
+
+    isNewCustomer() {
+        let customer = this.state.customer;
+        if (customer) {
+            return !customer.Id;
+        } else return false;
+    }
+
+    isCustomerCodeValid() {
+        if (!this.isNewCustomer()) {
+            return true;
+        }
+        let customer = this.state.customer;
+        let code = customer.Code;
+        if (code === '' || !code) {
+            return false
+        }
+        if (this.props.customers.find(c => c.Code === code)) {
+            return false
+        }
+        return true
+    }
+
+    warningCustomerCode() {
+        let customer = this.state.customer;
+        let code = customer.Code;
+        if (code === '') {
+            return 'Code can not be empty'
+        }
+        if (this.props.customers.find(c => c.Code === code)) {
+            return 'This code is already existed'
+        }
+        return null;
     }
 
     IsValidate() {
@@ -273,18 +327,44 @@ class ImportReceivable extends Component {
             return isValidated;
         }
     }
-
+    createCustomerThenIncreaseStep() {
+        this.setState({ loadingForm: true });
+        let customer = this.state.customer;
+        let data = {
+            Code: customer.Code,
+            Name: customer.Name,
+            Phone: '',
+            Address: ''
+        }
+        CustomerService.create(data).then(res => {
+            let newCustomer = res.data;
+            customer.Id = newCustomer.Id;
+            this.props.addCustomer(customer);
+            this.setState({
+                loadingForm: false,
+                customer: customer
+            });
+            NotificationManager.success('New customer', `Customer ${customer.Name} has been created!`, 3000, () => { });
+            this.increaseStep();
+        }).catch(err => {
+            window.alert('Service unavailable!')
+            this.setState({ loadingForm: false });
+        })
+    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />
         }
-        var customers = this.props.customers;
-        var profiles = this.props.profiles;
-        var isValidate = this.IsValidate();
+        let customers = this.props.customers;
+        let customer = this.state.customer;
+        let profiles = this.props.profiles;
+        let isValidate = this.IsValidate();
         let data2 = tableData2;
         if (this.state.insertedData !== null && this.state.step === 4) {
             data2 = pushData2(this.state.insertedData, this.props.collectors, this.props.customers);
         }
+        let isNewCustomer = this.isNewCustomer();
+        let codeValid = this.isCustomerCodeValid();
         return (<Container>
             <Header className='text-center'>Import receivable</Header>
             <Form loading={this.state.loadingForm} onSubmit={() => { }} className='col-sm-12 row justify-content-center align-self-center'>
@@ -302,7 +382,7 @@ class ImportReceivable extends Component {
                         </Step.Content>
                     </Step>
                     <Step active={this.state.step === 3}>
-                        <Icon name='save' />
+                        <Icon name='download' />
                         <Step.Content>
                             <Step.Title>Insert</Step.Title>
                         </Step.Content>
@@ -311,22 +391,44 @@ class ImportReceivable extends Component {
                 {/* START STEP 1 */}
                 {/* Customer */}
                 <div className='form-group col-sm-4' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Customer:</label>
-                    <select ref='selectCustomer' className='form-control col-sm-6' value={this.state.customerId}
+                    <label className='bold-text'>Customer</label>
+                    {/* <select ref='selectCustomer' className='form-control col-sm-6' value={this.state.customerId}
                         onChange={this.updateCustomer}>
                         <option value={-1}>--</option>
                         {customers.map((customer) =>
                             <option value={customer.Id}>{customer.Name}</option>
                         )}
-                    </select>
+                    </select> */}
+                    <ComboBox data={customers}
+                        dataItemKey='Id'
+                        textField='Name'
+                        placeholder='Customer'
+                        value={customer}
+                        className='form-control'
+                        allowCustom={true}
+                        onChange={(e) => {
+                            let val = e.target.value;
+                            this.updateCustomer(val);
+                        }} />
+                    {isNewCustomer ?
+                        [<label className='bold-text'><br />Code for new customer:&nbsp;{customer.Name}</label>,
+                        <input type='text' className='form-control' value={customer.Code}
+                            onChange={this.changeNewCustomerCode} />,
+                        <span style={{ color: 'red' }}><i>{this.warningCustomerCode()}</i><br /></span>] : null}
                     <Button color='primary' className='margin-btn'
-                        disabled={this.state.customerId === '-1'
-                            || this.state.profileId === '-1'}
-                        onClick={this.increaseStep}>Next</Button>
+                        disabled={customer === null
+                            || this.state.profileId === '-1' || !codeValid}
+                        onClick={() => {
+                            if (isNewCustomer) {
+                                this.createCustomerThenIncreaseStep();
+                            } else {
+                                this.increaseStep();
+                            }
+                        }}>Next</Button>
                 </div>
                 {/* Profile */}
                 <div className='form-group col-sm-4' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Profile:</label>
+                    <label className='bold-text'>Profile</label>
                     <select ref='selectProfile' className='form-control' value={this.state.profileId}
                         onChange={this.updateProfile}>
                         <option value='-1'>--</option>
@@ -336,7 +438,7 @@ class ImportReceivable extends Component {
                 {/* END STEP 1 */}
                 {!this.props.showRecent ?
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
-                        <span><b>Customer</b>: {customers.filter(c => c.Id === parseInt(this.state.customerId)).map(c => c.Name)}</span><br />
+                        <span><b>Customer</b>: {customer ? customer.Name : null}</span><br />
                         <span><b>Profile</b>: {profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name)}</span>
                     </div> :
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
@@ -347,7 +449,7 @@ class ImportReceivable extends Component {
                 {/* START STEP 2 */}
                 {/* File */}
                 <div className='form-group col-sm-8' style={{ display: this.state.step === 2 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Files:</label>
+                    <label className='bold-text'>Files</label>
                     <input type='file' onChange={this.handleFile} />
                     <span className='warning-text'>{this.state.fileWarning}<br /></span>
                     <Button color='secondary' className='margin-btn' onClick={this.decreaseStep}>Back</Button>
@@ -584,6 +686,9 @@ const mapDispatchToProps = (dispatch, props) => {
             })
             collectors.sort((c1, c2) => -(c2.NumberOfAssignedReceivables - c1.NumberOfAssignedReceivables))
             dispatch(CollectorAction.setCollectors(collectors));
+        },
+        addCustomer: (customer) => {
+            dispatch(CustomerAction.addCustomer(customer));
         }
     }
 }

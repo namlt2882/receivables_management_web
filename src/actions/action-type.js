@@ -50,6 +50,7 @@ export const SET_NEW_RECEIVABLE_LIST = 'SET_NEW_RECEIVABLE_LIST';
 
 //Customer
 export const SET_CUSTOMER_LIST = 'SET_CUSTOMER_LIST'
+export const ADD_CUSTOMER = 'ADD_CUSTOMER';
 
 //Contact
 export const SET_CONTACTS = 'SET_CONTACTS'
