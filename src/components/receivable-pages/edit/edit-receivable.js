@@ -61,14 +61,23 @@ class EditReceivable extends Component {
             DebtAmount: this.state.debtAmount,
             Id: origin.Id
         }
+        let isPending = this.state.isPending;
+        let status = origin.CollectionProgress.Status;
         ReceivableService.update(rei).then(res => {
             origin.PrepaidAmount = this.state.prepaidAmount;
             origin.DebtAmount = this.state.debtAmount;
-            if (origin.CollectionProgress.Status === 4) {
-                //when origin is pending
-                this.assignReceivable();
-            } else {
-                //when origin is collecting
+            if (status === 4) {
+                // when origin is pending
+                if (!isPending) {
+                    // when isPending = false
+                    this.assignReceivable();
+                } else {
+                    alert('Update receivable successfully!');
+                    this.props.updateReceivable(origin);
+                    this.closeModal();
+                }
+            } else if (status === 1) {
+                // when origin is collecting
                 if (origin.collector) {
                     if (origin.collector.Id !== this.state.collectorId) {
                         //update collector
@@ -96,9 +105,10 @@ class EditReceivable extends Component {
         ReceivableService
             .assignReceivable(origin.Id, collectorId, payableDay)
             .then(res => {
+                let dat = res.data;
                 let newCollector = this.props.collectorList.find(co => co.Id === collectorId);
                 origin.PayableDay = payableDay;
-                origin.CollectionProgress.Status = 1;
+                origin.CollectionProgress = dat[0].CollectionProgress;
                 if (newCollector) {
                     origin.collector = newCollector;
                 }
@@ -129,11 +139,13 @@ class EditReceivable extends Component {
         })
     }
     validate() {
-        if (this.state.isPending) {
+        let val = true;
+        if (!this.state.isPending) {
             if (!this.state.payableDay || this.state.collectorId === null) {
-                return false;
-            } else return true;
-        } else return true;
+                val = false;
+            } else val = true;
+        }
+        return val;
     }
     onChangeCollector = (e) => {
         var collector = e.target.value;

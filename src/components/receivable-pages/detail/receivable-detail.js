@@ -60,7 +60,7 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
             //[Receivable detail] get collector info
-            if (receivable.assignedCollector) {
+            if (receivable.assignedCollector && receivable.assignedCollector.CollectorId) {
                 UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
                     receivable.collector = res3.data;
                     this.setState({ receivable: receivable });
