@@ -344,7 +344,7 @@ class ImportReceivable extends Component {
                 loadingForm: false,
                 customer: customer
             });
-            NotificationManager.success('New customer', `Customer ${customer.Name} has been created!`, 3000, () => { });
+            NotificationManager.success('', `Customer ${customer.Name} has been created!`, 3000, () => { });
             this.increaseStep();
         }).catch(err => {
             window.alert('Service unavailable!')
