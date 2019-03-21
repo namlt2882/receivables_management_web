@@ -11,7 +11,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
     faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt,
-    faChalkboardTeacher, faSignOutAlt, faTasks
+    faChalkboardTeacher, faSignOutAlt, faTasks,
+    faAddressBook
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AuthService, isLoggedIn } from '../../services/auth-service';
@@ -27,7 +28,7 @@ import { Message, Button, Divider } from 'semantic-ui-react';
 import NewAssignedReceivable from '../receivable-pages/new-assigned-receivable';
 import { SERVER_IP } from '../../constants/config';
 library.add(faBell, faUserCircle, faCreditCard,
-    faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks);
+    faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks, faAddressBook);
 
 
 class MyMenu extends Component {
@@ -87,7 +88,7 @@ class MyMenu extends Component {
                             }
                             )}
                             <ConnectedNotification history={this.props.history} dropdownProfile={this.state.dropdownProfile} />
-                            <MyProfile dropdownProfile={this.state.dropdownProfile}
+                            <MyProfileWithRouter dropdownProfile={this.state.dropdownProfile}
                                 toggleProfile={this.toggleProfile} />
                         </Nav>
                     </Collapse>
@@ -98,11 +99,16 @@ class MyMenu extends Component {
     }
 }
 
+
 class MyProfile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
         }
+    }
+
+    viewProfile() {
+
     }
 
     render() {
@@ -114,10 +120,10 @@ class MyProfile extends React.Component {
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <DropdownItem style={{cursor:"default"}}>
+                        <DropdownItem style={{ cursor: "default" }}>
                             Hi, <b>{localStorage.getItem('username')}</b><br />
                         </DropdownItem>
-                        <DropdownItem>
+                        <DropdownItem onClick={() => { this.props.history.push(`/users/${localStorage.id}/view`) }}>
                             My profile
                             </DropdownItem>
                         <DropdownItem onClick={() => {
@@ -132,6 +138,9 @@ class MyProfile extends React.Component {
         </NavItem>);
     }
 }
+
+const MyProfileWithRouter = withRouter(MyProfile)
+
 
 class Notification extends React.Component {
     constructor(props) {
@@ -151,6 +160,7 @@ class Notification extends React.Component {
         this.checkMouseOutNoti = this.checkMouseOutNoti.bind(this);
         this.createNotification = this.createNotification.bind(this);
         this.type11Action = this.type11Action.bind(this);
+        this.type12Action = this.type12Action.bind(this);
         this.getAction = this.getAction.bind(this);
     }
 
@@ -197,20 +207,26 @@ class Notification extends React.Component {
     getAction({ Id, Type, NData, IsSeen }) {
         let action = () => { };
         let modalContent = null;
+        let openModal = true;
         switch (Type) {
             case 11:
                 action = this.type11Action(JSON.parse(NData));
                 modalContent = <NewAssignedReceivable history={this.props.history} />
                 break;
+            case 12:
+                action = this.type12Action(parseInt(NData));
+                openModal = false;
         }
         return () => {
             action();
-            this.setState({
-                dropdownNoti: false,
-                mouseInNoti: false,
-                modalContent: modalContent,
-                openModal: true
-            });
+            if (openModal) {
+                this.setState({
+                    dropdownNoti: false,
+                    mouseInNoti: false,
+                    modalContent: modalContent,
+                    openModal: true
+                });
+            }
             //send IsSeen = true
             if (!IsSeen) {
                 NotificationService.toggleSeen(Id).then(res => {
@@ -220,6 +236,12 @@ class Notification extends React.Component {
                     }
                 })
             }
+        }
+    }
+
+    type12Action(id) {
+        return () => {
+            this.props.history.push(`/receivable/${id}/view`);
         }
     }
 
@@ -391,7 +413,7 @@ const menus = [
     },
     {
         name: 'User',
-        to: '/user-list',
+        to: '/users',
         exact: false,
         icon: 'users',
         roles: ['Admin']
@@ -405,9 +427,16 @@ const menus = [
     },
     {
         name: 'Message Form',
-        to: '/message-list',
+        to: '/messages',
         exact: false,
         icon: 'comment-alt',
+        roles: ['Manager']
+    },
+    {
+        name: 'Customer',
+        to: '/customers',
+        exact: false,
+        icon: 'address-book',
         roles: ['Manager']
     }
 ];

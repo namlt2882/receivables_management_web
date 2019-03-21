@@ -6,5 +6,11 @@ export const CustomerService = {
     },
     getAll: () => {
         return AuthRequest.get('Customer');
+    },
+    update: (customer) => {
+        return AuthRequest.put('Customer', customer);
+    },
+    create: (customer) => {
+        return AuthRequest.post('Customer', customer);
     }
 }

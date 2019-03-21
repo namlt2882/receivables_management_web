@@ -1,0 +1,83 @@
+.messageTable > thead > tr > th:nth-child(2){
+    width: 50%;
+}
+
+.messageTable > thead > tr > th:nth-child(3){
+    width: 10%;
+}
+
+td { vertical-align: top; }
+
+.contact-firstcol {  
+    width:50px;
+    font-size:17px;
+    letter-spacing:2px;
+    border:1px solid white;
+}  
+
+.contact-secondcol {
+    color:#FFFFFF;
+    width:10px;
+    text-align:center;
+    font-size:17px;
+    border:1px solid white;
+}
+
+.contact-thirdcol {
+    width:500px;
+    padding-left:20px;
+    border:1px solid white;
+}
+
+.form textarea {   
+    width: 250px;  
+    max-width: 250px;  
+    height: 100px;
+    max-height:100px;
+    line-height: 150%;
+}
+
+.hover-message{
+    display:  none !important;
+}
+
+table.messageTable > tbody > tr:hover > td > p.hover-message{
+    display: inline-block !important;
+}
+
+table.messageTable > tbody > tr:hover > td > p.main-message{
+    display:none !important;
+}
+
+table.messageTable > tbody > tr > td{
+    vertical-align: middle;
+}
+
+table.messageTable > tbody > tr {
+    height: 5rem;
+}
+
+.messageStatusCol > p{
+    width: 100%;
+}
+
+.messageStatusCol{
+    width: 30%;
+}
+
+.messageNameCol{
+    text-decoration: underline;
+    cursor: pointer;
+    width: 40%;
+}
+
+.messageTypeCol{
+    width: 5%;
+}
+
+
+
+.disabled{
+    background-color: white !important;
+    border: none !important;
+}

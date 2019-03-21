@@ -17,7 +17,7 @@ class ActionHistory extends React.Component {
     componentDidMount() {
         let stages = this.state.stages;
         stages.forEach(stage => {
-            stage.history_actions = stage.Actions.filter(a => a.Status !== 1);
+            stage.history_actions = stage.Actions.filter(a => a.Status !== 1 && (a.Type === 0 || a.Type === 1));
             this.setState(pre => ({
                 total: pre.total + stage.history_actions.length
             }))

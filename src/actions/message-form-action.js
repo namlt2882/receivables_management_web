@@ -5,13 +5,13 @@ import { callApi } from '../utils/api-caller';
 export const actFetchMessageRequest = () => {
     return (dispatch) => {
         return callApi('messages', 'GET', null).then(res => {
-            dispatch(actFetchMessages(res.data))         
+            dispatch(actFetchMessages(res.data))
         });
     };
 }
 export const actFetchMessages = (messages) => {
     return {
-        type : Types.FETCH_MESSAGES,
+        type: Types.FETCH_MESSAGES,
         messages
     }
 }
@@ -26,7 +26,7 @@ export const actAddMessageRequest = (message) => {
 }
 export const actAddMessage = (message) => {
     return {
-        type : Types.ADD_MESSAGE,
+        type: Types.ADD_MESSAGE,
         message
     }
 }
@@ -34,8 +34,24 @@ export const actAddMessage = (message) => {
 //Search message
 export const searchMessage = (keyword) => {
     return {
-        type : Types.SEARCH_MESSAGE,
+        type: Types.SEARCH_MESSAGE,
         keyword
+    }
+}
+
+
+export const MessageFormAction = {
+    setMessages: (messages) => {
+        return {
+            type: Types.FETCH_MESSAGES,
+            messages
+        }
+    },
+    setMessage: (message) => {
+        return {
+            type: Types.SET_MESSAGE,
+            message
+        }
     }
 }
 

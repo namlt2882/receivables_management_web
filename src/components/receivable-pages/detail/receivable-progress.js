@@ -39,72 +39,68 @@ class ReceivableProgress extends Component {
         if (progress.Stages.length > 0) {
             endDate = progress.Stages[progress.Stages.length - 1].endDate;
         }
-        try {
-            return (<div className='col-sm-12 row justify-content-center align-self-center'>
-                {progress.Stages.map((stage, i) => {
-                    let className = `col-sm-${size} r-stage `;
-                    let status = '';
-                    let percent = stage.percent;
-                    if (stage.isCurrentStage) {
-                        //in stage
-                        className += 'progress-current-stage';
-                        status = 'Collection';
-                        if (percent < 5) {
-                            percent = 5;
-                        }
-                    } else if (stage.isIncommingStage) {
-                        //incomming stage
-                        className += 'r-low-stage';
-                        status = 'Incomming';
-                    } else {
-                        //finished stage
-                        status = 'Finished';
+        return (<div className='col-sm-12 row justify-content-center align-self-center'>
+            {progress.Stages.map((stage, i) => {
+                let className = `col-sm-${size} r-stage `;
+                let status = '';
+                let percent = stage.percent;
+                if (stage.isCurrentStage) {
+                    //in stage
+                    className += 'progress-current-stage';
+                    status = 'Collection';
+                    if (percent < 5) {
+                        percent = 5;
                     }
-                    if (this.props.isFinished) {
-                        className+=' end-progress'
-                    }
+                } else if (stage.isIncommingStage) {
+                    //incomming stage
+                    className += 'r-low-stage';
+                    status = 'Incomming';
+                } else {
+                    //finished stage
+                    status = 'Finished';
+                }
+                if (this.props.isFinished) {
+                    className += ' end-progress'
+                }
 
-                    return (<div className={className} startDate={numAsDate(stage.startDate)} id={'rps-' + i} onMouseEnter={() => { this.onMouseIn(i - 1) }}
-                        onMouseLeave={() => { this.onMouseOut(i - 1) }}>
-                        <div className='text-center'>{`${stage.Name} (${stage.Duration} days)`}</div>
-                        <Progress value={percent}></Progress>
-                        {/* Popover */}
-                        <Popover placement="bottom" isOpen={this.state.popoverStatuses[i - 1]} target={'rps-' + i}>
-                            <PopoverBody>
-                                <table className='deco-table'>
-                                    <tbody>
-                                        <tr>
-                                            <td>Start date:</td>
-                                            <td>{numAsDate(stage.startDate)}</td>
+                return (<div className={className} startDate={numAsDate(stage.startDate)} id={'rps-' + i} onMouseEnter={() => { this.onMouseIn(i - 1) }}
+                    onMouseLeave={() => { this.onMouseOut(i - 1) }}>
+                    <div className='text-center'>{`${stage.Name} (${stage.Duration} days)`}</div>
+                    <Progress value={percent}></Progress>
+                    {/* Popover */}
+                    <Popover placement="bottom" isOpen={this.state.popoverStatuses[i - 1]} target={'rps-' + i}>
+                        <PopoverBody>
+                            <table className='deco-table'>
+                                <tbody>
+                                    <tr>
+                                        <td>Start date:</td>
+                                        <td>{numAsDate(stage.startDate)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>End date:</td>
+                                        <td>{numAsDate(stage.endDate)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Status:</td>
+                                        <td>{status}</td>
+                                    </tr>
+                                    {stage.OriginalActions.map(oa => {
+                                        return <tr>
+                                            <td>{describeActionType(oa.Name, oa.Type)}:</td>
+                                            <td>{describeGroupActionFrequency(oa.Frequency)}</td>
                                         </tr>
-                                        <tr>
-                                            <td>End date:</td>
-                                            <td>{numAsDate(stage.endDate)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Status:</td>
-                                            <td>{status}</td>
-                                        </tr>
-                                        {stage.OriginalActions.map(oa => {
-                                            return <tr>
-                                                <td>{describeActionType(oa.Name, oa.Type)}:</td>
-                                                <td>{describeGroupActionFrequency(oa.Frequency)}</td>
-                                            </tr>
-                                        })}
-                                    </tbody>
-                                </table>
-                            </PopoverBody>
-                        </Popover>
-                    </div>)
-                })}
-                <div className='r-stage' startDate={numAsDate(endDate)} style={{ width: '50px' }}>
-                    <div style={{ opacity: '0' }}>abc</div>
-                    <Progress value={100} style={{ opacity: '0' }}></Progress>
-                </div>
-            </div>);
-        } catch (e) {
-            return null;
-        }
+                                    })}
+                                </tbody>
+                            </table>
+                        </PopoverBody>
+                    </Popover>
+                </div>)
+            })}
+            <div className='r-stage' startDate={numAsDate(endDate)} style={{ width: '50px' }}>
+                <div style={{ opacity: '0' }}>abc</div>
+                <Progress value={100} style={{ opacity: '0' }}></Progress>
+            </div>
+        </div>);
     }
 }
 

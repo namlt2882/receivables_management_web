@@ -1,5 +1,6 @@
 // User
 export const FETCH_USERS = 'FETCH_USERS';
+export const FETCH_USER = 'FETCH_USER';
 export const ADD_USER = 'ADD_USER';
 export const UPDATE_USER = 'UPDATE_USER';
 export const DELETE_USER = 'DELETE_USER';
@@ -10,6 +11,7 @@ export const SORT_TABLE = 'SORT_TABLE';
 // MessageForm
 export const FETCH_MESSAGES = 'FETCH_MESSAGES';
 export const SET_MESSAGE_LIST = 'SET_MESSAGE_LIST';
+export const SET_MESSAGE = 'SET_MESSAGE';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const SEARCH_MESSAGE = 'SEARCH_MESSAGE';
 
@@ -49,7 +51,9 @@ export const SET_RECEIVABLE_LIST = 'SET_RECEIVABLE_LIST';
 export const SET_NEW_RECEIVABLE_LIST = 'SET_NEW_RECEIVABLE_LIST';
 
 //Customer
-export const SET_CUSTOMER_LIST = 'SET_CUSTOMER_LIST'
+export const SET_CUSTOMER_LIST = 'SET_CUSTOMER_LIST';
+export const SET_CUSTOMER = 'SET_CUSTOMER';
+export const ADD_CUSTOMER = 'ADD_CUSTOMER';
 
 //Contact
 export const SET_CONTACTS = 'SET_CONTACTS'

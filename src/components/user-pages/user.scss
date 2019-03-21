@@ -38,28 +38,21 @@
     display: block;
 }
 
-// không sử dụng thẻ vì sẽ đè lên các table khác trong hệ thống
-// tr > th{
-//     text-align: center;
-//     border-bottom: none !important;
-// }
-// tr > td:nth-child(4){
-//     text-align: center;
-// }
-// tr > td:first-child {
-//     text-align: center;
-//     font-weight: bold;
-// }
-// tr > td:nth-child(2){
-//     width: 20% !important;
-// }
-// tr > td:nth-child(3){
-//     width: 40% !important;
-// }
-// table > thead > tr:nth-child(2) > td{
-//     background-color: rgb(0,191,255);
-// }
-.hungdtq-headerbtn-container {
+tr > th{
+    text-align: center;
+    border-bottom: none !important;
+}
+
+tr > td:first-child {
+    text-align: center;
+    font-weight: bold;
+}
+
+table.userlist > thead > tr:nth-child(2) > td{
+    background-color: rgb(0,191,255);
+}
+
+.hungdtq-headerbtn-container{
     width: 100%;
     text-align: right;
     padding: 20px 0px 0px 0px;
@@ -68,3 +61,69 @@
 .btn>a {
     color: white !important;
 }
+
+.hover-message{
+    display:  none !important;
+}
+
+table.userlist > tbody > tr:hover > td > p.hover-message{
+    display: inline-block !important;
+}
+
+table.userlist > tbody > tr:hover > td > p.main-message{
+    display:none !important;
+}
+
+table.userlist {
+    width: 100%;
+}
+
+.userlist > thead > tr > th {
+    vertical-align: middle;
+}
+
+.userlist > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.userNameCol{
+    width: 20% !important;
+}
+
+.usreFullNameCol{
+    width: 30%;
+}
+
+.userStatusCol{
+    width: 25%;
+}
+
+.userStatusCol > p{
+    width: 100%;
+}
+
+.noOfAssignedReceivableCol{
+    width: 20%;
+    text-align: center;
+}
+
+.UserDetailTable{
+    width: 100%;
+}
+
+.UserDetailTable-Col1{
+    width: 30%;
+    text-align: right !important;
+    padding-top: 0.5rem;
+}
+
+.UserDetailTable-Col2{
+    width: 5%;
+    text-align: left;
+    padding-top: 0.5rem;
+}
+
+.UserDetailTable-Col3{
+    width: 50%;
+}
+
