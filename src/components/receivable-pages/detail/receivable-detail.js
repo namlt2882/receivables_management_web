@@ -60,11 +60,15 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
             //[Receivable detail] get collector info
-            UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
-                receivable.collector = res3.data;
-                this.setState({ receivable: receivable });
+            if (receivable.assignedCollector && receivable.assignedCollector.CollectorId) {
+                UserService.getCollectorDetail(receivable.assignedCollector.CollectorId).then(res3 => {
+                    receivable.collector = res3.data;
+                    this.setState({ receivable: receivable });
+                    this.incrementLoading();
+                })
+            } else {
                 this.incrementLoading();
-            })
+            }
             //[Receivable detail] get today task of receivable
             if (!receivable.ClosedDay) {
                 TaskService.getReceivableTodayTask(receivable.Id).then(res6 => {
@@ -76,7 +80,11 @@ class ReceivableDetail extends Component {
             }
             //[Update receivable] get list collector
             UserService.getCollectors().then(res4 => {
-                this.setState({ collectorList: res4.data });
+                let list = res4.data;
+                list.forEach(c => {
+                    c.DisplayName = `${c.FirstName} ${c.LastName} (${c.Username})`;
+                })
+                this.setState({ collectorList: list });
                 this.incrementLoading();
             })
             //[Update receivable] get list customer
@@ -85,7 +93,6 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
         }).catch(err => {
-            this.props.history.push('/not-found');
         })
     }
     confirm() {
@@ -236,7 +243,7 @@ class ReceivableDetail extends Component {
                 dayMark = 'Tomorrow';
             }
             dateNote = `Process will start ${dayMark}`;
-        } else {
+        } else if (receivable.PayableDay !== null) {
             let tmp = totalDay + 1;
             let dayMark = `${totalDay + 1} day(s) ago`;
             if (tmp === 1) {
@@ -246,8 +253,8 @@ class ReceivableDetail extends Component {
             }
             dateNote = `Process started ${dayMark} `;
         }
-        let status = describeStatus(receivable.CollectionProgress.Status, receivable.IsConfirmed);
-        let statusColor = getStatusColor(receivable.CollectionProgress.Status, receivable.IsConfirmed);
+        let status = describeStatus(receivable.CollectionProgress.Status);
+        let statusColor = getStatusColor(receivable.CollectionProgress.Status);
         return (<div className='col-sm-12 row'>
             {/* History */}
             <div className='col-sm-3 row'>
@@ -265,9 +272,9 @@ class ReceivableDetail extends Component {
                 {/* receivable progress */}
                 <ReceivableProgress isFinished={isFinished} progress={receivable.CollectionProgress} />
                 {/* show date note*/}
-                <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
+                {receivable.PayableDay !== null ? <div className='col-sm-12' style={{ textAlign: 'center', fontStyle: 'italic', fontSize: '0.95rem' }}>
                     <span style={{ color: 'red' }}>*</span>
-                    {dateNote}</div>
+                    {dateNote}</div> : null}
             </div>
 
             {/* receivable information */}
@@ -277,7 +284,7 @@ class ReceivableDetail extends Component {
                         <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
                         Receivable Info <Label color={statusColor}>{status}</Label>
                         {/* Edit info of receivable */}
-                        {receivable.CollectionProgress.Status === 1 ?
+                        {receivable.CollectionProgress.Status === 1 || receivable.CollectionProgress.Status === 4 ?
                             <EditReceivable updateReceivable={this.updateReceivable}
                                 receivable={receivable}
                                 collectorList={this.state.collectorList} /> : null}
@@ -304,7 +311,7 @@ class ReceivableDetail extends Component {
                             <Table.Row>
                                 <Table.Cell>End day:</Table.Cell>
                                 <Table.Cell>
-                                    {`${(endDate ? numAsDate(endDate) : '')}${(!receivable.ClosedDay ? ' (Expectation)' : '')}`}
+                                    {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row>
@@ -348,62 +355,61 @@ class ReceivableDetail extends Component {
 }
 
 const statusWeight = [
-    { status: 'Collecting', weight: 4 },
-    { status: 'Not confirmed', weight: 3 },
-    { status: 'Pending', weight: 2 },
-    { status: 'Closed', weight: 1 }
+    { status: 'Collecting', weight: 5 },
+    { status: 'Pending', weight: 4 },
+    { status: 'Done', weight: 3 },
+    { status: 'Closed', weight: 2 },
+    { status: 'Cancel', weight: 1 }
 ]
 
-export const compareStatus = (a, b, aConfirmed = false, bConfirmed = false) => {
-
-    let aWeight = describeStatus(a, aConfirmed), bWeight = describeStatus(b, bConfirmed);
+export const compareStatus = (a, b) => {
+    let aWeight = describeStatus(a), bWeight = describeStatus(b);
     aWeight = statusWeight.find(sw => sw.status === aWeight).weight;
     bWeight = statusWeight.find(sw => sw.status === bWeight).weight;
     return bWeight - aWeight;
 }
 
-export const getStatusColor = (status, confirm = false) => {
+export const getStatusColor = (status) => {
     let statusColor = 'grey';
-    status = describeStatus(status, confirm);
-    if (status === 'Collecting') {
-        statusColor = 'green'
-    } else if (status === 'Pending') {
-        statusColor = 'yellow'
-    } else if (status === 'Not confirmed') {
-        statusColor = 'red'
+    switch (status) {
+        case 0:
+            // Cancel
+            statusColor = 'red';
+            break;
+        case 1: statusColor = 'green';
+            break;
+        case 2:
+            // Done
+            statusColor = 'blue';
+            break;
+        case 4:
+            // Pending
+            statusColor = 'orange';
+            break;
     }
     return statusColor;
 }
 
-export const describeStatus = (status, confirm = false) => {
+export const describeStatus = (status) => {
     let rs = status;
     switch (status) {
         case 0:
             // Cancel
-            rs = 'Closed';
-            if (!confirm) {
-                rs = 'Not confirmed'
-            }
+            rs = 'Cancel';
             break;
         case 1: rs = 'Collecting';
             break;
         case 2:
-            //Done
-            rs = 'Closed';
-            break;
-        case 3:
-            rs = 'Late';
+            // Done
+            rs = 'Done';
             break;
         case 4:
-            //change from Waiting to Pending
+            // Pending
             rs = 'Pending';
             break;
         case 5:
-            //Closed
+            // Closed
             rs = 'Closed';
-            if (!confirm) {
-                rs = 'Not confirmed'
-            }
             break;
     }
     return rs;
