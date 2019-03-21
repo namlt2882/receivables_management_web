@@ -6,7 +6,8 @@
     width: 10%;
 }
 
-td { vertical-align: top; }
+// không viết style vào thẻ
+// td { vertical-align: top; }
 
 .contact-firstcol {  
     width:50px;
@@ -76,8 +77,8 @@ table.messageTable > tbody > tr {
 }
 
 
-
-.disabled{
-    background-color: white !important;
-    border: none !important;
-}
+// conflict với class .disable trong thư viện semantic
+// .disabled{
+//     background-color: white !important;
+//     border: none !important;
+// }
