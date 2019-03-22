@@ -6,8 +6,25 @@ import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
 import LoginPage from './components/common/login';
 import { isLoggedIn } from './services/auth-service'
 import NotFoundPage from './components/common/not-found';
+import SideNav from './components/common/sideNav';
+
+import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      expanded: false
+    }
+
+    this.callBackFromSideNav = this.callBackFromSideNav.bind(this);
+  }
+
+  callBackFromSideNav(expanded) {
+    this.setState({ expanded: expanded });
+  }
+
   render() {
     isLoggedIn(() => { }, () => {
       var url = window.location.href;
@@ -22,23 +39,26 @@ class App extends Component {
           <Route path='/login' exact={true} component={({ match, history }) => <LoginPage match={match} history={history} />} />
           {/* <Route path='' exact={false}> */}
           <div>
-            <MyMenu />
-            <div className="container" style={{
-              padding: '20px',
-              zIndex: '0',
-              backgroundColor: 'white',
-              overflow: 'auto',
-              display: 'block',
-              borderRadius: '5px',
-              border: '1px solid #dddfe2'
-            }}>
-              <div className='row justify-content-center align-self-center'>
-                <div className='col-sm-12 row'>
+              <SideNav
+                expanded={this.state.expanded}
+                onToggle={(expanded) => {
+                  this.setState({ expanded });
+                }}
+                callBack={this.callBackFromSideNav}
+              />
+
+            <main>
+              <div className={!this.state.expanded ? "main-container" : "main-container-expanded"}>
+                <MyMenu />
+                <div
+                  className='row justify-content-center align-self-center main-content'
+                >
                   {this.privateContent(routes)}
                 </div>
               </div>
-            </div>
+            </main>
           </div>
+
           {/* </Route> */}
           <Route path="*" component={NotFoundPage} />
         </Switch>

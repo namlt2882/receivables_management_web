@@ -13,7 +13,7 @@ import './user.scss';
 
 class ListUser extends Component {
 
-    
+
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {
         document.title = 'User management';
@@ -41,16 +41,17 @@ class ListUser extends Component {
             }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div className="hungdtq-header">
-                        <h1>User management</h1>
-                    </div>
-                    <div className="hungdtq-Wrapper">
-                        <div className="hungdtq-Container">
-                            <div className="hungdtq-headerbtn-container">
-                                <div className="btn btn-success">
+                        <div>
+                            <div className="d-inline-block hungdtq-header-text">
+                                <h1>User management</h1>
+                            </div>
+                            <div className="d-inline-block hungdtq-headerbtn-container">
+                                <div className="btn btn-rcm-primary rcm-btn">
                                     <Link to="/users/add"> <i class="fas fa-plus"></i></Link>
                                 </div>
                             </div>
                         </div>
+                        <hr></hr>
                     </div>
                     <div>
                         <UserList>

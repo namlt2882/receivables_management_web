@@ -8,13 +8,13 @@ class MessageList extends Component {
 
             <div className="hungdtq-Wrapper">
                 <div className="hungdtq-Container">
-                    <table className="table table-hover messageTable">
+                    <table className="table table-hover messageTable table-strip">
                         <thead className="thead-blue">
                             <tr>
-                                <th  >ID</th>
-                                <th className="messageNameCol">Name</th>
-                                <th className="messageTypeCol">Type</th>
-                                <th className="messageStatusCol">Status</th>
+                                <th >ID</th>
+                                <th >Name</th>
+                                <th >Type</th>
+                                <th >Status</th>
                             </tr>
                         </thead>
                         <tbody>

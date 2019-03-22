@@ -63,17 +63,17 @@ class MessageItem extends Component {
                 <td>{++index}</td>
                 <td className="messageNameCol" onClick={this.handleClick.bind(this, message.Id)}>{message.Name}</td>
                 <td className="messageTypeCol">{message.Type === 1 &&
-                    "Call"
+                    <i class="fas fa-phone-square"></i>
                 }
                     {message.Type === 0 &&
-                        "SMS"
+                        <i class="fas fa-sms"></i>
                     }
                 </td>
                 <td className="messageStatusCol" >
                     <p style={{ display: message.IsDeleted ? 'inline-block' : 'none' }} className="btn btn-warning main-message">
                         Disabled
                     </p>
-                    <p style={{ display: message.IsDeleted ? 'none' : 'inline-block' }} className="btn btn-success main-message">
+                    <p style={{ display: message.IsDeleted ? 'none' : 'inline-block' }} className="btn btn-primary main-message">
                         Enabled
                     </p>
                     <p className="btn hover-message" onClick={(e) => { e.stopPropagation(); this.openModal(message) }}>

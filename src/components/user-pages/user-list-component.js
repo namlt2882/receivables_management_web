@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { actFilter } from '../../actions/user-action';
+import Table from '@material-ui/core/Table';
+
 
 class UserList extends Component {
 
@@ -33,44 +35,20 @@ class UserList extends Component {
         return (
             <div className="hungdtq-Wrapper">
                 <div className="hungdtq-Container">
-                    <table className="table table-hover userlist">
+                    <table className="table table-hover table-strip userlist">
                         <thead className="thead-blue">
                             <tr>
                                 <th>No.</th>
-                                <th className="userNameCol">
+                                <th>
                                     Username
                                 </th>
-                                <th className="fullNameCol">Full Name</th>
-                                <th className="noOfAssignedReceivableCol">
+                                <th>Full Name</th>
+                                <th>
                                     No. Of Assigned Receivable
                                 </th>
-                                <th className="userStatusCol">
+                                <th>
                                     Status
                                 </th>
-
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="filterName"
-                                        onChange={this.onChange}
-                                        value={this.state.filterName}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="filterUsername"
-                                        onChange={this.onChange}
-                                        value={this.state.filterUsername}
-                                    />
-                                </td>
-                                <td></td>
-                                <td></td>
 
                             </tr>
                         </thead>

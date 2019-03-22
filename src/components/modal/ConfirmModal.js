@@ -30,8 +30,8 @@ class ConfirmModal extends React.Component {
                     </p>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={this.onYes.bind(this)}>Yes</Button>
-                    <Button variant="warning" onClick={this.props.onHide}>Cancel</Button>
+                    <button className="btn btn-rcm-primary" onClick={this.onYes.bind(this)}>Yes</button>
+                    <button className="btn btn-rcm-secondary" onClick={this.props.onHide}>Cancel</button>
                 </Modal.Footer>
             </Modal>
         );

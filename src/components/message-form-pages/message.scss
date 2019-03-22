@@ -6,8 +6,6 @@
     width: 10%;
 }
 
-td { vertical-align: top; }
-
 .contact-firstcol {  
     width:50px;
     font-size:17px;
@@ -53,31 +51,30 @@ table.messageTable > tbody > tr > td{
     vertical-align: middle;
 }
 
-table.messageTable > tbody > tr {
-    height: 5rem;
-}
-
 .messageStatusCol > p{
-    width: 100%;
+    width: 11rem;
 }
 
 .messageStatusCol{
-    width: 30%;
-}
+    width: 10%;
+    text-align: center;
+    padding: 0px !important;
+} 
 
 .messageNameCol{
     text-decoration: underline;
     cursor: pointer;
-    width: 40%;
+    width: 70%;
 }
 
 .messageTypeCol{
     width: 5%;
+    text-align: center;
+    font-size: 25px;
+    color: #4285f4;
 }
 
-
-
-.disabled{
+.hungdtq-disabled{
     background-color: white !important;
     border: none !important;
 }

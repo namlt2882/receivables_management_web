@@ -5,6 +5,7 @@ import { available1 } from '../common/loading-page';
 import { CustomerService } from '../../services/customer-service';
 import { CustomerAction } from '../../actions/customer-action';
 import ConfirmModal from '../modal/ConfirmModal';
+import { Link } from 'react-router-dom';
 
 class CustomerActionPage extends Component {
 
@@ -20,7 +21,6 @@ class CustomerActionPage extends Component {
                 Phone: '',
                 Address: '',
                 Id: null,
-                viewMode: 2,
             },
             Name: '',
             Code: '',
@@ -28,6 +28,7 @@ class CustomerActionPage extends Component {
             Address: '',
             Id: null,
             title: 'Add new customer',
+            viewMode: 2
         }
 
         this.callbackFromModal = this.callbackFromModal.bind(this);
@@ -154,7 +155,6 @@ class CustomerActionPage extends Component {
                 CustomerService.get(id).then(res => {
                     this.props.setCustomer(res.data);
                     this.incrementLoading();
-                    console.log(res.data);
                     this.setState({
                         Id: res.data.Id,
                         Code: res.data.Code,
@@ -182,9 +182,21 @@ class CustomerActionPage extends Component {
                 width: "100%", paddingTop: "10px"
             }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+
                     <div className="hungdtq-header">
-                        <h1>{this.state.title}</h1>
+                        <div>
+                            <div className="d-inline-block hungdtq-header-text">
+                                <h1>{this.state.title}</h1>
+                            </div>
+                            <div className="d-inline-block hungdtq-headerbtn-container">
+                                <div className="btn btn-rcm-primary rcm-btn">
+                                    <Link to="/customers"><i className="fas fa-arrow-left"></i></Link>
+                                </div>
+                            </div>
+                        </div>
+                        <hr></hr>
                     </div>
+
                     <div className="hungdtq-Wrapper">
                         <div className="hungdtq-Container" style={{ paddingTop: "2rem" }}>
                             <table className="UserDetailTable">
@@ -197,14 +209,14 @@ class CustomerActionPage extends Component {
                                                 type="text"
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Name}
                                                 onChange={this.onNameChange}
                                             />
                                             <input
                                                 type="text"
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
-                                                className="form-control"
+                                                className="rcm-form-control"
                                                 value={this.state.Name}
                                                 onChange={this.onNameChange}
                                             />
@@ -218,7 +230,7 @@ class CustomerActionPage extends Component {
                                             <input
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
                                                 type="text"
-                                                className="form-control"
+                                                className="rcm-form-control"
                                                 value={this.state.Code}
                                                 onChange={this.onCodeChange}
                                             />
@@ -226,7 +238,7 @@ class CustomerActionPage extends Component {
                                                 type="text"
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Code}
                                                 onChange={this.onContentChange}
                                             />
@@ -240,7 +252,7 @@ class CustomerActionPage extends Component {
                                             <input
                                                 type="text"
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
-                                                className="form-control"
+                                                className="rcm-form-control"
                                                 value={this.state.Phone}
                                                 onChange={this.onPhoneChange}
                                             />
@@ -248,7 +260,7 @@ class CustomerActionPage extends Component {
                                                 type="text"
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Phone}
                                                 onChange={this.onPhoneChange}
                                             />
@@ -262,7 +274,7 @@ class CustomerActionPage extends Component {
                                         <td className="UserDetailTable-Col3">
                                             <input
                                                 type="text"
-                                                className="form-control"
+                                                className="rcm-form-control"
                                                 value={this.state.Address}
                                                 onChange={this.onAddressChange}
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
@@ -272,7 +284,7 @@ class CustomerActionPage extends Component {
                                                 type="text"
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Address}
                                                 onChange={this.onAddressChange}
                                             />
@@ -285,10 +297,10 @@ class CustomerActionPage extends Component {
                                         <td className="UserDetailTable-Col1"></td>
                                         <td className="UserDetailTable-Col2"></td>
                                         <td className="UserDetailTable-Col3">
-                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
-                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
-                                            <button style={{ width: '10rem', display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
-                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem', width: '5rem' }} className="btn btn-basic" onClick={this.onClear}>Reset</button>
+                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
+                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
+                                            <button style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
+                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem', width: '5rem' }} className="btn btn-rcm-secondary" onClick={this.onClear}>Reset</button>
                                         </td>
                                     </tr>
                                 </tbody>

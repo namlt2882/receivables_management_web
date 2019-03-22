@@ -43,19 +43,19 @@ class ListMessage extends Component {
             }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div className="hungdtq-header">
-                        <h1>Message form management</h1>
-                    </div>
-                    <div className="hungdtq-Wrapper">
-                        <div className="hungdtq-Container">
-                            <div className="hungdtq-headerbtn-container">
-                                <div className="btn btn-success">
+                        <div>
+                            <div className="d-inline-block hungdtq-header-text">
+                                <h1>Message form management</h1>
+                            </div>
+                            <div className="d-inline-block hungdtq-headerbtn-container">
+                                <div className="btn btn-rcm-primary rcm-btn">
                                     <Link to="/messages/add"><i className="fas fa-plus"></i></Link>
                                 </div>
                             </div>
                         </div>
+                        <hr></hr>
                     </div>
                     <div>
-
                         <MessageList>
                             {/* props nay goi la props chilren */}
                             {this.showMessages(messages)}

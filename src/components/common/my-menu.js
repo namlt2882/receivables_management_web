@@ -53,48 +53,25 @@ class MyMenu extends Component {
     }
 
     render() {
-        return (<div className='navbar-holder'>
-            <div className='my-navbar'>
-                <Navbar color="light" light expand="md" color='royalblue'>
-                    <NavbarBrand><Link to='/'>RCM</Link></NavbarBrand>
-                    <NavbarToggler onClick={this.toggle} />
-                    <Collapse isOpen={this.state.isOpen} navbar>
+        return (
+            <div className='navbar-holder'>
+                <div className="navbar-color">
+                    <Navbar expand="md">
+                        <NavbarBrand >
+                            <Link to='/'>
+                                <strong className="c-white">
+                                    RCM
+                                </strong>
+                            </Link>
+                        </NavbarBrand>
                         <Nav className="ml-auto" navbar>
-                            {menus.map(({ name, to, exact, icon, roles }) => {
-                                let role = localStorage.getItem('role');
-                                let isAuthenticated = roles.some((r) => r === role);
-                                if (!isAuthenticated) {
-                                    return false;
-                                }
-                                return (<Route
-                                    path={to} exact={exact}
-                                    children={({ match }) => {
-                                        var active = match ? 'active' : '';
-                                        var clazz = active ? 'choosen-nav-item' : '';
-                                        return (<NavItem className={clazz}>
-                                            <NavLink>
-                                                <Link to={to}>
-                                                    <FontAwesomeIcon icon={icon} color='white' size='md'
-                                                        style={{
-                                                            margin: '0 5 0 5',
-                                                            opacity: active ? '1' : '0.7'
-                                                        }} />
-                                                    {name}
-                                                </Link>
-                                            </NavLink>
-                                        </NavItem>)
-                                    }}
-                                />)
-                            }
-                            )}
                             <ConnectedNotification history={this.props.history} dropdownProfile={this.state.dropdownProfile} />
                             <MyProfileWithRouter dropdownProfile={this.state.dropdownProfile}
                                 toggleProfile={this.toggleProfile} />
                         </Nav>
-                    </Collapse>
-                </Navbar>
+                    </Navbar>
+                </div>
             </div>
-        </div>
         );
     }
 }
@@ -343,7 +320,7 @@ class Notification extends React.Component {
                     {this.state.modalContent}
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="secondary" onClick={() => {
+                    <Button className="btn btn-rcm-secondary" onClick={() => {
                         this.setState({
                             openModal: false,
                             modalContent: null

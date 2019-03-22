@@ -6,6 +6,8 @@ import { ProfileMessageFormService } from '../../services/profile-message-form-s
 import { MessageFormAction } from '../../actions/message-form-action';
 import ConfirmModal from '../modal/ConfirmModal';
 import Textarea from 'react-textarea-autosize';
+import { Link } from 'react-router-dom';
+
 
 class MessageActionPage extends Component {
 
@@ -171,8 +173,18 @@ class MessageActionPage extends Component {
                 width: "100%", paddingTop: "10px"
             }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
-                    <div className="hungdtq-header">
-                        <h1>{this.state.title}</h1>
+                <div className="hungdtq-header">
+                        <div>
+                            <div className="d-inline-block hungdtq-header-text">
+                            <h1>{this.state.title}</h1>
+                            </div>
+                            <div className="d-inline-block hungdtq-headerbtn-container">
+                                <div className="btn btn-rcm-primary rcm-btn">
+                                    <Link to="/messages"><i class="fas fa-arrow-left"></i></Link>
+                                </div>
+                            </div>
+                        </div>
+                        <hr></hr>
                     </div>
                     <div className="hungdtq-Wrapper">
                         <div className="hungdtq-Container" style={{ paddingTop: "2rem" }}>
@@ -186,14 +198,14 @@ class MessageActionPage extends Component {
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
                                                 type="text"
-                                                className="form-control disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Name}
                                                 onChange={this.onNameChange}
                                             />
                                             <input
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
                                                 type="text"
-                                                className="form-control"
+                                                className="rcm-form-control"
                                                 value={this.state.Name}
                                                 onChange={this.onNameChange}
                                             />
@@ -209,15 +221,15 @@ class MessageActionPage extends Component {
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
                                                 type="text"
-                                                minRows={3}
-                                                className="form-control detailTextArea disabled"
+                                                minRows={1}
+                                                className="rcm-form-control detailTextArea hungdtq-disabled"
                                                 value={this.state.Content}
                                                 onChange={this.onContentChange}
                                             />
                                             <Textarea
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
                                                 type="text"
-                                                className="form-control detailTextArea"
+                                                className="rcm-form-control detailTextArea"
                                                 value={this.state.Content}
                                                 onChange={this.onContentChange}
                                             />
@@ -231,16 +243,16 @@ class MessageActionPage extends Component {
                                             <div style={{ paddingTop: '0.5rem', display: viewMode != 0 ? 'block' : 'none' }}>
                                                 <div className="d-inline" style={{paddingRight: '5px'}}>
                                                     <input type="radio" value='0' checked={this.state.Type == 0} onChange={this.onTypeChange} />
-                                                    <label>SMS</label>
+                                                    <i>SMS</i>
                                                 </div>
                                                 <div className="d-inline">
                                                     <input type="radio" value='1' checked={this.state.Type == 1} onChange={this.onTypeChange} />
-                                                    <label>Call</label>
+                                                    <i>Call</i>
                                                 </div>
                                             </div>
                                             <div style={{ paddingTop: '0.5rem', display: viewMode != 0 ? 'none' : 'block'}}>
                                                 <div className="d-inline">
-                                                    <label>{this.state.Type == 0 ? 'SMS' : 'Call'}</label>
+                                                    <i>{this.state.Type == 0 ? 'SMS' : 'Call'}</i>
                                                 </div>
                                                 
                                             </div>
@@ -252,10 +264,10 @@ class MessageActionPage extends Component {
                                         <td className="UserDetailTable-Col1"></td>
                                         <td className="UserDetailTable-Col2"></td>
                                         <td className="UserDetailTable-Col3">
-                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
-                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
-                                            <button style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
-                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem' }} className="btn btn-basic" onClick={this.onClear}>Reset</button>
+                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
+                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
+                                            <button style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
+                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem' }} className="btn btn-rcm-secondary" onClick={this.onClear}>Reset</button>
                                         </td>
                                     </tr>
                                 </tbody>

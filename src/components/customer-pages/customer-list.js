@@ -13,11 +13,10 @@ class UserList extends Component {
     componentDidMount() {
         document.title = 'Customers';
         available(resolve => setTimeout(resolve, 400));
-        //CustomerService.getAll().then(res => {
-        //    this.props.fetchAllCustomers(res.data);
-        //   console.log("testing data: " + res.data);
-        //   this.incrementLoading();
-        //})
+        CustomerService.getAll().then(res => {
+            this.props.fetchAllCustomers(res.data);
+            this.incrementLoading();
+        })
     }
 
     handleClick(customerId) {
@@ -32,13 +31,7 @@ class UserList extends Component {
         }
 
         var customers = this.props.customers;
-        if (customers.length == 0 || !Array.isArray(customers)) {
-            CustomerService.getAll().then(res => {
-                this.props.fetchAllCustomers(res.data);
-                console.log("testing data: " + res.data);
-                this.incrementLoading();
-            })
-        }
+
 
         var index = 1;
         return (
@@ -47,25 +40,24 @@ class UserList extends Component {
             }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div className="hungdtq-header">
-                        <h1>Customer management</h1>
-                    </div>
-                    <div className="hungdtq-Wrapper">
-                        <div className="hungdtq-Container">
-                            <div className="hungdtq-headerbtn-container">
-                                <div className="btn btn-success">
+                        <div>
+                            <div className="d-inline-block hungdtq-header-text">
+                                <h1>Customer management</h1>
+                            </div>
+                            <div className="d-inline-block hungdtq-headerbtn-container">
+                                <div className="btn btn-rcm-primary rcm-btn">
                                     <Link to="/customers/add"><i className="fas fa-plus"></i></Link>
                                 </div>
                             </div>
                         </div>
+                        <hr></hr>
                     </div>
 
                     <div>
-
-
                         <div className="hungdtq-Wrapper">
                             <div className="hungdtq-Container">
 
-                                <table fixed style={{ display: customers ? 'table' : 'none' }} className="table table-hover">
+                                <table fixed="true" style={{ display: customers ? 'table' : 'none' }} className="table table-hover table-strip">
                                     <thead className="thead-blue">
                                         <tr>
                                             <th className="customerIndexCol">No.</th>
@@ -76,7 +68,9 @@ class UserList extends Component {
                                     </thead>
                                     <tbody>
                                         {customers.map(customer =>
-                                            <tr style={{cursor: "pointer"}} onClick={this.handleClick.bind(this, customer.Id)}>
+                                            <tr
+                                                style={{ cursor: "pointer" }}
+                                                onClick={this.handleClick.bind(this, customer.Id)}>
 
                                                 <td className="customerIndexCol">{index++}</td>
                                                 <td className="customerNameCol">{customer.Name}</td>

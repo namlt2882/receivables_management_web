@@ -10,9 +10,10 @@ class Dashboard extends Component {
     render() {
         return (
 
-            <div className="container">
+            <div className="container-fluid">
                 <div className="hungdtq-header">
                     <h1>Dashboard</h1>
+                    <hr></hr>
                 </div>
             </div>
 

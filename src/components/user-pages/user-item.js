@@ -59,13 +59,13 @@ class UserItem extends Component {
 
 
         return (
-            <tr className="users-item" >
+            <tr>
                 <td>{index + 1}</td>
                 <td className="userNameCol" onClick={this.openDetailPage.bind(this, user.Id)} style={{ cursor: "pointer", textDecoration: "underline" }}>{user.Username}</td>
                 <td className="fullNameCol">{user.LastName + ' ' + user.FirstName}</td>
                 <td className="noOfAssignedReceivableCol"> {user.NumberOfAssignedReceivables}</td>
                 <td className="userStatusCol">
-                    <p style={{ display: user.IsBanned ? 'none' : 'inline-block' }} className="btn btn-success main-message">
+                    <p style={{ display: user.IsBanned ? 'none' : 'inline-block' }} className="btn btn-rcm-primary main-message">
                         Active
                     </p>
                     <p style={{ display: user.IsBanned ? 'inline-block' : 'none' }} className="btn btn-warning main-message">
@@ -76,7 +76,7 @@ class UserItem extends Component {
                             Ban  this user?
                         </i>
                         <i style={{ display: user.IsBanned ? 'inline-block' : 'none' }}>
-                            Active this user?
+                            Activate this user?
                         </i>
                     </p>
                 </td>
