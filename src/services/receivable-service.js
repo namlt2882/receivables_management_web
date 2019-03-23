@@ -24,5 +24,12 @@ export const ReceivableService = {
     },
     confirm: (id) => {
         return AuthRequest.put('Receivable/Confirm', { Id: id });
+    },
+    assignReceivable: (id, collectorId, payableDay) => {
+        return AuthRequest.put('Receivable/AssignReceivable', [{
+            Id: id,
+            CollectorId: collectorId,
+            PayableDay: payableDay
+        }]);
     }
 }

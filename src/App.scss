@@ -213,13 +213,33 @@ table.table a {
     background-color: #fff;
 }
 
-.rcm-btn{
+.rcm-btn {
     border-radius: 50px !important;
     padding: 10px !important;
     width: 40px;
     height: 40px;
 }
 
-.sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ- > .sidenav---navitem---9uL5T{
+.sidenav---sidenav-nav---3tvij>.sidenav---sidenav-navitem---uwIJ->.sidenav---navitem---9uL5T {
     font-size: 1.2rem !important;
+}
+
+.k-animation-container {
+    position: relative;
+    z-index: 10003 !important;
+}
+
+.normal-modal {
+    width: 60% !important;
+    max-width: none !important;
+}
+
+.normal-modal .modal-body {
+    max-height: 30rem !important;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+a.active {
+    font-weight: bold;
 }
