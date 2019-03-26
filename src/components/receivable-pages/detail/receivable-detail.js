@@ -257,10 +257,11 @@ class ReceivableDetail extends Component {
         let statusColor = getStatusColor(receivable.CollectionProgress.Status);
         return (<div className='col-sm-12 row'>
             {/* History */}
-            <div className='col-sm-3 row'>
+            <div className='col-sm-3' style={{ boxSizing: 'border-box', fontSize: '0.9rem' }}>
+                <br />
                 <div className='col-sm-12'>
                     {/* show current date */}
-                    <div style={{ textAlign: 'left' }}>{`Today is ${numAsDate(this.state.currentDate)}`}</div>
+                    <span>Today is <b>{` ${numAsDate(this.state.currentDate)}`}</b></span>
                 </div>
                 <div className='col-sm-12'>
                     <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
@@ -268,7 +269,7 @@ class ReceivableDetail extends Component {
                 </div>
             </div>
             {/* Progress bar */}
-            <div className='col-sm-9 receivable-progress row' style={{ padding: '0px' }}>
+            <div className='col-sm-9 receivable-progress row no-space-side' style={{ padding: '0px' }}>
                 {/* receivable progress */}
                 <ReceivableProgress isFinished={isFinished} progress={receivable.CollectionProgress} />
                 {/* show date note*/}
@@ -290,45 +291,45 @@ class ReceivableDetail extends Component {
                                 collectorList={this.state.collectorList} /> : null}
                     </Header>
                     {/* Receivable info */}
-                    <Table className='info-table' hover>
-                        <Table.Body>
-                            <Table.Row>
-                                <Table.Cell>Debt amount:</Table.Cell>
-                                <Table.Cell>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>Prepaid amount:</Table.Cell>
-                                <Table.Cell>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>Customer:</Table.Cell>
-                                <Table.Cell>{receivable.customer ? receivable.customer.Name : null}</Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>Start day:</Table.Cell>
-                                <Table.Cell>{numAsDate(receivable.PayableDay)}</Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>End day:</Table.Cell>
-                                <Table.Cell>
+                    <table className='info-table' style={{ marginBottom: '20px' }} hover>
+                        <tbody>
+                            <tr>
+                                <td>Debt amount:</td>
+                                <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                            </tr>
+                            <tr>
+                                <td>Prepaid amount:</td>
+                                <td>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                            </tr>
+                            <tr>
+                                <td>Customer:</td>
+                                <td>{receivable.customer ? receivable.customer.Name : null}</td>
+                            </tr>
+                            <tr>
+                                <td>Start day:</td>
+                                <td>{numAsDate(receivable.PayableDay)}</td>
+                            </tr>
+                            <tr>
+                                <td>End day:</td>
+                                <td>
                                     {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
-                                </Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>Collector:</Table.Cell>
-                                <Table.Cell>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Collector:</td>
+                                <td>
                                     {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
-                                </Table.Cell>
-                            </Table.Row>
+                                </td>
+                            </tr>
                             {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?
-                                <Table.Row>
-                                    <Table.Cell></Table.Cell>
-                                    <Table.Cell>
+                                <tr>
+                                    <td></td>
+                                    <td>
                                         <Button color='green' onClick={this.confirm}>Confirm</Button>
-                                    </Table.Cell>
-                                </Table.Row> : null}
-                        </Table.Body>
-                    </Table>
+                                    </td>
+                                </tr> : null}
+                        </tbody>
+                    </table>
                 </Container>
             </div>
 
@@ -342,11 +343,11 @@ class ReceivableDetail extends Component {
                 </CurrentStage>
             </div> : null}
             {/* contacts */}
-            <div className='col-sm-6' style={{ marginTop: '20px' }}>
+            <div className='col-sm-6'>
                 {/* Debtor */}
                 <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
             </div>
-            <div className='col-sm-6' style={{ marginTop: '20px' }}>
+            <div className='col-sm-12' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
                 {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives' isDebtor={false} contacts={contacts} /> : null}
             </div>

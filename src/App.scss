@@ -11,10 +11,6 @@
     @extend .root;
 }
 
-.App {
-    text-align: center;
-}
-
 .App-logo {
     animation: App-logo-spin infinite 20s linear;
     height: 40vmin;
@@ -158,7 +154,7 @@ table.table a {
     color: #3778C2;
 }
 
-.table .thead-blue th {
+.table thead th {
     color: #fff;
     background-color: #3778C2;
     border-color: #3778C2;
@@ -184,6 +180,52 @@ table.table a {
 .main-content {
     background-color: white;
     min-height: calc(100vh - 70px);
+}
+
+.table {
+    @extend .table-strip;
+    border: 1px solid #dee2e6;
+}
+
+.table.thin th {
+    padding: 10px;
+}
+
+.table.thin td {
+    padding: 5px;
+}
+
+.ui.table {
+    @extend .table;
+}
+
+.info-table {
+    width: 100%;
+    box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15);
+    border: 1.5px solid rgba(34, 36, 38, .15);
+}
+
+.info-table tr {
+    border: none;
+    text-align: left !important;
+}
+
+.info-table tr>td:first-child {
+    max-width: 100px;
+    font-weight: bold;
+}
+
+.info-table td {
+    border: none !important;
+    padding: 5px 15px 5px 15px !important;
+}
+
+.info-table>tbody>tr {
+    background-color: white !important;
+}
+
+.table td {
+    text-align: center;
 }
 
 .table-strip>tbody>tr:nth-of-type(even) {
@@ -242,4 +284,29 @@ table.table a {
 
 a.active {
     font-weight: bold;
+}
+
+// for semantic ui
+.ui.segment {
+    border-radius: 0px !important;
+}
+
+.no-space-side{
+    @extend .no-margin-side;
+    @extend .no-padding-side;
+}
+
+.no-margin-side{
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.no-padding-side{
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.full-width{
+    width: 100%;
+    box-sizing: border-box;
 }

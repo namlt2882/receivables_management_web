@@ -46,57 +46,58 @@ class Contact extends Component {
                 </Header>
                 {addable && !isFinished ? <FontAwesomeIcon icon='user-plus' size='md' color='black' className='icon-btn'
                     onClick={this.add} /> : null}
-                {this.props.isDebtor ? this.props.contacts.map((contact, i) => (<Table key={i} hover className='info-table'>
-                    <Table.Body>
-                        <Table.Row>
-                            <Table.Cell>Id:</Table.Cell>
-                            <Table.Cell>{contact.IdNo}</Table.Cell>
-                        </Table.Row>
-                        <Table.Row>
-                            <Table.Cell>Name:</Table.Cell>
-                            <Table.Cell>{contact.Name}</Table.Cell>
-                        </Table.Row>
-                        <Table.Row>
-                            <Table.Cell>Phone:</Table.Cell>
-                            <Table.Cell>{contact.Phone}</Table.Cell>
-                        </Table.Row>
-                        <Table.Row>
-                            <Table.Cell>Address:</Table.Cell>
-                            <Table.Cell>{contact.Address}</Table.Cell>
-                        </Table.Row>
-                        <Table.Row>
-                            <Table.Cell></Table.Cell>
-                            <Table.Cell>
-                                {AuthService.isCollector() && !isFinished ?
-                                    <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a> : null}
-                            </Table.Cell>
-                        </Table.Row>
-                    </Table.Body>
-                </Table>)) : <Table>
-                        <Table.Header>
-                            <Table.Row>
-                                <Table.HeaderCell>#</Table.HeaderCell>
-                                <Table.HeaderCell>Id</Table.HeaderCell>
-                                <Table.HeaderCell>Name</Table.HeaderCell>
-                                <Table.HeaderCell>Phone</Table.HeaderCell>
-                                <Table.HeaderCell>Address</Table.HeaderCell>
-                                <Table.HeaderCell></Table.HeaderCell>
-                            </Table.Row>
-                        </Table.Header>
-                        <Table.Body>
-                            {this.props.contacts.map((c, i) => (<Table.Row>
-                                <Table.Cell>{i + 1}</Table.Cell>
-                                <Table.Cell>{c.IdNo}</Table.Cell>
-                                <Table.Cell>{c.Name}</Table.Cell>
-                                <Table.Cell>{c.Phone}</Table.Cell>
-                                <Table.Cell>{c.Address}</Table.Cell>
-                                <Table.Cell>
+                {this.props.isDebtor ? this.props.contacts.map((contact, i) =>
+                    (<table key={i} hover className='info-table'>
+                        <tbody>
+                            <tr>
+                                <td>Id:</td>
+                                <td>{contact.IdNo}</td>
+                            </tr>
+                            <tr>
+                                <td>Name:</td>
+                                <td>{contact.Name}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone:</td>
+                                <td>{contact.Phone}</td>
+                            </tr>
+                            <tr>
+                                <td>Address:</td>
+                                <td>{contact.Address}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    {AuthService.isCollector() && !isFinished ?
+                                        <a style={{ marginRight: '10px' }} href='' onClick={this.edit}>Edit</a> : null}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>)) : <table className='table thin'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.props.contacts.map((c, i) => (<tr>
+                                <td>{i + 1}</td>
+                                <td>{c.IdNo}</td>
+                                <td>{c.Name}</td>
+                                <td>{c.Phone}</td>
+                                <td>{c.Address}</td>
+                                <td>
                                     {!isFinished ? <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn' /> : null}
                                     {!isFinished ? <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn' /> : null}
-                                </Table.Cell>
-                            </Table.Row>))}
-                        </Table.Body>
-                    </Table>}
+                                </td>
+                            </tr>))}
+                        </tbody>
+                    </table>}
             </Container>);
     }
 }

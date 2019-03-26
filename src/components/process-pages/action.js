@@ -128,17 +128,17 @@ class Action extends Component {
         let _24Array = new Array(25).fill(0);
         let _60Array = new Array(61).fill(0);
         // get message form
-        return (<Table.Row>
-            <Table.Cell>
+        return (<tr>
+            <td>
                 {this.props.no}
-            </Table.Cell>
-            <Table.Cell>
+            </td>
+            <td>
                 {/* Input name */}
                 {action.Type === 3 ? <input value={this.state.name}
                     readOnly={action.Type === 3 ? false : true} required={true} onChange={this.editName} />
                     : <span>{action.Name}</span>}
-            </Table.Cell>
-            <Table.Cell>
+            </td>
+            <td>
                 {/* Select action type */}
                 <select className='form-control' onChange={this.editType} value={this.state.actionType}>
                     {ProcessActionTypes.map(({ type, name }) =>
@@ -146,8 +146,8 @@ class Action extends Component {
                             {name}
                         </option>)}
                 </select>
-            </Table.Cell>
-            <Table.Cell>
+            </td>
+            <td>
                 {/* Start time */}
                 <select value={this.state.hour} onChange={this.editHour}>
                     {_24Array.map((tmp, i) =>
@@ -157,13 +157,13 @@ class Action extends Component {
                     {_60Array.map((tmp, i) =>
                         <option value={i}>{i}</option>)}
                 </select>
-            </Table.Cell>
-            <Table.Cell>
+            </td>
+            <td>
                 {/* Frequency */}
                 <input type='number' min='1' max={this.props.duration} value={this.state.frequency}
                     onChange={this.editFrequency} />
-            </Table.Cell>
-            <Table.Cell>
+            </td>
+            <td>
                 {/* Message form */}
                 {action.Type !== 0 && action.Type !== 1 ? null :
                     <select
@@ -176,13 +176,13 @@ class Action extends Component {
                                     selected={mf.Id === action.ProfileMessageFormId}>{mf.Name}</option>
                             )}
                     </select>}
-            </Table.Cell>
-            <Table.Cell>
+            </td>
+            <td>
                 {/* Actions */}
                 <FontAwesomeIcon icon='trash-alt' size='sm' color='black' className='icon-btn'
                     onClick={this.deleteAction} />
-            </Table.Cell>
-        </Table.Row>);
+            </td>
+        </tr>);
     }
 }
 const mapStateToProps = state => {

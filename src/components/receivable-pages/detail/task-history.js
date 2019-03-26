@@ -34,7 +34,7 @@ class TaskHistory extends React.Component {
                     {`Today tasks (${todayTask.length})`}
                 </ModalHeader>
                 <ModalBody>
-                    {todayTask.length > 0 ? <Table className='info-table' striped>
+                    {todayTask.length > 0 ? <table className='table thin' striped>
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -49,7 +49,7 @@ class TaskHistory extends React.Component {
                                 <td>{numAsTime(t.StartTime)}</td>
                             </tr>))}
                         </tbody>
-                    </Table> : null}
+                    </table> : null}
                     {todayTask.length == 0 ? <i>No task need to be done today!</i> : null}
                 </ModalBody>
                 <ModalFooter>

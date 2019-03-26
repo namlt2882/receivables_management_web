@@ -8,6 +8,7 @@ import { faPen } from '@fortawesome/free-solid-svg-icons'
 import { DatePicker } from '@progress/kendo-react-dateinputs';
 import { numAsDate, dateToInt } from '../../../utils/time-converter';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
+import { errorAlert, successAlert } from '../../common/my-menu';
 library.add(faPen);
 
 class EditReceivable extends Component {
@@ -72,7 +73,7 @@ class EditReceivable extends Component {
                     // when isPending = false
                     this.assignReceivable();
                 } else {
-                    alert('Update receivable successfully!');
+                    successAlert('Update receivable successfully!');
                     this.props.updateReceivable(origin);
                     this.closeModal();
                 }
@@ -83,7 +84,7 @@ class EditReceivable extends Component {
                         //update collector
                         this.updateCollector();
                     } else {
-                        alert('Update receivable successfully!');
+                        successAlert('Update receivable successfully!');
                         this.props.updateReceivable(origin);
                         this.closeModal();
                     }
@@ -93,7 +94,7 @@ class EditReceivable extends Component {
                 }
             }
         }).catch(err => {
-            alert('Fail to update receivable!');
+            errorAlert('Fail to update receivable!');
             this.setState({ loadingForm: false })
         })
     }
@@ -115,7 +116,7 @@ class EditReceivable extends Component {
                 this.props.updateReceivable(origin);
                 this.closeModal();
             }).catch(err => {
-                alert('Fail to assign receivable');
+                errorAlert('Fail to assign receivable');
             })
     }
 
@@ -131,10 +132,10 @@ class EditReceivable extends Component {
                 origin.collector = newCollector;
                 this.props.updateReceivable(origin);
             }
-            alert('Update receivable successfully!');
+            successAlert('Update receivable successfully!');
             this.closeModal();
         }).catch(err => {
-            alert('Fail to update collector!');
+            errorAlert('Fail to update collector!');
             this.setState({ loadingForm: false })
         })
     }

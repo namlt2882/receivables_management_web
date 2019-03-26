@@ -50,9 +50,7 @@ class App extends Component {
             <main>
               <div className={!this.state.expanded ? "main-container" : "main-container-expanded"}>
                 <MyMenu />
-                <div
-                  className='row justify-content-center align-self-center main-content'
-                >
+                <div className='row justify-content-center main-content arial'>
                   {this.privateContent(routes)}
                 </div>
               </div>

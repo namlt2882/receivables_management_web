@@ -12,16 +12,21 @@ import { UserAction } from '../../actions/user-action';
 import './user.scss';
 
 class ListUser extends Component {
-
+    constructor(props) {
+        super(props);
+        this.state = {
+            maxLoading: 1
+        };
+    }
 
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {
         document.title = 'User management';
+        available1();
         UserService.getCollectors().then(res => {
             this.props.fetchAllUsers(res.data);
             this.incrementLoading();
         });
-        available1();
     }
 
     onDelete = (id) => {

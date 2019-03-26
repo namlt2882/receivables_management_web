@@ -1,25 +1,24 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCheck, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { MultiSelect } from '@progress/kendo-react-dropdowns';
+import classnames from 'classnames';
+import { MDBDataTable } from 'mdbreact';
 import React from 'react';
 import { connect } from 'react-redux';
-import { ReceivableAction } from '../../actions/receivable-action'
 import { Link } from 'react-router-dom';
-import { available, PrimaryLoadingPage } from '../common/loading-page'
-import Component from '../common/component'
-import { ReceivableService } from '../../services/receivable-service';
-import { numAsDate } from '../../utils/time-converter';
-import { Button, Container, Header, Label, Icon, Checkbox } from 'semantic-ui-react'
-import { describeStatus, compareStatus, getStatusColor } from './detail/receivable-detail';
-import { compareIntDate } from '../../utils/time-converter'
-import { MDBDataTable } from 'mdbreact'
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { Checkbox, Container, Divider, Label } from 'semantic-ui-react';
+import { CollectorAction } from '../../actions/collector-action';
+import { CustomerAction } from '../../actions/customer-action';
+import { ReceivableAction } from '../../actions/receivable-action';
 import { AuthService } from '../../services/auth-service';
-import { CollectorAction } from '../../actions/collector-action'
+import { ReceivableService } from '../../services/receivable-service';
 import { UserService } from '../../services/user-service';
-import { MultiSelect } from '@progress/kendo-react-dropdowns';
-import { CustomerAction } from '../../actions/customer-action'
-import classnames from 'classnames';
-import { TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCheck, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { compareIntDate, numAsDate } from '../../utils/time-converter';
+import Component from '../common/component';
+import { available, PrimaryLoadingPage } from '../common/loading-page';
+import { compareStatus, describeStatus, getStatusColor } from './detail/receivable-detail';
 library.add(faCheck, faExclamationCircle);
 
 class ReceivableList extends Component {
@@ -200,20 +199,27 @@ class ReceivableList extends Component {
     }
 
     statusFilterComp() {
-        return <div className='col-sm-3'>
+        return <div className='col-sm-12' style={{ marginTop: '10px' }}>
             <div>
-                {this.currentSeries().map(s => <div style={{ padding: '5px' }}>
+                {this.currentSeries().map(s => <div style={{
+                    padding: '5px',
+                    display: 'inline-block',
+                    marginRight: '10px'
+                }}>
                     <Checkbox checked={s.checked}
                         onChange={(e, data) => {
                             this.toggleStatus(s.category, data.checked);
                         }} />
-                    <Label color={s.color}>{`${s.category} (${s.value})`}</Label>
+                    <Label color={s.color} style={{ cursor: 'pointer' }} onClick={() => {
+                        let checked = !s.checked;
+                        this.toggleStatus(s.category, checked);
+                    }}>{`${s.category} (${s.value})`}</Label>
                 </div>)}
             </div>
         </div>
     }
     managerFilterComp() {
-        return <div className='col-sm-4' style={{ paddingTop: '20px' }}>
+        return <div className='col-sm-8' style={{ paddingTop: '20px' }}>
             {/* Collector filter */}
             {AuthService.isManager() ? <div>
                 <div><b>Collector</b>:</div>
@@ -235,52 +241,67 @@ class ReceivableList extends Component {
             </div> : null}
         </div>
     }
-    toggleConfirmed() {
-        let getConfirmed = !this.state.getConfirmed;
-        this.setState({
-            getConfirmed: getConfirmed
-        })
-        this.filterReceivable(undefined, undefined, undefined, getConfirmed);
+    toggleConfirmed(val) {
+        let origin = this.state.getConfirmed;
+        if (origin != val) {
+            this.setState({
+                getConfirmed: val
+            })
+            this.filterReceivable(undefined, undefined, undefined, val);
+        }
     }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
         }
         let data1 = this.pushDataToTable();
+        let isManager = AuthService.isManager();
         return (
             <Container className='col-sm-12 row justify-content-center align-self-center'>
                 <div className="hungdtq-header">
-                    <h1>
-                        {AuthService.isManager() ? `Receivables` : 'Your assigned receivables'}
-                    </h1>
+                    <div>
+                        <div className="d-inline-block hungdtq-header-text">
+                            <h1>{isManager ? `Receivables` : 'Your assigned receivables'}</h1>
+                        </div>
+                        <div className="d-inline-block hungdtq-headerbtn-container">
+                            <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                this.props.history.push('/receivable/add');
+                            }}>
+                                <a><i className="fas fa-plus"></i></a>
+                            </div>
+                        </div></div>
+                    <Divider />
                 </div>
-                {AuthService.isManager() ? <div>
-                    <Button primary onClick={() => { this.props.history.push('/receivable/add') }}>Import</Button><br />
-                    <Link to='/receivable/recent-add'>Recent added receivables</Link><br />
-                </div> : null}
+                <div className='col-sm-12 row' style={{ display: isManager ? 'block' : 'none' }}>
+
+                </div>
                 <div className='col-sm-12 row justify-content-center align-self-center'>
                     <Nav tabs className='col-sm-7'>
                         <NavItem>
                             <NavLink className={classnames({ active: this.state.getConfirmed })}
-                                onClick={this.toggleConfirmed}>
+                                onClick={() => { this.toggleConfirmed(true) }}>
                                 <FontAwesomeIcon icon='check' size='md' color='green'
                                     className='icon-btn' />Confirmed
                             </NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink className={classnames({ active: !this.state.getConfirmed })}
-                                onClick={this.toggleConfirmed}>
+                                onClick={() => { this.toggleConfirmed(false); }}>
                                 <FontAwesomeIcon icon='exclamation-circle' size='md' color='orange'
                                     className='icon-btn' />Not confirmed
                             </NavLink>
                         </NavItem>
+                        <div style={{
+                            position: 'absolute', top: 0, right: 0,
+                            display: isManager ? 'block' : 'none'
+                        }}>
+                            <Link to='/receivable/recent-add'>Recent added receivables</Link>
+                        </div>
                     </Nav>
-                    <TabContent activeTab='1' className='col-sm-12 row justify-content-center align-self-center'>
+                    <TabContent activeTab='1' className='col-sm-7 row justify-content-center align-self-center'>
                         <TabPane tabId='1' className='col-sm-12 row justify-content-center align-self-center'>
-                            <div className='col-sm-12 row justify-content-center align-self-center'>
-                                {this.managerFilterComp()}
-                                {this.statusFilterComp()}
-                            </div>
+                            {this.managerFilterComp()}
+                            {this.statusFilterComp()}
                         </TabPane>
                     </TabContent>
 
@@ -306,7 +327,7 @@ class ReceivableList extends Component {
                         </Chart>
                     </div> */}
                 </div >
-                <div id='receivable-list'>
+                <div className='col-sm-12'>
                     {data1.rows.length > 0 ? <MDBDataTable
                         className='hide-last-row'
                         striped

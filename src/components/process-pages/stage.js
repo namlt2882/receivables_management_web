@@ -88,33 +88,33 @@ class Stage extends Component {
                     <div className='col-sm-9'>
                         <div class="form-group">
                             <label className='bold-text'>Action:</label>
-                            {stage.Actions.length > 0 ? <Table>
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell>No.</Table.HeaderCell>
-                                        <Table.HeaderCell>Name</Table.HeaderCell>
-                                        <Table.HeaderCell>Type</Table.HeaderCell>
-                                        <Table.HeaderCell>Start time</Table.HeaderCell>
-                                        <Table.HeaderCell>Frequency</Table.HeaderCell>
-                                        <Table.HeaderCell>Message</Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
+                            {stage.Actions.length > 0 ? <table className='table thin'>
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Start time</th>
+                                        <th>Frequency</th>
+                                        <th>Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     {stage.Actions.map((a, i) => {
                                         let messageForm = this.props.messageForms.find(mf => mf.Id === a.ProfileMessageFormId);
-                                        return <Table.Row>
-                                            <Table.Cell>{i + 1}</Table.Cell>
-                                            <Table.Cell>{a.Name}</Table.Cell>
-                                            <Table.Cell>{describeActionType(a.Name, a.Type)}</Table.Cell>
-                                            <Table.Cell>{numAsTime(a.StartTime)}</Table.Cell>
-                                            <Table.Cell>{`${a.Frequency} days/time`}</Table.Cell>
-                                            <Table.Cell>
+                                        return <tr>
+                                            <td>{i + 1}</td>
+                                            <td>{a.Name}</td>
+                                            <td>{describeActionType(a.Name, a.Type)}</td>
+                                            <td>{numAsTime(a.StartTime)}</td>
+                                            <td>{`${a.Frequency} days/time`}</td>
+                                            <td>
                                                 {messageForm ? messageForm.Name : ''}
-                                            </Table.Cell>
-                                        </Table.Row>
+                                            </td>
+                                        </tr>
                                     })}
-                                </Table.Body>
-                            </Table> : null}
+                                </tbody>
+                            </table> : null}
                         </div>
                     </div>
                 </div>
@@ -184,32 +184,28 @@ export class UpdateStageForm extends Component {
                     </Form.Field>
                     <Form.Field>
                         <label>Actions:</label>
-                        <Table fixed>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell>No.</Table.HeaderCell>
-                                    <Table.HeaderCell>Name</Table.HeaderCell>
-                                    <Table.HeaderCell>Type</Table.HeaderCell>
-                                    <Table.HeaderCell>Start time</Table.HeaderCell>
-                                    <Table.HeaderCell>Frequency</Table.HeaderCell>
-                                    <Table.HeaderCell>Message</Table.HeaderCell>
-                                    <Table.HeaderCell></Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
+                        <table className='table thin'>
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Start time</th>
+                                    <th>Frequency</th>
+                                    <th>Message</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {this.state.actions.map((action, i) =>
                                     <Action action={action} key={i} no={i + 1}
                                         updateAction={this.updateAction}
                                         deleteAction={this.deleteAction}
                                         duration={this.state.duration} />)}
-                                <Table.Row>
-                                    <Table.Cell colspan='7'>
-                                        <Button onClick={this.addAction}>Add Action</Button>
-                                    </Table.Cell>
-                                </Table.Row>
-                            </Table.Body>
-                        </Table>
+                            </tbody>
+                        </table>
                     </Form.Field>
+                    <Button color='primary' onClick={this.addAction}>Add Action</Button>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
                 </Form>
             </ModalBody>

@@ -14,12 +14,12 @@ import './message.scss';
 
 class ListMessage extends Component {
 
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         messages: []
-    //     };
-    // }
+    constructor(props) {
+        super(props);
+        this.state = {
+            maxLoading: 1
+        };
+    }
 
     // lifecycle này được gọi sau khi component render lần đầu tiên
     componentDidMount() {

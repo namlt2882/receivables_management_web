@@ -55,13 +55,20 @@ class ActionHistory extends React.Component {
                         return <div>
                             {i >= 1 ? <Divider /> : null}
                             <span><h3>{stage.Name}</h3></span>
-                            <Table className='info-table' striped>
+                            <table className='table thin' striped>
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {actions.map((action, i) => {
                                         return <ActionRecord action={action} key={i} />
                                     })}
                                 </tbody>
-                            </Table>
+                            </table>
                         </div>
                     })}
                     {isEmpty ? <span>Sorry, SMS and phone call history is empty!</span> : null}
@@ -98,9 +105,9 @@ class ActionRecord extends React.Component {
             <td>{action.Name}</td>
             <td>
                 <span>At{` ${date} ${time}`}</span>
-                <span style={{ float: 'right' }}>
-                    <Label color={color}>{describeActionStatus(action.Status)}</Label>
-                </span>
+            </td>
+            <td>
+                <Label color={color}>{describeActionStatus(action.Status)}</Label>
             </td>
         </tr>);
     }

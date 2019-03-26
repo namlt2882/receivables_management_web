@@ -51,7 +51,7 @@ class Process extends Component {
                                 stages.map((stage, i) => <Stage stageId={stage.Id} key={i} />)
                             }
                             {readOnly ? null :
-                                (<Button onClick={this.props.addStage}>Add stage</Button>)
+                                (<Button color='primary' onClick={this.props.addStage}>Add stage</Button>)
                             }
                         </div>
                     </Form.Field>

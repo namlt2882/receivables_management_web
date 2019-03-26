@@ -21,6 +21,7 @@ import { describeStatus, getStatusColor } from './detail/receivable-detail';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { DatePicker } from '@progress/kendo-react-dateinputs';
 import { NotificationManager } from 'react-notifications';
+import { errorAlert, successAlert } from '../common/my-menu';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -234,7 +235,7 @@ class ImportReceivable extends Component {
             })
             this.setLoadingForm(false);
         }).catch(err => {
-            alert('Service unavailable!');
+            errorAlert('Service unavailable!');
         })
     }
 
@@ -245,7 +246,7 @@ class ImportReceivable extends Component {
             let currentDate = this.state.currentDate;
             let customer = this.state.customer;
             let profile = this.props.profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name);
-            localStorage.setItem('recent_customer', customer);
+            localStorage.setItem('recent_customer', JSON.stringify(customer));
             localStorage.setItem('recent_profile', profile);
             localStorage.setItem('recent_inserted_data', JSON.stringify(insertedData));
             localStorage.setItem('recent_inserted_date', currentDate);
@@ -254,7 +255,7 @@ class ImportReceivable extends Component {
                 loadingForm: false,
                 step: this.state.step + 1
             })
-            alert(`Import ${insertedData.length} receivable(s) successfully!`)
+            successAlert(`Import ${insertedData.length} receivable(s) successfully!`)
         })
     }
 
@@ -347,7 +348,7 @@ class ImportReceivable extends Component {
             NotificationManager.success('', `Customer ${customer.Name} has been created!`, 3000, () => { });
             this.increaseStep();
         }).catch(err => {
-            window.alert('Service unavailable!')
+            errorAlert('Service unavailable!')
             this.setState({ loadingForm: false });
         })
     }
@@ -365,8 +366,10 @@ class ImportReceivable extends Component {
         }
         let isNewCustomer = this.isNewCustomer();
         let codeValid = this.isCustomerCodeValid();
-        return (<Container>
-            <Header className='text-center'>Import receivable</Header>
+        return (<Container className='col-sm-12 row'>
+            <div className="hungdtq-header"><h1>Import receivable</h1>
+                <Divider />
+            </div>
             <Form loading={this.state.loadingForm} onSubmit={() => { }} className='col-sm-12 row justify-content-center align-self-center'>
                 <Step.Group size='mini' className='col-sm-10' style={{ display: this.state.step === 4 ? 'none' : 'flex' }}>
                     <Step active={this.state.step === 1}>
@@ -465,19 +468,19 @@ class ImportReceivable extends Component {
                 {this.state.validatedData !== null && this.state.step === 3 ?
                     <Container>
                         <Divider />
-                        <Table>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell>No</Table.HeaderCell>
-                                    <Table.HeaderCell>Debtor</Table.HeaderCell>
-                                    <Table.HeaderCell>Debt Amount</Table.HeaderCell>
-                                    <Table.HeaderCell>Prepaid Amount</Table.HeaderCell>
-                                    <Table.HeaderCell>Start date</Table.HeaderCell>
-                                    <Table.HeaderCell>Collector</Table.HeaderCell>
-                                    <Table.HeaderCell>Pending</Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
+                        <table className='table'>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Debtor</th>
+                                    <th>Debt Amount</th>
+                                    <th>Prepaid Amount</th>
+                                    <th>Start date</th>
+                                    <th>Collector</th>
+                                    <th>Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {this.state.validatedData.map((r, i) => {
                                     let debtor = r.Contacts.find(c => c.Type === 0);
                                     let isWaiting = r.PayableDay === undefined || r.PayableDay === null;
@@ -486,31 +489,31 @@ class ImportReceivable extends Component {
                                     if (!isWaiting) {
                                         date = new Date(numAsDate(r.PayableDay));
                                     }
-                                    return <Table.Row>
-                                        <Table.Cell>{i + 1}</Table.Cell>
-                                        <Table.Cell>{debtor ? debtor.Name : null}</Table.Cell>
-                                        <Table.Cell>{r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
-                                        <Table.Cell>{r.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</Table.Cell>
-                                        <Table.Cell>
+                                    return <tr>
+                                        <td>{i + 1}</td>
+                                        <td>{debtor ? debtor.Name : null}</td>
+                                        <td>{r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                        <td>{r.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                        <td>
                                             {!isWaiting ? <DatePicker min={min} value={date} onChange={(e) => {
                                                 let value = e.target.value;
                                                 this.setPayableDay(i, dateToInt(value));
                                             }} /> : null}
-                                        </Table.Cell>
-                                        <Table.Cell>
+                                        </td>
+                                        <td>
                                             {!isWaiting ? <ConnectedSelectCollector
                                                 reiNo={i}
                                                 collectorId={r.CollectorId}
                                                 setCollector={this.setCollector} /> : null}
-                                        </Table.Cell>
-                                        <Table.Cell>
+                                        </td>
+                                        <td>
                                             <PendingCheckbox no={i} currentDate={this.state.currentDate} isWaiting={isWaiting}
                                                 setPayableDay={this.setPayableDay} />
-                                        </Table.Cell>
-                                    </Table.Row>
+                                        </td>
+                                    </tr>
                                 })}
-                            </Table.Body>
-                        </Table>
+                            </tbody>
+                        </table>
                     </Container> : null}
                 {/* START STEP 4 */}
                 {this.state.insertedData !== null && this.state.step === 4 ?
