@@ -134,6 +134,10 @@
     margin: 0px 10px 0px 10px;
 }
 
+.icon-btn:focus{
+    outline: none;
+}
+
 table.table a {
     color: #1e70bf !important;
     text-decoration: underline;
@@ -187,6 +191,10 @@ table.table a {
     @extend .table-strip;
     border: 1px solid #dee2e6;
     box-shadow: 0 2px 4px 0 rgba(34, 36, 38, .15);
+}
+
+.table td:empty::before{
+    content: '-';
 }
 
 .table.thin th {

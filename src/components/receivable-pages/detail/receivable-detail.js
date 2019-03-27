@@ -37,7 +37,8 @@ class ReceivableDetail extends Component {
         this.updateReceivable = this.updateReceivable.bind(this);
         this.confirm = this.confirm.bind(this);
     }
-    updateReceivable(receivable) {
+    updateReceivable(receivable = this.state.receivable, resolve = (receivable) => { }) {
+        resolve(receivable);
         this.setState({ receivable: receivable });
     }
     componentDidMount() {
@@ -345,11 +346,16 @@ class ReceivableDetail extends Component {
             {/* contacts */}
             <div className='col-sm-6'>
                 {/* Debtor */}
-                <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor' isDebtor={true} contacts={debtor !== null ? [debtor] : []} style={{ marginBottom: '20px' }} />
+                <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor'
+                    isDebtor={true} contacts={debtor !== null ? [debtor] : []}
+                    style={{ marginBottom: '20px' }}
+                    updateReceivable={this.updateReceivable} />
             </div>
             <div className='col-sm-12' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
-                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives' isDebtor={false} contacts={contacts} /> : null}
+                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives'
+                    isDebtor={false} contacts={contacts}
+                    updateReceivable={this.updateReceivable} /> : null}
             </div>
         </div>);
     }

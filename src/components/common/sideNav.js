@@ -23,6 +23,8 @@ class MyNav extends Component {
         defaultSelected = defaultSelected.split('/');
         if (defaultSelected.length > 2) {
             defaultSelected = '/' + defaultSelected[1];
+        }else{
+            defaultSelected = '/';
         }
         return (
             <SideNav
