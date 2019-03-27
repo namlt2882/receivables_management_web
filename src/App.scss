@@ -180,11 +180,13 @@ table.table a {
 .main-content {
     background-color: white;
     min-height: calc(100vh - 70px);
+    padding-bottom: 20px;
 }
 
 .table {
     @extend .table-strip;
     border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px 0 rgba(34, 36, 38, .15);
 }
 
 .table.thin th {
@@ -201,8 +203,7 @@ table.table a {
 
 .info-table {
     width: 100%;
-    box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15);
-    border: 1.5px solid rgba(34, 36, 38, .15);
+    @extend .border-shadow;
 }
 
 .info-table tr {
@@ -237,7 +238,7 @@ table.table a {
 }
 
 .table-strip>tbody>tr:hover {
-    background-color: #6db1ea61 !important;
+    background-color: #387cb461 !important;
 }
 
 .rcm-form-control {
@@ -309,4 +310,9 @@ a.active {
 .full-width{
     width: 100%;
     box-sizing: border-box;
+}
+
+.border-shadow{
+    box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15);
+    border: 1.5px solid rgba(34, 36, 38, .15);
 }

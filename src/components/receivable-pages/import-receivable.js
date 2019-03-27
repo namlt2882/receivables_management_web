@@ -366,6 +366,10 @@ class ImportReceivable extends Component {
         }
         let isNewCustomer = this.isNewCustomer();
         let codeValid = this.isCustomerCodeValid();
+        let cacheCustomer = localStorage.getItem('recent_customer');
+        if (cacheCustomer) {
+            cacheCustomer = JSON.parse(cacheCustomer);
+        }
         return (<Container className='col-sm-12 row'>
             <div className="hungdtq-header"><h1>Import receivable</h1>
                 <Divider />
@@ -445,7 +449,7 @@ class ImportReceivable extends Component {
                         <span><b>Profile</b>: {profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name)}</span>
                     </div> :
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
-                        <span><b>Customer</b>: {localStorage.getItem('recent_customer')}</span><br />
+                        <span><b>Customer</b>: {cacheCustomer.Name}</span><br />
                         <span><b>Profile</b>: {localStorage.getItem('recent_profile')}</span>
                     </div>
                 }

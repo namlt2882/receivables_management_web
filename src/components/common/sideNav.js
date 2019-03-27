@@ -19,6 +19,11 @@ class MyNav extends Component {
     }
 
     render() {
+        let defaultSelected = this.props.location.pathname;
+        defaultSelected = defaultSelected.split('/');
+        if (defaultSelected.length > 2) {
+            defaultSelected = '/' + defaultSelected[1];
+        }
         return (
             <SideNav
                 onSelect={(selected) => {
@@ -34,7 +39,7 @@ class MyNav extends Component {
             >
                 <SideNav.Toggle className="sideNav-TogleButton" />
                 <div className="sideNav-TogleDiv"></div>
-                <SideNav.Nav defaultSelected={this.props.location.pathname}>
+                <SideNav.Nav defaultSelected={defaultSelected}>
                     {menus.map(({ name, to, exact, icon, roles }) => {
                         let role = localStorage.getItem('role');
                         let isAuthenticated = roles.some((r) => r === role);

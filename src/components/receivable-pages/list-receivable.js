@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faExclamationCircle, faRedo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MultiSelect } from '@progress/kendo-react-dropdowns';
 import classnames from 'classnames';
@@ -19,7 +19,7 @@ import { compareIntDate, numAsDate } from '../../utils/time-converter';
 import Component from '../common/component';
 import { available, PrimaryLoadingPage } from '../common/loading-page';
 import { compareStatus, describeStatus, getStatusColor } from './detail/receivable-detail';
-library.add(faCheck, faExclamationCircle);
+library.add(faCheck, faExclamationCircle, faRedo);
 
 class ReceivableList extends Component {
     constructor(props) {
@@ -42,6 +42,7 @@ class ReceivableList extends Component {
             getConfirmed: true,
             selectedCollector: [],
             selectedCustomer: [],
+            isRefreshing: false
         }
         this.calculateSeries = this.calculateSeries.bind(this);
         this.filterReceivable = this.filterReceivable.bind(this);
@@ -54,6 +55,7 @@ class ReceivableList extends Component {
         this.statusFilterComp = this.statusFilterComp.bind(this);
         this.managerFilterComp = this.managerFilterComp.bind(this);
         this.toggleConfirmed = this.toggleConfirmed.bind(this);
+        this.refreshData = this.refreshData.bind(this);
     }
     setSeriesState(series, getConfirmed = this.state.getConfirmed) {
         let state = {};
@@ -250,11 +252,26 @@ class ReceivableList extends Component {
             this.filterReceivable(undefined, undefined, undefined, val);
         }
     }
+    refreshData() {
+        this.setState({ isRefreshing: true });
+        this.props.fetchReceivableList().then(res => {
+            this.filterReceivable();
+            this.setState({ isRefreshing: false });
+        });
+    }
     render() {
-        if (this.isLoading()) {
-            return <PrimaryLoadingPage />;
-        }
         let data1 = this.pushDataToTable();
+        let tableComponent = null;
+        if (this.isLoading() || this.state.isRefreshing) {
+            tableComponent = <PrimaryLoadingPage />;
+        } else {
+            tableComponent = data1.rows.length > 0 ? <MDBDataTable
+                className='hide-last-row'
+                striped
+                bordered
+                data={data1} /> :
+                <div>No receivable found!</div>
+        }
         let isManager = AuthService.isManager();
         return (
             <Container className='col-sm-12 row justify-content-center align-self-center'>
@@ -298,7 +315,7 @@ class ReceivableList extends Component {
                             <Link to='/receivable/recent-add'>Recent added receivables</Link>
                         </div>
                     </Nav>
-                    <TabContent activeTab='1' className='col-sm-7 row justify-content-center align-self-center'>
+                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }} className='border-shadow col-sm-7 row justify-content-center align-self-center'>
                         <TabPane tabId='1' className='col-sm-12 row justify-content-center align-self-center'>
                             {this.managerFilterComp()}
                             {this.statusFilterComp()}
@@ -327,15 +344,19 @@ class ReceivableList extends Component {
                         </Chart>
                     </div> */}
                 </div >
-                <div className='col-sm-12'>
-                    {data1.rows.length > 0 ? <MDBDataTable
-                        className='hide-last-row'
-                        striped
-                        bordered
-                        data={data1} /> :
-                        <div>No receivable found!</div>}
+                <div className='col-sm-12 hungdtq-header'>
+                    <div className='float-right'>
+                        <div className='btn btn-rcm-primary rcm-btn'
+                            style={{ zIndex: 10, position: 'relative' }}
+                            onClick={this.refreshData}>
+                            <a><i class="fas fa-redo"></i></a>
+                        </div>
+                    </div>
                 </div>
-            </Container >);
+                <div className='col-sm-12'>
+                    {tableComponent}
+                </div>
+            </Container>);
     }
 }
 
