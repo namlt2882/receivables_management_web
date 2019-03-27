@@ -9,7 +9,24 @@ body {
   font-size: 1.1rem !important;
 }
 
+.arial{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.modal{
+  @extend .arial;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+table td {
+  font-size: 1rem !important;
+  font-weight: 300;
+}
+
+table th {
+  font-size: 1rem;
 }

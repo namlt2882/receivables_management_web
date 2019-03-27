@@ -1,35 +1,22 @@
+import * as signalR from '@aspnet/signalr';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faAddressBook, faBell, faChalkboardTeacher, faChartLine, faCommentAlt, faCreditCard, faSignOutAlt, faTasks, faUserCircle, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import {
-    Collapse, Navbar, NavbarToggler,
-    NavbarBrand, Nav, NavItem,
-    NavLink, Dropdown, DropdownToggle,
-    DropdownMenu, DropdownItem, Popover, PopoverHeader, PopoverBody
-} from 'reactstrap';
-import { Route, Link } from 'react-router-dom';
-import './common.scss'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {
-    faBell, faUserCircle, faCreditCard,
-    faChartLine, faUsers, faCommentAlt,
-    faChalkboardTeacher, faSignOutAlt, faTasks,
-    faAddressBook
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { AuthService, isLoggedIn } from '../../services/auth-service';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
-import { withRouter } from 'react-router-dom'
-import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import * as signalR from '@aspnet/signalr'
-import { ReceivableAction } from '../../actions/receivable-action';
 import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, Nav, Navbar, NavbarBrand, NavItem, Popover, PopoverBody } from 'reactstrap';
+import { Button } from 'semantic-ui-react';
+import { ReceivableAction } from '../../actions/receivable-action';
+import { SERVER_IP } from '../../constants/config';
+import { AuthService, isLoggedIn } from '../../services/auth-service';
 import { NotificationService } from '../../services/notification-service';
 import { ReceivableService } from '../../services/receivable-service';
-import { Message, Button, Divider } from 'semantic-ui-react';
 import NewAssignedReceivable from '../receivable-pages/new-assigned-receivable';
-import { SERVER_IP } from '../../constants/config';
+import './common.scss';
 library.add(faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks, faAddressBook);
-
 
 class MyMenu extends Component {
     constructor(props) {
@@ -76,7 +63,6 @@ class MyMenu extends Component {
     }
 }
 
-
 class MyProfile extends React.Component {
     constructor(props) {
         super(props);
@@ -97,9 +83,9 @@ class MyProfile extends React.Component {
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <DropdownItem style={{ cursor: "default" }}>
+                        <div className='col-sm-10' style={{ cursor: 'default' }}>
                             Hi, <b>{localStorage.getItem('username')}</b><br />
-                        </DropdownItem>
+                        </div>
                         <DropdownItem onClick={() => { this.props.history.push(`/users/${localStorage.id}/view`) }}>
                             My profile
                             </DropdownItem>
@@ -226,15 +212,8 @@ class Notification extends React.Component {
         return () => {
             this.props.setNewIds(ids);
             this.props.setReceivables([]);
-            ReceivableService.getAll().then(res => {
+            ReceivableService.getReceivablesByIds(ids).then(res => {
                 let list = res.data;
-                list = list.reduce((acc, r) => {
-                    let foundR = ids.find(id => id === r.Id);
-                    if (foundR) {
-                        acc.push(r);
-                    }
-                    return acc;
-                }, []);
                 this.props.setReceivables(list);
             })
         }
@@ -333,7 +312,7 @@ class Notification extends React.Component {
                     {this.state.modalContent}
                 </ModalBody>
                 <ModalFooter>
-                    <Button className="btn btn-rcm-secondary" onClick={() => {
+                    <Button color='secondary' onClick={() => {
                         this.setState({
                             openModal: false,
                             modalContent: null
@@ -357,63 +336,23 @@ const mapDispatchToProps = (dispatch, props) => {
             dispatch(ReceivableAction.setNewReceivableIds(ids))
         },
         setReceivables: (list) => {
-            dispatch(ReceivableAction.setReceivableList(list));
+            dispatch(ReceivableAction.setReceivableList2(list));
         }
     }
+}
+
+export const infoAlert = (message, callback = () => { }) => {
+    NotificationManager.info(message, '', 3000, callback);
+}
+
+export const errorAlert = (message, callback = () => { }) => {
+    NotificationManager.error(message, '', 3000, callback);
+}
+
+export const successAlert = (message, callback = () => { }) => {
+    NotificationManager.success(message, '', 3000, callback);
 }
 
 const ConnectedNotification = connect(mapStateToProps, mapDispatchToProps)(Notification)
 
 export default withRouter(MyMenu);
-
-const menus = [
-    {
-        name: 'Dashboard',
-        to: '/',
-        exact: true,
-        icon: 'chart-line',
-        roles: ['Collector', 'Admin', 'Manager']
-    },
-    {
-        name: 'Task',
-        to: '/task',
-        exact: false,
-        icon: 'tasks',
-        roles: ['Collector']
-    },
-    {
-        name: 'Receivable',
-        to: '/receivable',
-        exact: false,
-        icon: 'credit-card',
-        roles: ['Collector', 'Manager']
-    },
-    {
-        name: 'User',
-        to: '/users',
-        exact: false,
-        icon: 'users',
-        roles: ['Admin']
-    },
-    {
-        name: 'Profile',
-        to: '/profile',
-        exact: false,
-        icon: 'chalkboard-teacher',
-        roles: ['Manager']
-    },
-    {
-        name: 'Message Form',
-        to: '/messages',
-        exact: false,
-        icon: 'comment-alt',
-        roles: ['Manager']
-    },
-    {
-        name: 'Customer',
-        to: '/customers',
-        exact: false,
-        icon: 'address-book',
-        roles: ['Manager']
-    }
-];

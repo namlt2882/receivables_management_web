@@ -1,13 +1,3 @@
-.info-table {}
-
-.info-table tr {
-    border: 1px solid gray !important;
-}
-
-.info-table tr>td:first-child {
-    max-width: 100px;
-    font-weight: bold;
-}
 
 .deco-table td {
     color: black !important;
@@ -16,11 +6,6 @@
 
 .deco-table tr>td:first-child {
     font-weight: bold;
-}
-
-.info-table td {
-    border: none !important;
-    padding: 5px 15px 5px 15px !important;
 }
 
 .card-title {

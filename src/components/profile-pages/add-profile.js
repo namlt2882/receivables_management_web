@@ -8,7 +8,8 @@ import { available, PrimaryLoadingPage } from '../common/loading-page';
 import { ProfileService } from '../../services/profile-service'
 import { ProfileAction } from './../../actions/profile-action'
 import * as ProcessReducer from '../../reducers/process-reducer'
-import { Button } from 'semantic-ui-react';
+import { Button, Container, Divider } from 'semantic-ui-react';
+import { successAlert, errorAlert } from '../common/my-menu';
 
 class AddProfile extends Component {
     constructor(props) {
@@ -35,12 +36,12 @@ class AddProfile extends Component {
     createNewProfile() {
         this.setState({ formLoading: true });
         this.props.createNewProfile(this.props.process).then(res => {
-            alert('Insert successfully!');
+            successAlert('Insert successfully!');
             this.props.history.push(`/profile`)
         }).catch(err => {
             let status = err.response.status;
             console.log(`http status: ${status}`);
-            alert('Something went wrong! Please try again later!');
+            errorAlert('Something went wrong! Please try again later!');
             this.setState({ formLoading: false });
         });
     }
@@ -49,17 +50,23 @@ class AddProfile extends Component {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />
         }
-        return (<div>
-            <div className='row'>
-                <div className='col-sm-12'>
-                    <div className='panel-action'>
-                        <Button color='primary' onClick={this.createNewProfile}>Save</Button>
-                        <Button onClick={this.cancel}>Cancel</Button>
+        return (<Container className='col-sm-12 row justify-content-center'>
+            <div className='col-sm-12'>
+                <div className="hungdtq-header">
+                    <div>
+                        <div className="d-inline-block hungdtq-header-text">
+                            <h1>Add new Profiles</h1>
+                        </div>
                     </div>
+                    <Divider />
+                </div>
+                <div className='panel-action' style={{ zIndex: 10, position: 'relative' }}>
+                    <Button color='primary' onClick={this.createNewProfile}>Save</Button>
+                    <Button onClick={this.cancel}>Cancel</Button>
                 </div>
             </div>
             <Process formLoading={this.state.formLoading} />
-        </div>);
+        </Container >);
     }
 }
 const mapStateToProps = state => {

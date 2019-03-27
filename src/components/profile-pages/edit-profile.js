@@ -47,20 +47,18 @@ class EditProfile extends Component {
             return <PrimaryLoadingPage />
         }
         var readOnly = this.props.processStatus.readOnly;
-        return (<Container className='col-sm-12 row justify-content-center align-self-center'>
-            <div className='row'>
-                <div className='col-sm-12'>
-                    <div className='panel-action'>
-                        {readOnly ? <Button color='primary' onClick={this.setEditable}>Edit</Button> :
-                            <div>
-                                <Button color='primary'>Save</Button>
-                                <Button onClick={this.setUneditable}>Cancel</Button>
-                            </div>
-                        }
-                    </div>
+        return (<Container className='col-sm-12 row justify-content-center'>
+            <div className='col-sm-12'>
+                <div className='panel-action' style={{ zIndex: 10, position: 'relative' }}>
+                    {readOnly ? <Button color='primary' onClick={this.setEditable}>Edit</Button> :
+                        <div>
+                            <Button color='primary'>Save</Button>
+                            <Button onClick={this.setUneditable}>Cancel</Button>
+                        </div>
+                    }
                 </div>
             </div>
-            <Process formLoading={this.state.formLoading}/>
+            <Process formLoading={this.state.formLoading} />
         </Container>);
     }
 }

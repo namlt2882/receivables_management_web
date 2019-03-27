@@ -10,6 +10,13 @@ import { PrimaryLoadingPage } from '../common/loading-page';
 import './customer.scss';
 
 class UserList extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            maxLoading: 1
+        };
+    }
+
     componentDidMount() {
         document.title = 'Customers';
         available(resolve => setTimeout(resolve, 400));
@@ -31,7 +38,6 @@ class UserList extends Component {
         }
 
         var customers = this.props.customers;
-
 
         var index = 1;
         return (

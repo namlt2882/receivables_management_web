@@ -1,13 +1,13 @@
+import { MDBDataTable } from 'mdbreact';
 import React from 'react';
 import { connect } from 'react-redux';
-import { ReceivableAction } from '../../actions/receivable-action'
-import { available, PrimaryLoadingPage } from '../common/loading-page'
-import Component from '../common/component'
-import { numAsDate } from '../../utils/time-converter';
-import { Container, Header, Label } from 'semantic-ui-react'
-import { describeStatus } from './detail/receivable-detail';
-import { MDBDataTable } from 'mdbreact'
 import { Link } from 'react-router-dom';
+import { Container, Label } from 'semantic-ui-react';
+import { ReceivableAction } from '../../actions/receivable-action';
+import { numAsDate } from '../../utils/time-converter';
+import Component from '../common/component';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
+import { describeStatus } from './detail/receivable-detail';
 
 class NewAssignedReceivable extends Component {
     constructor(props) {
@@ -18,13 +18,10 @@ class NewAssignedReceivable extends Component {
     }
 
     componentDidMount() {
-        document.title = 'New assigned receivable';
-        available(resolve => setTimeout(resolve, 400));
+        available1();
     }
 
-    componentWillUnmount() {
-        
-    }
+    componentWillUnmount() { }
 
     pushDataToTable() {
         let data1 = { ...data };
@@ -120,7 +117,7 @@ const data = {
 
 const mapStateToProps = state => {
     return {
-        receivableList: state.receivableList,
+        receivableList: state.receivableList2,
         collectors: state.collectors,
         customers: state.customers,
         newReceiavbleIds: state.newReceiavbleIds
@@ -129,7 +126,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch, props) => {
     return {
         setReceivables: (list) => {
-            dispatch(ReceivableAction.setReceivableList(list));
+            dispatch(ReceivableAction.setReceivableList2(list));
         }
     }
 }

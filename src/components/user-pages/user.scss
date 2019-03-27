@@ -39,12 +39,12 @@
     display: block;
 }
 
-tr>th {
+.table tr>th {
     text-align: center;
     border-bottom: none !important;
 }
 
-tr>td:first-child {
+.table tr>td:first-child {
     text-align: center;
     font-weight: bold;
 }

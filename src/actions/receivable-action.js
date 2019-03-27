@@ -7,6 +7,12 @@ export const ReceivableAction = {
             list
         }
     },
+    setReceivableList2: (list) => {
+        return {
+            type: Types.SET_RECEIVABLE_LIST_2,
+            list
+        }
+    },
     setNewReceivableIds: (list) => {
         return {
             type: Types.SET_NEW_RECEIVABLE_LIST,

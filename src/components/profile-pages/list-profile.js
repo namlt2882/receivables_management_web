@@ -5,7 +5,7 @@ import { ProcessAction } from '../../actions/process-action';
 import { Link } from 'react-router-dom';
 import Component from '../common/component'
 import { available, PrimaryLoadingPage } from '../common/loading-page'
-import { Container, Button, Header, Table, Form } from 'semantic-ui-react';
+import { Container, Button, Header, Table, Form, Divider } from 'semantic-ui-react';
 import * as ProcessReducer from '../../reducers/process-reducer'
 import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { ProfileService } from '../../services/profile-service';
@@ -39,36 +39,47 @@ class ProfileList extends Component {
     }
     render() {
         if (this.isLoading()) {
-            return <PrimaryLoadingPage/>
+            return <PrimaryLoadingPage />
         }
         var profiles = this.props.profiles;
-        return (<div className='col-sm-12 row justify-content-center align-self-center'>
-            <Container>
-                <Header className='text-center'>Profiles</Header>
-                <Button primary onClick={this.toggleAddForm}>Add Profile</Button>
-                <Table className="table-hover">
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell>Id</Table.HeaderCell>
-                            <Table.HeaderCell>Profile name</Table.HeaderCell>
-                            {/* <th>Customer</th> */}
-                            <Table.HeaderCell>Actions</Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        {profiles.map((profile) => (<Table.Row>
-                            <Table.Cell>{profile.Id}</Table.Cell>
-                            <Table.Cell>{profile.Name}</Table.Cell>
-                            {/* <td>{profile.customer !== null ? profile.customer.name : ''}</td> */}
-                            <Table.Cell>
-                                <Link to={`/profile/${profile.Id}/view`}>View</Link>
-                            </Table.Cell>
-                        </Table.Row>))}
-                    </Table.Body>
-                </Table>
+        return (
+            <Container className='col-sm-12 row justify-content-center'>
+                <div className='col-sm-12'>
+                <div className="hungdtq-header">
+                    <div>
+                        <div className="d-inline-block hungdtq-header-text">
+                            <h1>Profiles</h1>
+                        </div>
+                        <div className="d-inline-block hungdtq-headerbtn-container">
+                            <div className="btn btn-rcm-primary rcm-btn" onClick={this.toggleAddForm}>
+                                <a><i className="fas fa-plus"></i></a>
+                            </div>
+                        </div></div>
+                    <Divider />
+                </div>
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Profile name</th>
+                                {/* <th>Customer</th> */}
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {profiles.map((profile) => (<tr>
+                                <td>{profile.Id}</td>
+                                <td>{profile.Name}</td>
+                                {/* <td>{profile.customer !== null ? profile.customer.name : ''}</td> */}
+                                <td>
+                                    <Link to={`/profile/${profile.Id}/view`}>View</Link>
+                                </td>
+                            </tr>))}
+                        </tbody>
+                    </table>
+                </div>
                 <AddNewProfileForm addNewProfile={this.addNewProfile} toggle={this.toggleAddForm} isOpen={this.state.isOpenAddForm} />
-            </Container>
-        </div>);
+            </Container>);
     }
 }
 

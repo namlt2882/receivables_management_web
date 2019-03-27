@@ -39,7 +39,7 @@ class ReceivableProgress extends Component {
         if (progress.Stages.length > 0) {
             endDate = progress.Stages[progress.Stages.length - 1].endDate;
         }
-        return (<div className='col-sm-12 row justify-content-center align-self-center'>
+        return (<div className='col-sm-12 row no-space-side'>
             {progress.Stages.map((stage, i) => {
                 let className = `col-sm-${size} r-stage `;
                 let status = '';
