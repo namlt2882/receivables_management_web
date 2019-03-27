@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Form, Checkbox } from 'semantic-ui-react';
-import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { ReceivableService } from '../../../services/receivable-service';
-import { dateToInt } from '../../../utils/time-converter'
+import { Button, Confirm } from 'semantic-ui-react';
 import { AuthService } from '../../../services/auth-service';
+import { ReceivableService } from '../../../services/receivable-service';
+import ConfirmModal from '../../modal/ConfirmModal';
+import { successAlert, errorAlert, infoAlert } from '../../common/my-menu';
 
 class ChangeStatus extends Component {
     constructor(props) {
@@ -13,11 +13,14 @@ class ChangeStatus extends Component {
             showTodayTask: true,
             receivable: this.props.receivable,
             status: this.props.receivable.CollectionProgress.Status,
-            isPayed: false
+            openConfirm: false,
+            confirmMessage: '',
+            changeStatus: () => { }
         }
         this.openForm = this.openForm.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.changeStatus = this.changeStatus.bind(this);
+        this.confirm = this.confirm.bind(this);
     }
     openForm(e) {
         e.preventDefault();
@@ -28,35 +31,57 @@ class ChangeStatus extends Component {
     closeModal() {
         this.setState({ modal: false });
     }
-    changeStatus(isPayed) {
-        let message = 'Money is collected and will close this case?';
+    confirm(isPayed) {
+        let message = 'The debt is collected successfully. This action will CLOSE this case, confirm action.';
         if (!isPayed) {
-            message = 'Stop this case?';
+            message = 'This action will CANCEL this case, confirm action.';
         }
-        if (window.confirm(message)) {
-            let data = {
-                Id: this.state.receivable.Id,
-                isPayed: isPayed
+        this.setState({
+            openConfirm: true,
+            confirmMessage: message,
+            changeStatus: () => {
+                this.changeStatus(isPayed);
             }
-            ReceivableService.closeReceivable(data).then(res => {
-                let rs = res.data;
-                this.state.receivable.CollectionProgress.Status = rs.Status;
-                this.state.receivable.ClosedDay = rs.ClosedTime;
-                this.props.updateReceivable(this.state.receivable);
-            })
+        });
+    }
+    changeStatus(isPayed) {
+        let successMsg = 'This receivable has been cancel!';
+        if (isPayed) {
+            successMsg = 'This receivable has been closed!';
         }
+        let data = {
+            Id: this.state.receivable.Id,
+            isPayed: isPayed
+        }
+        ReceivableService.closeReceivable(data).then(res => {
+            let rs = res.data;
+            this.state.receivable.CollectionProgress.Status = rs.Status;
+            this.state.receivable.ClosedDay = rs.ClosedTime;
+            this.props.updateReceivable(this.state.receivable);
+            if (isPayed) {
+                successAlert(successMsg);
+            } else {
+                infoAlert(successMsg);
+            }
+        })
     }
     render() {
         return (<div>
             {AuthService.isCollector() ?
-                <div style={{ marginBottom: '10px', marginLeft: '20%' }}>
-                    <Button color='blue' onClick={() => { this.changeStatus(true) }}>Finish</Button>
-                </div> : null}
-
-            {AuthService.isCollector() ?
-                <div style={{marginLeft: '20%' }}>
-                    <Button color='red' onClick={() => { this.changeStatus(false) }}>Stop</Button>
-                </div> : null}
+                [<div style={{ marginBottom: '10px', marginLeft: '20%' }}>
+                    <Button content='Finish' color='blue' icon='check' labelPosition='left'
+                        onClick={() => { this.confirm(true) }} />
+                </div>,
+                <div style={{ marginLeft: '20%' }}>
+                    <Button content='Stop' color='red' icon='cancel' labelPosition='left'
+                        onClick={() => { this.confirm(false) }} />
+                </div>] : null}
+            <ConfirmModal
+                show={this.state.openConfirm}
+                onHide={() => { this.setState({ openConfirm: false }) }}
+                header='Confirm'
+                body={this.state.confirmMessage}
+                callback={this.state.changeStatus} />
         </div>);
     }
 }

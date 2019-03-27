@@ -83,9 +83,9 @@ class MyProfile extends React.Component {
                         <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <DropdownItem style={{ cursor: "default" }}>
+                        <div className='col-sm-10' style={{ cursor: 'default' }}>
                             Hi, <b>{localStorage.getItem('username')}</b><br />
-                        </DropdownItem>
+                        </div>
                         <DropdownItem onClick={() => { this.props.history.push(`/users/${localStorage.id}/view`) }}>
                             My profile
                             </DropdownItem>
@@ -212,15 +212,8 @@ class Notification extends React.Component {
         return () => {
             this.props.setNewIds(ids);
             this.props.setReceivables([]);
-            ReceivableService.getAll().then(res => {
+            ReceivableService.getReceivablesByIds(ids).then(res => {
                 let list = res.data;
-                list = list.reduce((acc, r) => {
-                    let foundR = ids.find(id => id === r.Id);
-                    if (foundR) {
-                        acc.push(r);
-                    }
-                    return acc;
-                }, []);
                 this.props.setReceivables(list);
             })
         }
@@ -343,7 +336,7 @@ const mapDispatchToProps = (dispatch, props) => {
             dispatch(ReceivableAction.setNewReceivableIds(ids))
         },
         setReceivables: (list) => {
-            dispatch(ReceivableAction.setReceivableList(list));
+            dispatch(ReceivableAction.setReceivableList2(list));
         }
     }
 }

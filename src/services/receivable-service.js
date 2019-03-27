@@ -7,6 +7,13 @@ export const ReceivableService = {
     getAll: () => {
         return AuthRequest.get(`Receivable`);
     },
+    getReceivablesByIds: (ids) => {
+        let params = ids.map((id) => {
+            let val = `receivableId=${id}`;
+            return val;
+        }).join('&');
+        return AuthRequest.get(`Receivable/GetReceivablesById?${params}`);
+    },
     create: (list) => {
         return AuthRequest.post(`Receivable`, list);
     },

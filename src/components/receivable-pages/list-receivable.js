@@ -280,13 +280,15 @@ class ReceivableList extends Component {
                         <div className="d-inline-block hungdtq-header-text">
                             <h1>{isManager ? `Receivables` : 'Your assigned receivables'}</h1>
                         </div>
-                        <div className="d-inline-block hungdtq-headerbtn-container">
+                        {/* Add button */}
+                        {AuthService.isManager() ? <div className="d-inline-block hungdtq-headerbtn-container">
                             <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
                                 this.props.history.push('/receivable/add');
                             }}>
                                 <a><i className="fas fa-plus"></i></a>
                             </div>
-                        </div></div>
+                        </div> : null}
+                    </div>
                     <Divider />
                 </div>
                 <div className='col-sm-12 row' style={{ display: isManager ? 'block' : 'none' }}>

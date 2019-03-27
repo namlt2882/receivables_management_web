@@ -1,13 +1,10 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faKey, faUser } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
-import { Jumbotron, Button } from 'reactstrap';
-// import { isLoggedIn, AuthService } from '../../services/auth-service';
 import { Redirect } from 'react-router-dom';
+import { Form, Button, Message } from 'semantic-ui-react';
+import { AuthService, isLoggedIn } from '../../services/auth-service';
 import Component from './component';
-import { FormGroup, Label, Input } from 'reactstrap';
-import { isLoggedIn, AuthService } from '../../services/auth-service'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faKey, faUser } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 library.add(faKey, faUser);
 
 class LoginPage extends Component {
@@ -16,7 +13,9 @@ class LoginPage extends Component {
         this.state = {
             username: '',
             password: '',
-            isLoggedIn: false
+            isLoggedIn: false,
+            isFail: false,
+            formLoading: false
         }
         isLoggedIn(() => {
             this.setIsLoggedIn(true);
@@ -32,11 +31,12 @@ class LoginPage extends Component {
     }
 
     login() {
+        this.setState({ formLoading: true });
         AuthService.login(this.state.username, this.state.password)
             .then(res => {
                 window.location.href = '/'
             }).catch(err => {
-                alert('Wrong username or password!')
+                this.setState({ formLoading: false, isFail: true });
             })
     }
 
@@ -52,28 +52,35 @@ class LoginPage extends Component {
         if (this.state.isLoggedIn) {
             return <Redirect to={{ pathname: '/' }} />
         } else {
-            return (<div className='container'>
+            return (<div style={{
+                backgroundImage: 'url(/images/currency.jpg)',
+                backgroundSize: '100% 100%',
+                width: '100 %'
+            }}>
                 <div className='row justify-content-center align-self-center'>
-                    <div className='col-sm-6' style={{ 'margin-top': '100px' }}>
-                        <Jumbotron>
-                            <h3 style={{ color: 'blue' }}>Receivable management system</h3>
-                            <FormGroup>
-                                <Label>
-                                    <FontAwesomeIcon icon='user' size='lg' color='black' style={{ marginRight: '10px' }} />
-                                    Username</Label>
-                                <Input type="text" required={true} placeholder="Username" value={this.state.username}
-                                    onChange={this.changeUsername} />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label>
-                                    <FontAwesomeIcon icon='key' size='lg' color='black' style={{ marginRight: '10px' }} />
-                                    Password</Label>
-                                <Input type="password" required={true} placeholder="Password" value={this.state.password}
-                                    onChange={this.changePassword} />
-                            </FormGroup>
-                            <Button onClick={this.login}>Login</Button>
-                        </Jumbotron>
-                    </div></div>
+                    <div className='col-sm-4' style={{
+                        marginTop: '100px',
+                        backgroundColor: 'white',
+                        padding: '40px',
+                        borderRadius: '5px'
+                    }}>
+                        <div className='text-center'><h2>Receivable management system</h2></div>
+                        <br />
+                        <Form onSubmit={this.login} error={this.state.isFail} loading={this.state.formLoading}>
+                            <Form.Input label='Username' required placeholder='Ex: namlt'
+                                icon='users' iconPosition='left'
+                                value={this.state.username} onChange={this.changeUsername} />
+                            <Form.Input label='Password' type='password' required placeholder='Password'
+                                icon='key' iconPosition='left'
+                                value={this.state.password} onChange={this.changePassword} />
+                            {/* Message */}
+                            {this.state.isFail ? <Message error
+                                header='Wrong username or password'
+                                content='Please check your username and password again!' /> : null}
+                            <Button color='primary'>Login</Button>
+                        </Form>
+                    </div>
+                </div>
             </div>);
         }
     }

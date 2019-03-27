@@ -21,7 +21,7 @@ class MyNav extends Component {
     render() {
         let defaultSelected = this.props.location.pathname;
         defaultSelected = defaultSelected.split('/');
-        if (defaultSelected.length > 2) {
+        if (defaultSelected.length > 1) {
             defaultSelected = '/' + defaultSelected[1];
         }else{
             defaultSelected = '/';

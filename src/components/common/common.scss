@@ -8,6 +8,7 @@
 
 .sidenav---sidenav---_2tBP {
     background-color: white !important;
+    position: fixed !important;
 }
 
 .sideNav-TogleButton {
@@ -25,8 +26,16 @@
 }
 
 .navbar-holder {
-    height: 5rem;
-    z-index: 1;
+    height: 4.5rem;
+    z-index: 30000;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+.navbar-holder>.navbar-color{
+    position: fixed;
+    width: 95%;
+    z-index: 30000;
 }
 
 .nav-link:hover svg {
@@ -167,7 +176,7 @@
 }
 
 .not-readed-noti {
-    background-color: #cbdaf2;
+    background-color: #6db1ea61;
 }
 
 .noti-item {
@@ -177,7 +186,7 @@
 }
 
 .noti-item:hover {
-    background-color: #afc6ea;
+    background-color: #387cb461;
 }
 
 .noti-item-body {
@@ -188,13 +197,8 @@
     font-weight: 500;
 }
 
-.dropdown-item {
-    width: 20vh !important;
-    height: 5vh !important;
-}
-
 .dropdown-item:hover {
-    background-color: rgba(0, 191, 255, 0.5) !important;
+    background-color: #387cb461 !important;
 }
 
 .sidenav---sidenav-nav---3tvij>.sidenav---sidenav-navitem---uwIJ->.sidenav---navitem---9uL5T .sidenav---navicon---3gCRo,

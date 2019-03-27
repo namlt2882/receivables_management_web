@@ -9,6 +9,7 @@ import { DatePicker } from '@progress/kendo-react-dateinputs';
 import { numAsDate, dateToInt } from '../../../utils/time-converter';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { errorAlert, successAlert } from '../../common/my-menu';
+import MyToolTip from '../../common/my-tooltip';
 library.add(faPen);
 
 class EditReceivable extends Component {
@@ -186,7 +187,9 @@ class EditReceivable extends Component {
         }
 
         return (<div style={{ width: '30px', float: 'right', paddingRight: '20px' }}>
-            <FontAwesomeIcon icon='pen' size='sm' color='black' className='icon-btn' onClick={this.openModal} />
+            <FontAwesomeIcon icon='pen' size='sm' color='black' className='icon-btn'
+                id='edit-receivable-info' onClick={this.openModal} />
+            <MyToolTip target='edit-receivable-info' message='Edit receivable info' />
             <Modal isOpen={this.state.modal} className={modalClass}>
                 <ModalHeader>Update information of receivable</ModalHeader>
                 <ModalBody>
