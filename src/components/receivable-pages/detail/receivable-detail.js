@@ -353,9 +353,9 @@ class ReceivableDetail extends Component {
             </div>
             <div className='col-sm-12' style={{ marginTop: '20px' }}>
                 {/* Relatives (only visible for collector)*/}
-                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Relatives'
+                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Contact list'
                     isDebtor={false} contacts={contacts}
-                    updateReceivable={this.updateReceivable} /> : null}
+                    updateReceivable={this.updateReceivable} receivableId={receivable.Id} /> : null}
             </div>
         </div>);
     }

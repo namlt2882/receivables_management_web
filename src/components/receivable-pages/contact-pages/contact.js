@@ -6,33 +6,21 @@ import { faUserInjured, faUserFriends, faPen, faTrashAlt, faUserPlus } from '@fo
 import { AuthService } from '../../../services/auth-service';
 import EditContact from './edit-contact';
 import MyToolTip from '../../common/my-tooltip';
+import AddContact from './add-contact';
 library.add(faUserInjured, faUserFriends, faPen, faTrashAlt, faUserPlus);
 
 class Contact extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dropdownOpen: false,
-            mouseIn: false
-        };
-        this.toggle = this.toggle.bind(this);
-    }
-    toggle() {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen
-        });
-    }
-    edit(e) {
-        e.preventDefault();
-    }
-    add(e) {
-        e.preventDefault();
+        }
     }
     render() {
         let contacts = this.props.contacts;
         let addable = true;
         let isFinished = this.props.isFinished;
         let debtor = null;
+        let receivableId = this.props.receivableId;
         if (this.props.isDebtor) {
             // will add if debtor not existed
             if (contacts == 0) {
@@ -53,8 +41,7 @@ class Contact extends Component {
                         <EditContact contact={debtor} updateReceivable={updateReceivable} />
                     </div> : null}
                 </Header>
-                {addable && !isFinished ? <FontAwesomeIcon icon='user-plus' size='md' color='black' className='icon-btn'
-                    onClick={this.add} /> : null}
+                {addable && !isFinished ? <AddContact receivableId={receivableId} updateReceivable={updateReceivable} /> : null}
                 {this.props.isDebtor ? this.props.contacts.map((contact) =>
                     (<table hover className='info-table'>
                         <tbody>
@@ -95,8 +82,7 @@ class Contact extends Component {
                                 <td>{c.Address}</td>
                                 <td>
                                     {!isFinished ?
-                                        [<EditContact contact={c} updateReceivable={updateReceivable} />,
-                                        <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn' />]
+                                        [<EditContact contact={c} updateReceivable={updateReceivable} />]
                                         : null}
                                 </td>
                             </tr>))}
