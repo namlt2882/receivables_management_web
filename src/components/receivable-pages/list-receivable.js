@@ -234,7 +234,7 @@ class ReceivableList extends Component {
             <br />
             {/* Customer filter */}
             {AuthService.isManager() ? <div>
-                <div><b>Customer</b>:</div>
+                <div><b>Partner</b>:</div>
                 <MultiSelect
                     data={this.getNotChoosenCustomer()}
                     onChange={this.onChangeSelectedCustomer}
@@ -295,7 +295,7 @@ class ReceivableList extends Component {
 
                 </div>
                 <div className='col-sm-12 row justify-content-center align-self-center'>
-                    <Nav tabs className='col-sm-7'>
+                    <Nav tabs className='col-sm-8'>
                         <NavItem>
                             <NavLink className={classnames({ active: this.state.getConfirmed })}
                                 onClick={() => { this.toggleConfirmed(true) }}>
@@ -317,7 +317,7 @@ class ReceivableList extends Component {
                             <Link to='/receivable/recent-add'>Recent added receivables</Link>
                         </div>
                     </Nav>
-                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }} className='border-shadow col-sm-7 row justify-content-center align-self-center'>
+                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }} className='border-shadow col-sm-8 row justify-content-center align-self-center'>
                         <TabPane tabId='1' className='col-sm-12 row justify-content-center align-self-center'>
                             {this.managerFilterComp()}
                             {this.statusFilterComp()}
@@ -376,7 +376,7 @@ const data = {
             width: 270
         },
         {
-            label: 'Customer',
+            label: 'Partner',
             field: 'CustomerName',
             sort: 'asc',
             width: 270

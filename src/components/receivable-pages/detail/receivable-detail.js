@@ -303,7 +303,7 @@ class ReceivableDetail extends Component {
                                 <td>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
                             </tr>
                             <tr>
-                                <td>Customer:</td>
+                                <td>Partner:</td>
                                 <td>{receivable.customer ? receivable.customer.Name : null}</td>
                             </tr>
                             <tr>

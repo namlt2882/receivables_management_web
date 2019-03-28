@@ -27,7 +27,7 @@
 
 .navbar-holder {
     height: 4.5rem;
-    z-index: 30000;
+    z-index: 1049;
     position: relative;
     width: 100%;
     box-sizing: border-box;
@@ -35,7 +35,7 @@
 .navbar-holder>.navbar-color{
     position: fixed;
     width: 95%;
-    z-index: 30000;
+    z-index: 1049;
 }
 
 .nav-link:hover svg {
