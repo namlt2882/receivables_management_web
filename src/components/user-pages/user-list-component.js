@@ -39,14 +39,14 @@ class UserList extends Component {
                         <thead className="thead-blue">
                             <tr>
                                 <th>No.</th>
-                                <th>
+                                <th className="userNameCol">
                                     Username
                                 </th>
-                                <th>Full Name</th>
-                                <th>
+                                <th className="fullNameCol">Full Name</th>
+                                <th className="noOfAssignedReceivableCol">
                                     No. Of Assigned Receivable
                                 </th>
-                                <th>
+                                <th className="userStatusCol">
                                     Status
                                 </th>
 

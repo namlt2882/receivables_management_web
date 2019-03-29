@@ -1,0 +1,20 @@
+diff a/src/components/common/common.scss b/src/components/common/common.scss	(rejected hunks)
+@@ -26,8 +26,16 @@
+ }
+ 
+ .navbar-holder {
+-    height: 5rem;
+-    z-index: 1;
++    height: 4.5rem;
++    z-index: 30000;
++    position: relative;
++    width: 100%;
++    box-sizing: border-box;
++}
++.navbar-holder>.navbar-color{
++    position: fixed;
++    width: 95%;
++    z-index: 30000;
+ }
+ 
+ .nav-link:hover svg {

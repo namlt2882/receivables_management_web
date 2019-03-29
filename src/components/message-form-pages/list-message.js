@@ -17,7 +17,7 @@ class ListMessage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 1
+            filterVal: ""
         };
     }
 
@@ -36,7 +36,8 @@ class ListMessage extends Component {
             return <PrimaryLoadingPage />
         }
 
-        var messages = this.props.messages;
+        var { messages } = this.props;
+        var { filterVal } = this.state;
         return (
             <div style={{
                 width: "100%"
@@ -55,15 +56,44 @@ class ListMessage extends Component {
                         </div>
                         <hr></hr>
                     </div>
+                    <div className="hungdtq-Wrapper">
+                        <div className="hungdtq-Container">
+                            <div className="tableSearchBox">
+                                <input
+                                    type="text"
+                                    className="rcm-form-control"
+                                    placeholder="Search by form name..."
+                                    onChange={e => this.setState({ filterVal: e.target.value })}
+                                    value={filterVal}
+                                />
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <MessageList>
-                            {/* props nay goi la props chilren */}
-                            {this.showMessages(messages)}
+                            {messages
+                                .filter(function (message) {
+                                    if (filterVal) {
+                                        return message.Name
+                                            .toLowerCase()
+                                            .includes(filterVal
+                                                .toLowerCase()
+                                                .trim())
+                                    } else {
+                                        return message;
+                                    }
+                                })
+                                .map((message, index) =>
+                                    <MessageItem
+                                        key={index}
+                                        message={message}
+                                        index={index}
+                                    />)}
                         </MessageList>
 
                     </div>
 
-                    <div className="hungdtq-Wrapper" style={{ display: (messages == null || messages.length === 0) ? 'block' : 'none' }}>
+                    <div className="hungdtq-Wrapper" style={{ display: (this.props.messages == null || this.props.messages.length === 0) ? 'block' : 'none' }}>
                         <div className="hungdtq-Container">
                             <p>There is no message form.</p>
                         </div>
@@ -73,21 +103,6 @@ class ListMessage extends Component {
         );
     }
 
-    showMessages(messages) {
-        var result = null;
-        if (messages && messages.length > 0) {
-            result = messages.map((message, index) => {
-                return (
-                    <MessageItem
-                        key={index}
-                        message={message}
-                        index={index}
-                    />
-                );
-            });
-        }
-        return result;
-    }
 }
 
 const mapStateToProps = state => {

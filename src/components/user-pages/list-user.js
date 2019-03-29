@@ -10,12 +10,14 @@ import { UserService } from '../../services/user-service';
 import { UserAction } from '../../actions/user-action';
 
 import './user.scss';
+import { Last } from 'react-bootstrap/PageItem';
 
 class ListUser extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 1
+            filterVal: ""
         };
     }
 
@@ -40,6 +42,8 @@ class ListUser extends Component {
         });
     }
     render() {
+        var { filterVal } = this.state;
+        var { users } = this.props;
         return (
             <div style={{
                 width: "100%"
@@ -58,9 +62,41 @@ class ListUser extends Component {
                         </div>
                         <hr></hr>
                     </div>
+                    <div className="hungdtq-Wrapper">
+                        <div className="hungdtq-Container">
+                            <div className="tableSearchBox">
+                                <input
+                                    type="text"
+                                    className="rcm-form-control"
+                                    placeholder="Search by name..."
+                                    onChange={e => this.setState({ filterVal: e.target.value })}
+                                    value={filterVal}
+                                />
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <UserList>
-                            {this.showUsers(this.props.users)}
+                            {users
+                                .filter(function (user) {
+                                    if (filterVal) {
+                                        return (user.LastName + ' ' + user.FirstName)
+                                            .toLowerCase()
+                                            .includes(filterVal
+                                                .toLowerCase()
+                                                .trim())
+                                           
+                                    } else {
+                                        return user;
+                                    }
+                                })
+                                .map((user, index) =>
+                                    <UserItem
+                                        key={index}
+                                        user={user}
+                                        index={index}
+                                        onDelete={this.onDelete}
+                                    />)}
                         </UserList>
                     </div>
                 </div>
