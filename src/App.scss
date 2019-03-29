@@ -187,7 +187,7 @@ table.table a {
 }
 
 .table-strip>tbody>tr:nth-of-type(even) {
-    background-color: #6db1ea61 !important;
+    background-color: #6db1ea1f !important;
 }
 
 .table-strip>tbody>tr:nth-of-type(odd) {
@@ -195,7 +195,7 @@ table.table a {
 }
 
 .table-strip>tbody>tr:hover {
-    background-color: #6db1ea61 !important;
+    background-color: #6db1eaa8 !important;
 }
 
 .rcm-form-control {
@@ -211,6 +211,7 @@ table.table a {
     line-height: 1.5;
     color: #495057;
     background-color: #fff;
+    outline: none;
 }
 
 .rcm-btn{
@@ -222,4 +223,27 @@ table.table a {
 
 .sidenav---sidenav-nav---3tvij > .sidenav---sidenav-navitem---uwIJ- > .sidenav---navitem---9uL5T{
     font-size: 1.2rem !important;
+}
+
+.tableSearchBox{
+    padding-bottom: 5px;
+    width: 100%;
+}
+
+.tableSearchBox > input{
+    float: right;
+    width: 20rem;
+}
+
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.error-validation-message{
+    color: red;
 }

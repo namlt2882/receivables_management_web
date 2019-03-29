@@ -11,10 +11,10 @@ class MessageList extends Component {
                     <table className="table table-hover messageTable table-strip">
                         <thead className="thead-blue">
                             <tr>
-                                <th >ID</th>
-                                <th >Name</th>
-                                <th >Type</th>
-                                <th >Status</th>
+                                <th className="">No.</th>
+                                <th className="messageNameCol">Name</th>
+                                <th className="messageTypeCol">Type</th>
+                                <th className="messageStatusCol">Status</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -7,6 +7,10 @@ import { CustomerAction } from '../../actions/customer-action';
 import ConfirmModal from '../modal/ConfirmModal';
 import { Link } from 'react-router-dom';
 
+const nameChangeMessageErr = "Name must have 10 to 100 characters.";
+const codeChangeMessageErr = "Code must have 4 to 50 characters.";
+const phoneChangeMessageErr = "Phone is not valid.";
+
 class CustomerActionPage extends Component {
 
     constructor(props) {
@@ -27,8 +31,17 @@ class CustomerActionPage extends Component {
             Phone: '',
             Address: '',
             Id: null,
-            title: 'Add new customer',
-            viewMode: 2
+            title: 'Add new partner',
+            viewMode: 2,
+
+            nameInputErr: true,
+            nameChangeMessageErr: '',
+
+            codeInputErr: true,
+            codeChangeMessageErr: '',
+
+            phoneInputErr: true,
+            phoneChangeMessageErr: '',
         }
 
         this.callbackFromModal = this.callbackFromModal.bind(this);
@@ -38,6 +51,72 @@ class CustomerActionPage extends Component {
         this.onCodeChange = this.onCodeChange.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
         this.onClear = this.onClear.bind(this);
+
+        this.onNameBlur = this.onNameBlur.bind(this);
+        this.onCodeBlur = this.onCodeBlur.bind(this);
+        this.onPhoneBlur = this.onPhoneBlur.bind(this);
+
+    }
+
+    onPhoneBlur(e) {
+        let phone = e.target.value.trim();
+        var regrex = new RegExp("(09|01[2|6|8|9]|1800)+([0-9]{4,8})");
+
+        if (!regrex.test(phone)) {
+            this.setState({
+                phoneInputErr: true,
+                phoneChangeMessageErr: phoneChangeMessageErr
+            });
+            return;
+        } else {
+            this.setState({
+                phoneInputErr: false,
+                phoneChangeMessageErr: ''
+            });
+        }
+
+        if (phone.length < 7) {
+            this.setState({
+                phoneInputErr: true,
+                phoneChangeMessageErr: phoneChangeMessageErr
+            });
+            return;
+        } else {
+            this.setState({
+                phoneInputErr: false,
+                phoneChangeMessageErr: ''
+            });
+        }
+    }
+
+    onCodeBlur(e) {
+        let code = e.target.value;
+        if (code.length < 2 || code.length > 50) {
+            this.setState({
+                codeInputErr: true,
+                codeChangeMessageErr: codeChangeMessageErr
+            });
+        } else {
+            this.setState({
+                codeInputErr: false,
+                codeChangeMessageErr: ''
+            });
+        }
+    }
+
+    onNameBlur(e) {
+        let name = e.target.value;
+        if (name.length < 10 || name.length > 100) {
+            this.setState({
+                nameInputErr: true,
+                nameInputErrMessage: nameChangeMessageErr
+            });
+        } else {
+            this.setState({
+                nameInputErr: false,
+                nameInputErrMessage: ''
+            });
+        }
     }
 
     changeMode() {
@@ -72,8 +151,14 @@ class CustomerActionPage extends Component {
     }
 
     openModal() {
+
+        let { nameInputErr, phoneInputErr, codeInputErr } = this.state;
+        if (nameInputErr || phoneInputErr || codeInputErr) {
+            return;
+        }
+
         var { match } = this.props;
-        let tmpMes = 'Are you sure want add new customer?';
+        let tmpMes = 'Are you sure want add new partner?';
         if (match) {
             if (match.params.id) {
                 tmpMes = 'Are you sure want edit?';
@@ -102,7 +187,7 @@ class CustomerActionPage extends Component {
 
     onCodeChange(e) {
         this.setState({
-            Code: e.target.value
+            Code: e.target.value.toUpperCase()
         })
     }
 
@@ -140,15 +225,15 @@ class CustomerActionPage extends Component {
 
     // Dispatch action và lưu itemEditing vào store
     componentDidMount() {
-        document.title = "Add new customer"
+        document.title = "Add new partner"
         var { match } = this.props;
         if (match) {
             var id = match.params.id;
             if (id) {
-                document.title = "Customer detail";
+                document.title = "Partner detail";
                 this.setState({
                     messageId: id,
-                    title: 'Customer Detail',
+                    title: 'Partner Detail',
                     viewMode: 0
                 });
 
@@ -161,7 +246,11 @@ class CustomerActionPage extends Component {
                         Name: res.data.Name,
                         Phone: res.data.Phone,
                         Address: res.data.Address,
-                        customer: res.data
+                        customer: res.data,
+
+                        nameInputErr: false,
+                        codeInputErr: false,
+                        phoneInputErr: false,
                     });
                 });
             }
@@ -215,24 +304,32 @@ class CustomerActionPage extends Component {
                                             />
                                             <input
                                                 type="text"
-                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none', width: "40%" }}
                                                 className="rcm-form-control"
                                                 value={this.state.Name}
                                                 onChange={this.onNameChange}
+                                                onBlur={this.onNameBlur}
+                                                autoComplete="off"
                                             />
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.nameChangeMessageErr}
+                                            </i>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td className="UserDetailTable-Col1">Code</td>
                                         <td className="UserDetailTable-Col2">:</td>
                                         <td className="UserDetailTable-Col3">
                                             <input
-                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none', width: "20%" }}
                                                 type="text"
                                                 className="rcm-form-control"
                                                 value={this.state.Code}
                                                 onChange={this.onCodeChange}
+                                                autoComplete="off"
+                                                onBlur={this.onCodeBlur}
                                             />
                                             <input
                                                 type="text"
@@ -240,21 +337,26 @@ class CustomerActionPage extends Component {
                                                 disabled
                                                 className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Code}
-                                                onChange={this.onContentChange}
                                             />
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.codeChangeMessageErr}
+                                            </i>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td className="UserDetailTable-Col1">Phone</td>
                                         <td className="UserDetailTable-Col2">:</td>
                                         <td className="UserDetailTable-Col3">
                                             <input
-                                                type="text"
-                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
+                                                type="phone"
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none', width: "20%" }}
                                                 className="rcm-form-control"
                                                 value={this.state.Phone}
                                                 onChange={this.onPhoneChange}
+                                                autoComplete="off"
+                                                onBlur={this.onPhoneBlur}
                                             />
                                             <input
                                                 type="text"
@@ -262,11 +364,14 @@ class CustomerActionPage extends Component {
                                                 disabled
                                                 className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Phone}
-                                                onChange={this.onPhoneChange}
                                             />
 
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.phoneChangeMessageErr}
+                                            </i>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td className="UserDetailTable-Col1">Address</td>
@@ -278,6 +383,7 @@ class CustomerActionPage extends Component {
                                                 value={this.state.Address}
                                                 onChange={this.onAddressChange}
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
+                                                autoComplete="off"
                                             />
 
                                             <input
@@ -286,11 +392,14 @@ class CustomerActionPage extends Component {
                                                 disabled
                                                 className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.Address}
-                                                onChange={this.onAddressChange}
                                             />
 
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.addressChangeMessageErr}
+                                            </i>
+                                        </td>
                                     </tr>
                                     <tr></tr>
                                     <tr>
