@@ -1,4 +1,4 @@
-import { Request, AuthRequest } from '../utils/request'
+import { AuthRequest } from '../utils/request';
 
 export const ReceivableService = {
     get: (id) => {

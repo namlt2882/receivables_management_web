@@ -1,16 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import UserList from './user-list-component';
-import UserItem from './user-item';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { available1 } from '../common/loading-page'
-import Component from '../common/component';
-import { UserService } from '../../services/user-service';
 import { UserAction } from '../../actions/user-action';
-
+import { UserService } from '../../services/user-service';
+import Component from '../common/component';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
+import UserItem from './user-item';
+import UserList from './user-list-component';
 import './user.scss';
-import { Last } from 'react-bootstrap/PageItem';
 
 class ListUser extends Component {
 
@@ -43,6 +40,9 @@ class ListUser extends Component {
         });
     }
     render() {
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var { filterVal } = this.state;
         var { users } = this.props;
         return (
@@ -56,8 +56,10 @@ class ListUser extends Component {
                                 <h1>User management</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
-                                <div className="btn btn-rcm-primary rcm-btn">
-                                    <Link to="/users/add"> <i class="fas fa-plus"></i></Link>
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                    this.props.history.push('/users/add');
+                                }}>
+                                    <a> <i class="fas fa-plus"></i></a>
                                 </div>
                             </div>
                         </div>

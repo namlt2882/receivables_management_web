@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Component from '../common/component';
-import { available1 } from '../common/loading-page';
-import { CustomerService } from '../../services/customer-service';
+import { Button } from 'semantic-ui-react';
 import { CustomerAction } from '../../actions/customer-action';
+import { CustomerService } from '../../services/customer-service';
+import Component from '../common/component';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import ConfirmModal from '../modal/ConfirmModal';
-import { Link } from 'react-router-dom';
+import { successAlert, errorAlert } from '../common/my-menu'
 
 const nameChangeMessageErr = "Name must have 10 to 100 characters.";
 const codeChangeMessageErr = "Code must have 4 to 50 characters.";
@@ -17,6 +18,7 @@ class CustomerActionPage extends Component {
         super(props);
 
         this.state = {
+            maxLoading: 1,
             modalShow: false,
             message: '',
             customer: {
@@ -129,22 +131,22 @@ class CustomerActionPage extends Component {
         this.setState({ modalShow: false });
         if (this.state.Id) {
             CustomerService.update(this.state.customer).then(res => {
-                if (res.status === 200) {
-                    this.props.history.push(`/customers/${this.props.match.params.id}/view`);
-                    this.setState({
-                        viewMode: 0
-                    });
-                } else {
-                    prompt('Failed to execute action');
-                }
+                this.props.history.push(`/customers/${this.props.match.params.id}/view`);
+                this.setState({
+                    viewMode: 0
+                });
+                successAlert(`The partner ${this.state.Name} has been updated!`);
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Failed to execute this action, please try again later!');
             });
         } else {
             CustomerService.create(this.state.customer).then(res => {
-                if (res.status === 200) {
-                    this.props.history.push(`/customers/`);
-                } else if (res.status) {
-                    prompt('Failed to execuaction');
-                }
+                this.props.history.push(`/customers/`);
+                successAlert(`The partner ${this.state.Name} has been created!`);
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Failed to execute this action, please try again later!');
             });
         }
 
@@ -253,12 +255,17 @@ class CustomerActionPage extends Component {
                         phoneInputErr: false,
                     });
                 });
+            } else {
+                this.incrementLoading();
             }
         }
         available1();
     }
 
     render() {
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var viewMode = this.state.viewMode;
         let modalClose = () => {
             this.setState({
@@ -278,8 +285,10 @@ class CustomerActionPage extends Component {
                                 <h1>{this.state.title}</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
-                                <div className="btn btn-rcm-primary rcm-btn">
-                                    <Link to="/customers"><i className="fas fa-arrow-left"></i></Link>
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                    this.props.history.push('/customers')
+                                }}>
+                                    <a><i className="fas fa-arrow-left"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -405,11 +414,18 @@ class CustomerActionPage extends Component {
                                     <tr>
                                         <td className="UserDetailTable-Col1"></td>
                                         <td className="UserDetailTable-Col2"></td>
-                                        <td className="UserDetailTable-Col3">
-                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
-                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
-                                            <button style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
-                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem', width: '5rem' }} className="btn btn-rcm-secondary" onClick={this.onClear}>Reset</button>
+                                        <td className="UserDetailTable-Col3" style={{ paddingTop: '1.5rem' }}>
+                                            <Button color='primary' style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }}
+                                                onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</Button>
+
+                                            <Button color='primary' style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }}
+                                                onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</Button>
+
+                                            <Button color='primary' style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }}
+                                                onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</Button>
+
+                                            <Button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '10rem' }}
+                                                onClick={this.onClear}>Reset</Button>
                                         </td>
                                     </tr>
                                 </tbody>

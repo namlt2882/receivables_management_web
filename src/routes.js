@@ -30,7 +30,7 @@ const routes = [
     {
         path: '/users/add',
         exact: true,
-        main: ({ history }) => <UserActionPage history={history} />
+        main: ({ match, history }) => <UserActionPage match={match} history={history} />
     },
     {
         path: '/users/:id/edit',
@@ -70,7 +70,7 @@ const routes = [
     {
         path: '/messages/add',
         exact: true,
-        main: ({ match, history }) => <MessageActionPage history={history} />
+        main: ({ match, history }) => <MessageActionPage match={match} history={history} />
     },
     {
         path: '/messages/:id/view',
@@ -115,7 +115,7 @@ const routes = [
     {
         path: '/customers/add',
         exact: true,
-        main: ({ match, history }) => <CustomerActionPage history={history} />
+        main: ({ match, history }) => <CustomerActionPage match={match} history={history} />
     },
     {
         path: '/customers/:id/view',
