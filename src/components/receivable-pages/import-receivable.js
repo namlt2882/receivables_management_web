@@ -398,7 +398,7 @@ class ImportReceivable extends Component {
                 {/* START STEP 1 */}
                 {/* Customer */}
                 <div className='form-group col-sm-4' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Customer</label>
+                    <label className='bold-text'>Partner</label>
                     {/* <select ref='selectCustomer' className='form-control col-sm-6' value={this.state.customerId}
                         onChange={this.updateCustomer}>
                         <option value={-1}>--</option>
@@ -409,7 +409,7 @@ class ImportReceivable extends Component {
                     <ComboBox data={customers}
                         dataItemKey='Id'
                         textField='Name'
-                        placeholder='Customer'
+                        placeholder='Partner'
                         value={customer}
                         className='form-control'
                         allowCustom={true}
@@ -418,7 +418,7 @@ class ImportReceivable extends Component {
                             this.updateCustomer(val);
                         }} />
                     {isNewCustomer ?
-                        [<label className='bold-text'><br />Code for new customer:&nbsp;{customer.Name}</label>,
+                        [<label className='bold-text'><br />Code for new Partner:&nbsp;{customer.Name}</label>,
                         <input type='text' className='form-control' value={customer.Code}
                             onChange={this.changeNewCustomerCode} />,
                         <span style={{ color: 'red' }}><i>{this.warningCustomerCode()}</i><br /></span>] : null}
@@ -445,11 +445,11 @@ class ImportReceivable extends Component {
                 {/* END STEP 1 */}
                 {!this.props.showRecent ?
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
-                        <span><b>Customer</b>: {customer ? customer.Name : null}</span><br />
+                        <span><b>Partner</b>: {customer ? customer.Name : null}</span><br />
                         <span><b>Profile</b>: {profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name)}</span>
                     </div> :
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
-                        <span><b>Customer</b>: {cacheCustomer.Name}</span><br />
+                        <span><b>Partner</b>: {cacheCustomer.Name}</span><br />
                         <span><b>Profile</b>: {localStorage.getItem('recent_profile')}</span>
                     </div>
                 }
@@ -632,7 +632,7 @@ const tableData2 = {
             width: 270
         },
         {
-            label: 'Customer name',
+            label: 'Partner',
             field: 'CustomerName',
             sort: 'asc',
             width: 270

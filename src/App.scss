@@ -238,7 +238,7 @@ table.table a {
 }
 
 .table-strip>tbody>tr:nth-of-type(even) {
-    background-color: #6db1ea61 !important;
+    background-color: #6db1ea1f !important;
 }
 
 .table-strip>tbody>tr:nth-of-type(odd) {
@@ -246,7 +246,7 @@ table.table a {
 }
 
 .table-strip>tbody>tr:hover {
-    background-color: #387cb461 !important;
+    background-color: #6db1eaa8 !important;
 }
 
 .rcm-form-control {
@@ -262,6 +262,7 @@ table.table a {
     line-height: 1.5;
     color: #495057;
     background-color: #fff;
+    outline: none;
 }
 
 .rcm-btn {
@@ -323,4 +324,26 @@ a.active {
 .border-shadow{
     box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15);
     border: 1.5px solid rgba(34, 36, 38, .15);
+}
+.tableSearchBox{
+    padding-bottom: 5px;
+    width: 100%;
+}
+
+.tableSearchBox > input{
+    float: right;
+    width: 20rem;
+}
+
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.error-validation-message{
+    color: red;
 }

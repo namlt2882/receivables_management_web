@@ -1,80 +1,114 @@
-.messageTable > thead > tr > th:nth-child(2){
-    width: 50%;
+.contact-firstcol {
+    width: 50px;
+    font-size: 17px;
+    letter-spacing: 2px;
+    border: 1px solid white;
 }
-
-.messageTable > thead > tr > th:nth-child(3){
-    width: 10%;
-}
-
-.contact-firstcol {  
-    width:50px;
-    font-size:17px;
-    letter-spacing:2px;
-    border:1px solid white;
-}  
 
 .contact-secondcol {
-    color:#FFFFFF;
-    width:10px;
-    text-align:center;
-    font-size:17px;
-    border:1px solid white;
+    color: #FFFFFF;
+    width: 10px;
+    text-align: center;
+    font-size: 17px;
+    border: 1px solid white;
 }
 
 .contact-thirdcol {
-    width:500px;
-    padding-left:20px;
-    border:1px solid white;
+    width: 500px;
+    padding-left: 20px;
+    border: 1px solid white;
 }
 
-.form textarea {   
-    width: 250px;  
-    max-width: 250px;  
+.form textarea {
+    width: 250px;
+    max-width: 250px;
     height: 100px;
-    max-height:100px;
+    max-height: 100px;
     line-height: 150%;
 }
 
-.hover-message{
-    display:  none !important;
+.hover-message {
+    display: none !important;
 }
 
-table.messageTable > tbody > tr:hover > td > p.hover-message{
+table.messageTable>tbody>tr:hover>td>p.hover-message {
     display: inline-block !important;
 }
 
-table.messageTable > tbody > tr:hover > td > p.main-message{
-    display:none !important;
+table.messageTable>tbody>tr:hover>td>p.main-message {
+    display: none !important;
 }
 
-table.messageTable > tbody > tr > td{
+table.messageTable>tbody>tr>td {
     vertical-align: middle;
 }
 
-.messageStatusCol > p{
+.messageStatusCol>p {
     width: 11rem;
 }
 
-.messageStatusCol{
+.messageStatusCol {
     width: 10%;
     text-align: center;
-    padding: 0px !important;
-} 
-
-.messageNameCol{
-    text-decoration: underline;
-    cursor: pointer;
-    width: 70%;
 }
 
-.messageTypeCol{
+td.messageStatusCol {
+    padding: 0px !important;
+}
+
+.messageNameCol {
+    text-decoration: underline;
+    cursor: pointer;
+    width: 75%;
+}
+
+.messageTypeCol {
     width: 5%;
     text-align: center;
+}
+
+td.messageTypeCol {
     font-size: 25px;
     color: #4285f4;
 }
 
-.hungdtq-disabled{
+.hungdtq-disabled {
     background-color: white !important;
     border: none !important;
+}
+
+.MessageDetailTable {
+    width: 100%;
+}
+
+.MessageDetailTable-Col1 {
+    width: 30%;
+    text-align: right !important;
+    padding-top: 0.5rem;
+}
+
+.MessageDetailTable-Col2 {
+    width: 2%;
+    text-align: left;
+    padding-top: 0.5rem;
+}
+
+.MessageDetailTable-Col3 {
+    width: 30%;
+}
+
+.MessageDetailTable-Col4 > i{
+    margin-left: 20px;
+}
+
+.btn-rotate{
+    transform:rotate(-5deg);
+}
+
+.message-edit-tags{
+    width: 100%;
+}
+
+.message-edit-count{
+    padding: 10px 0px;
 }
