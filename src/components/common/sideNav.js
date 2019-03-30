@@ -38,6 +38,7 @@ class MyNav extends Component {
                     this.setState({ expanded });
                     this.callBack(expanded);
                 }}
+                style={{position: "fixed"}}
             >
                 <SideNav.Toggle className="sideNav-TogleButton" />
                 <div className="sideNav-TogleDiv"></div>

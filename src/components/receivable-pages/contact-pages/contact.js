@@ -83,7 +83,7 @@ class Contact extends Component {
                                 <td>
                                     {!isFinished ?
                                         [<EditContact contact={c} updateReceivable={updateReceivable} />]
-                                        : null}
+                                        :  <p>&nbsp;</p>}
                                 </td>
                             </tr>))}
                         </tbody>

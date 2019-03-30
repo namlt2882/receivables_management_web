@@ -7,6 +7,11 @@ import Component from '../common/component';
 import ConfirmModal from '../modal/ConfirmModal';
 import { Link } from 'react-router-dom';
 
+
+const lastnameChangeMessageErr = "Last name is required";
+const firstnameChangeMessageErr = "First name is required";
+const usernameChangeMessageErr = "User name must have 5 to 100 characters";
+
 class UserDetailPage extends Component {
 
     constructor(props) {
@@ -24,7 +29,16 @@ class UserDetailPage extends Component {
             user: null,
             id: null,
             password: '',
-            viewMode: 2
+            viewMode: 2,
+
+            usernameInputErr: true,
+            usernameChangeMessageErr: '',
+
+            fisrtnameInputErr: true,
+            firstNameChangeMessageErr: '',
+
+            lastnameInputErr: true,
+            lastnameChangeMessageErr: '',
         }
 
         this.callbackFromModal = this.callbackFromModal.bind(this);
@@ -35,6 +49,55 @@ class UserDetailPage extends Component {
         this.onUsernameChange = this.onUsernameChange.bind(this);
         this.onClear = this.onClear.bind(this);
         this.banUser = this.banUser.bind(this);
+
+        this.onUsernameBlur = this.onUsernameBlur.bind(this);
+        this.onFirstnameBlur = this.onFirstnameBlur.bind(this);
+        this.onLastnameBlur = this.onLastnameBlur.bind(this);
+    }
+
+    onUsernameBlur(e) {
+        let value = e.target.value;
+        if (value.length < 5 || value.length > 100) {
+            this.setState({
+                usernameInputErr: true,
+                usernameChangeMessageErr: usernameChangeMessageErr
+            });
+        } else {
+            this.setState({
+                usernameInputErr: false,
+                usernameChangeMessageErr: ''
+            });
+        }
+    }
+
+    onFirstnameBlur(e) {
+        let value = e.target.value;
+        if (value.length < 1) {
+            this.setState({
+                fisrtnameInputErr: true,
+                firstNameChangeMessageErr: firstnameChangeMessageErr
+            });
+        } else {
+            this.setState({
+                fisrtnameInputErr: false,
+                firstNameChangeMessageErr: ''
+            });
+        }
+    }
+
+    onLastnameBlur(e) {
+        let value = e.target.value;
+        if (value.length < 1) {
+            this.setState({
+                lastnameInputErr: true,
+                lastnameChangeMessageErr: lastnameChangeMessageErr
+            });
+        } else {
+            this.setState({
+                lastnameInputErr: false,
+                lastnameChangeMessageErr: ''
+            });
+        }
     }
 
     callbackFromBanModal() {
@@ -99,6 +162,11 @@ class UserDetailPage extends Component {
     }
 
     openModal() {
+        let {usernameInputErr, lastnameInputErr, fisrtnameInputErr} = this.state;
+        if (usernameInputErr || lastnameInputErr || fisrtnameInputErr){
+            return;
+        }
+
         var { match } = this.props;
         let tmpMes = 'Are you sure want add new user?';
         if (match) {
@@ -142,7 +210,11 @@ class UserDetailPage extends Component {
                         address: res.data.Address,
                         username: res.data.UserName,
                         isBanned: res.data.IsBanned,
-                        password: res.data.Password
+                        password: res.data.Password,
+
+                        fisrtnameInputErr: false,
+                        lastnameInputErr : false,
+                        usernameInputErr: false
                     });
                 });
             }
@@ -212,14 +284,14 @@ class UserDetailPage extends Component {
                 width: "100%", paddingTop: "10px"
             }}>
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
-                <div className="hungdtq-header">
+                    <div className="hungdtq-header">
                         <div>
                             <div className="d-inline-block hungdtq-header-text">
-                            <h1>User detail</h1>
+                                <h1>User detail</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
                                 <div className="btn btn-rcm-primary rcm-btn">
-                                <Link to="/users"><i class="fas fa-arrow-left"></i></Link>
+                                    <Link to="/users"><i className="fas fa-arrow-left"></i></Link>
                                 </div>
                             </div>
                         </div>
@@ -235,26 +307,27 @@ class UserDetailPage extends Component {
                                         <td className="UserDetailTable-Col3">
                                             <input
                                                 disabled
+                                                style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 type="text"
-                                                className="form-control hungdtq-disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.username}
-                                                onChange={this.onUsernameChange}
                                             />
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr style={{ display: (viewMode !== 0 && localStorage.id == this.state.id) ? ' table-row' : 'none' }}>
-                                        <td className="UserDetailTable-Col1">Password</td>
-                                        <td className="UserDetailTable-Col2">:</td>
-                                        <td className="UserDetailTable-Col3">
                                             <input
                                                 type="text"
-                                                className="form-control"
-                                                value={this.state.password}
-                                                onChange={this.onPasswordChange}
+                                                className="rcm-form-control"
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none', width: "40%" }}
+                                                value={this.state.username}
+                                                onChange={this.onUsernameChange}
+                                                autoComplete="off"
+                                                onBlur={this.onUsernameBlur}
+
                                             />
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.usernameChangeMessageErr}
+                                            </i>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td className="UserDetailTable-Col1">Firstname</td>
@@ -262,21 +335,26 @@ class UserDetailPage extends Component {
                                         <td className="UserDetailTable-Col3">
                                             <input
                                                 type="text"
-                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
-                                                className="form-control"
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none', width: "40%" }}
+                                                className="rcm-form-control"
                                                 value={this.state.firstName}
                                                 onChange={this.onFirstNameChange}
+                                                autoComplete="off"
+                                                onBlur={this.onFirstnameBlur}
                                             />
                                             <input
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control hungdtq-disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 type="text"
                                                 value={this.state.firstName}
-                                                onChange={this.onFirstNameChange}
                                             />
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.firstNameChangeMessageErr}
+                                            </i>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td className="UserDetailTable-Col1">Lastname</td>
@@ -284,21 +362,26 @@ class UserDetailPage extends Component {
                                         <td className="UserDetailTable-Col3">
                                             <input
                                                 type="text"
-                                                style={{ display: viewMode !== 0 ? 'block' : 'none' }}
-                                                className="form-control"
+                                                style={{ display: viewMode !== 0 ? 'block' : 'none', width: "40%" }}
+                                                className="rcm-form-control"
                                                 value={this.state.lastName}
                                                 onChange={this.onLastNameChange}
+                                                autoComplete="off"
+                                                onBlur={this.onLastnameBlur}
                                             />
                                             <input
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control hungdtq-disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 type="text"
                                                 value={this.state.lastName}
-                                                onChange={this.onLastNameChange}
                                             />
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <i className="error-validation-message">
+                                                {this.state.lastnameChangeMessageErr}
+                                            </i>
+                                        </td>
 
                                     </tr>
                                     <tr>
@@ -307,18 +390,18 @@ class UserDetailPage extends Component {
                                         <td className="UserDetailTable-Col3">
                                             <input
                                                 type="text"
-                                                className="form-control"
+                                                className="rcm-form-control"
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none' }}
                                                 value={this.state.address ? this.state.address : ''}
                                                 onChange={this.onAddressChange}
+                                                autoComplete="off"
                                             />
                                             <input
                                                 type="text"
                                                 style={{ display: viewMode === 0 ? 'block' : 'none' }}
                                                 disabled
-                                                className="form-control hungdtq-disabled"
+                                                className="rcm-form-control hungdtq-disabled"
                                                 value={this.state.address ? this.state.address : ''}
-                                                onChange={this.onAddressChange}
                                             />
                                         </td>
                                         <td></td>
@@ -335,7 +418,7 @@ class UserDetailPage extends Component {
                                             {/*<button style={{ display: (viewMode === 0 && !this.state.IsBanned && localStorage.role === 'Admin') ? 'inline-block' : 'none', width: '6rem' }} className="btn btn-basic" onClick={(e) => { e.stopPropagation(); this.banUser() }}>Ban</button>
                                             <button style={{ display: (viewMode === 0 && this.state.IsBanned && localStorage.role === 'Admin') ? 'inline-block' : 'none', width: '6rem' }} className="btn btn-success" onClick={(e) => { e.stopPropagation(); this.banUser() }}>Active</button>
         */}
-                                            </td>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

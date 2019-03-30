@@ -6,10 +6,9 @@ import { Link } from 'react-router-dom';
 import { CustomerService } from '../../services/customer-service';
 import { CustomerAction } from '../../actions/customer-action';
 import { PrimaryLoadingPage } from '../common/loading-page';
-
 import './customer.scss';
 
-class UserList extends Component {
+class CustomerList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,12 +17,40 @@ class UserList extends Component {
     }
 
     componentDidMount() {
-        document.title = 'Customers';
-        available(resolve => setTimeout(resolve, 400));
+        document.title = 'Partners';
         CustomerService.getAll().then(res => {
             this.props.fetchAllCustomers(res.data);
             this.incrementLoading();
-        })
+        });
+
+        this.state = {
+            prevColumn: '',
+            isAscSort: false,
+            filterVal: ''
+        }
+
+        this.handleSort = this.handleClick.bind(this);
+        available(resolve => setTimeout(resolve, 400));
+    }
+
+    handleSort(columnName) {
+        let prev = this.state.prevColumn;
+
+        //Change sort direction if click on the same column.
+        if (prev == columnName) {
+            this.setState({
+                isAscSort: !this.state.isAscSort
+            })
+        } else {
+            //reset the sort directiion if new column is clicked.
+            this.setState({
+                isAscSort: false
+            })
+        }
+
+        this.setState({
+            prevColumn: columnName
+        });
     }
 
     handleClick(customerId) {
@@ -37,7 +64,8 @@ class UserList extends Component {
             return <PrimaryLoadingPage />
         }
 
-        var customers = this.props.customers;
+        var { customers } = this.props;
+        var { filterVal } = this.state;
 
         var index = 1;
         return (
@@ -48,7 +76,7 @@ class UserList extends Component {
                     <div className="hungdtq-header">
                         <div>
                             <div className="d-inline-block hungdtq-header-text">
-                                <h1>Customer management</h1>
+                                <h1>Partner management</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
                                 <div className="btn btn-rcm-primary rcm-btn">
@@ -59,6 +87,20 @@ class UserList extends Component {
                         <hr></hr>
                     </div>
 
+                    <div className="hungdtq-Wrapper">
+                        <div className="hungdtq-Container">
+                            <div className="tableSearchBox">
+                                <input
+                                    type="text"
+                                    className="rcm-form-control"
+                                    placeholder="Search by name..."
+                                    onChange={e => this.setState({ filterVal: e.target.value })}
+                                    value={filterVal}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <div className="hungdtq-Wrapper">
                             <div className="hungdtq-Container">
@@ -66,23 +108,38 @@ class UserList extends Component {
                                 <table fixed="true" style={{ display: customers ? 'table' : 'none' }} className="table table-hover table-strip">
                                     <thead className="thead-blue">
                                         <tr>
-                                            <th className="customerIndexCol">No.</th>
-                                            <th className="customerNameCol">Name</th>
+                                            <th className="customerIndexCol" >No.</th>
+                                            <th className="customerNameCol" >Name</th>
                                             <th className="customerCodeCol">Code</th>
-                                            <th className="customerNumberOfReceivableCol">Number of Receivable</th>
+                                            <th className="customerNumberOfReceivableCol" >Number of Receivable</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {customers.map(customer =>
-                                            <tr
-                                                style={{ cursor: "pointer" }}
-                                                onClick={this.handleClick.bind(this, customer.Id)}>
+                                        {customers
+                                            .filter(function (customer) {
+                                                if (filterVal) {
+                                                    return customer.Name
+                                                        .toLowerCase()
+                                                        .includes(filterVal
+                                                            .toLowerCase()
+                                                            .trim()
+                                                        );
+                                                } else {
+                                                    return customer;
+                                                }
+                                            })
+                                            .map(customer =>
+                                                <tr
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={this.handleClick.bind(this, customer.Id)}>
 
-                                                <td className="customerIndexCol">{index++}</td>
-                                                <td className="customerNameCol">{customer.Name}</td>
-                                                <td className="customerCodeCol">{customer.Code}</td>
-                                                <td className="customerNumberOfReceivableCol">{customer.NumberOfReceivable}</td>
-                                            </tr>)}
+                                                    <td className="customerIndexCol">{index++}</td>
+                                                    <td className="customerNameCol">{customer.Name}</td>
+                                                    <td className="customerCodeCol">{customer.Code}</td>
+                                                    <td className="customerNumberOfReceivableCol">{customer.NumberOfReceivable}</td>
+                                                </tr>
+                                            )
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -114,4 +171,4 @@ const mapDispatchToProps = (dispatch, props) => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserList);
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerList);

@@ -63,7 +63,7 @@ class MessageItem extends Component {
                 <td>{++index}</td>
                 <td className="messageNameCol" onClick={this.handleClick.bind(this, message.Id)}>{message.Name}</td>
                 <td className="messageTypeCol">{message.Type === 1 &&
-                    <i class="fas fa-phone-square"></i>
+                    <i className="fas fa-phone-square"></i>
                 }
                     {message.Type === 0 &&
                         <i class="fas fa-sms"></i>
