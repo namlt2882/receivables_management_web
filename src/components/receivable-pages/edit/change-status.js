@@ -68,12 +68,14 @@ class ChangeStatus extends Component {
     render() {
         return (<div>
             {AuthService.isCollector() ?
-                [<div style={{ marginBottom: '10px', marginLeft: '20%' }}>
+                [<div style={{ marginBottom: '10px', marginLeft: '10%' }}>
                     <Button content='Finish' color='blue' icon='check' labelPosition='left'
+                        style={{width:'10rem'}}
                         onClick={() => { this.confirm(true) }} />
                 </div>,
-                <div style={{ marginLeft: '20%' }}>
+                <div style={{ marginLeft: '10%' }}>
                     <Button content='Stop' color='red' icon='cancel' labelPosition='left'
+                        style={{width:'10rem'}}
                         onClick={() => { this.confirm(false) }} />
                 </div>] : null}
             <ConfirmModal

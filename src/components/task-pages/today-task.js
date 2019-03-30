@@ -5,6 +5,7 @@ import { TaskService } from '../../services/task-service';
 import { numAsTime } from '../../utils/time-converter';
 
 import "./task.scss";
+import { Divider } from 'semantic-ui-react';
 
 class TodayTask extends Component {
     constructor(props) {
@@ -36,13 +37,14 @@ class TodayTask extends Component {
         }
         let hasTask = this.state.todayTask && this.state.todayTask.length > 0;
         return (
-            <div className='col-sm-12 row justify-content-center align-self-center'>
+            <div className='col-sm-12 row justify-content-center'>
                 <div className="hungdtq-header">
                     <h1>Today task</h1>
+                    <Divider />
                 </div>
                 <div className="hungdtq-Wrapper">
                     <div className="hungdtq-Container">
-                        <div>{!hasTask ? 'You have no task today!' : null}</div>
+                        <div style={{ fontSize: '2rem' }}>{!hasTask ? 'You have no task today!' : null}</div>
                         <table fixed style={{ display: hasTask ? 'table' : 'none' }} className="table table-hover task-table">
                             <thead className="thead-blue">
                                 <tr>

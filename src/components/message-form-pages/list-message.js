@@ -50,8 +50,10 @@ class ListMessage extends Component {
                                 <h1>Message form management</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
-                                <div className="btn btn-rcm-primary rcm-btn">
-                                    <Link to="/messages/add"><i className="fas fa-plus"></i></Link>
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                    this.props.history.push('/messages/add');
+                                }}>
+                                    <a><i className="fas fa-plus"></i></a>
                                 </div>
                             </div>
                         </div>

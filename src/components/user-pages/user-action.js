@@ -1,12 +1,12 @@
 import React from 'react';
-import { UserService } from '../../services/user-service';
-import { UserAction } from '../../actions/user-action';
 import { connect } from 'react-redux';
-import { available1 } from '../common/loading-page';
+import { Button } from 'semantic-ui-react';
+import { UserAction } from '../../actions/user-action';
+import { UserService } from '../../services/user-service';
 import Component from '../common/component';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import ConfirmModal from '../modal/ConfirmModal';
-import { Link } from 'react-router-dom';
-
+import { successAlert, errorAlert } from '../common/my-menu'
 
 const lastnameChangeMessageErr = "Last name is required";
 const firstnameChangeMessageErr = "First name is required";
@@ -18,6 +18,7 @@ class UserDetailPage extends Component {
         super(props);
 
         this.state = {
+            maxLoading: 1,
             modalShow: false,
             message: '',
             isEditMode: false,
@@ -140,30 +141,30 @@ class UserDetailPage extends Component {
         this.setState({ modalShow: false });
         if (this.state.id) {
             UserService.updateCollector(this.state.user).then(res => {
-                if (res.status === 200) {
-                    this.props.history.push(`/users/${this.props.match.params.id}/view`);
-                    this.setState({
-                        viewMode: 0
-                    });
-                } else if (res.status) {
-                    prompt('Failed to execuaction');
-                }
+                this.props.history.push(`/users/${this.props.match.params.id}/view`);
+                this.setState({
+                    viewMode: 0
+                });
+                successAlert(`The new collector "${this.state.firstName + ' ' + this.state.lastName}" has been updated!`)
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Failed to execute this action, please try again later!');
             });
         } else {
             UserService.addCollector(this.state.user).then(res => {
-                if (res.status === 201) {
-                    this.props.history.push(`/users/`);
-                } else if (res.status) {
-                    prompt('Failed to execute action');
-                }
+                this.props.history.push(`/users/`);
+                successAlert(`The new collector "${this.state.firstName + ' ' + this.state.lastName}" has been created!`)
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Failed to execute this action, please try again later!');
             });
         }
 
     }
 
     openModal() {
-        let {usernameInputErr, lastnameInputErr, fisrtnameInputErr} = this.state;
-        if (usernameInputErr || lastnameInputErr || fisrtnameInputErr){
+        let { usernameInputErr, lastnameInputErr, fisrtnameInputErr } = this.state;
+        if (usernameInputErr || lastnameInputErr || fisrtnameInputErr) {
             return;
         }
 
@@ -191,7 +192,6 @@ class UserDetailPage extends Component {
     }
 
     componentDidMount() {
-
         var { match } = this.props;
         if (match) {
             let id = match.params.id;
@@ -213,17 +213,17 @@ class UserDetailPage extends Component {
                         password: res.data.Password,
 
                         fisrtnameInputErr: false,
-                        lastnameInputErr : false,
+                        lastnameInputErr: false,
                         usernameInputErr: false
                     });
                 });
+            } else {
+                this.incrementLoading();
             }
-
         } else {
             document.title = "Add new collector";
         }
         available1();
-
     }
 
     onUsernameChange(e) {
@@ -271,7 +271,9 @@ class UserDetailPage extends Component {
     }
 
     render() {
-
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var viewMode = this.state.viewMode;
         let modalClose = () => {
             this.setState({
@@ -287,11 +289,13 @@ class UserDetailPage extends Component {
                     <div className="hungdtq-header">
                         <div>
                             <div className="d-inline-block hungdtq-header-text">
-                                <h1>User detail</h1>
+                                <h1>{this.state.viewMode === 0 ? 'User detail' : 'New user'}</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
-                                <div className="btn btn-rcm-primary rcm-btn">
-                                    <Link to="/users"><i className="fas fa-arrow-left"></i></Link>
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                    this.props.history.push('/users');
+                                }}>
+                                    <a><i className="fas fa-arrow-left"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -313,6 +317,7 @@ class UserDetailPage extends Component {
                                                 value={this.state.username}
                                             />
                                             <input
+                                                disabled
                                                 type="text"
                                                 className="rcm-form-control"
                                                 style={{ display: viewMode !== 0 ? 'block' : 'none', width: "40%" }}
@@ -410,14 +415,16 @@ class UserDetailPage extends Component {
                                     <tr>
                                         <td className="UserDetailTable-Col1"></td>
                                         <td className="UserDetailTable-Col2"></td>
-                                        <td className="UserDetailTable-Col3">
-                                            <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
-                                            <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
-                                            <button style={{ width: '10rem', display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
-                                            <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem' }} className="btn btn-rcm-secondary" onClick={this.onClear}>Reset</button>
-                                            {/*<button style={{ display: (viewMode === 0 && !this.state.IsBanned && localStorage.role === 'Admin') ? 'inline-block' : 'none', width: '6rem' }} className="btn btn-basic" onClick={(e) => { e.stopPropagation(); this.banUser() }}>Ban</button>
-                                            <button style={{ display: (viewMode === 0 && this.state.IsBanned && localStorage.role === 'Admin') ? 'inline-block' : 'none', width: '6rem' }} className="btn btn-success" onClick={(e) => { e.stopPropagation(); this.banUser() }}>Active</button>
-        */}
+                                        <td className="UserDetailTable-Col3" style={{ paddingTop: '1.5rem' }}>
+                                            <Button color='primary' style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }}
+                                                onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</Button>
+
+                                            <Button color='primary' style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }}
+                                                onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</Button>
+                                            <Button color='primary' style={{ width: '10rem', display: viewMode === 2 ? 'inline-block' : 'none' }}
+                                                onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</Button>
+                                            <Button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '10rem' }}
+                                                onClick={this.onClear}>Reset</Button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -441,7 +448,7 @@ class UserDetailPage extends Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.users,
+        user: state.user,
     }
 }
 
