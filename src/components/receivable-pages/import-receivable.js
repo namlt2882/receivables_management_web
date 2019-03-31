@@ -65,15 +65,15 @@ class ImportReceivable extends Component {
     componentDidMount() {
         document.title = 'Import receivables';
         available1();
-        CustomerService.getAll().then(res => {
-            this.props.fetchCustomers(res.data);
-            this.incrementLoading();
-        })
         UserService.getCollectors().then(res => {
             this.props.fetchCollectors(res.data);
             this.incrementLoading();
         })
         if (!this.props.showRecent) {
+            CustomerService.getAll().then(res => {
+                this.props.fetchCustomers(res.data);
+                this.incrementLoading();
+            })
             ProfileService.getAll().then(res => {
                 this.props.fetchProfiles(res.data);
                 this.incrementLoading();
@@ -84,7 +84,7 @@ class ImportReceivable extends Component {
                 this.incrementLoading();
             })
         } else {
-            this.incrementLoading(2);
+            this.incrementLoading(3);
         }
     }
 
@@ -242,20 +242,29 @@ class ImportReceivable extends Component {
     insertReceivable() {
         this.setLoadingForm(true);
         ReceivableService.create(this.state.validatedData).then(res => {
-            let insertedData = res.data;
+            let insertedIds = res.data;
             let currentDate = this.state.currentDate;
             let customer = this.state.customer;
             let profile = this.props.profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name);
-            localStorage.setItem('recent_customer', JSON.stringify(customer));
-            localStorage.setItem('recent_profile', profile);
-            localStorage.setItem('recent_inserted_data', JSON.stringify(insertedData));
-            localStorage.setItem('recent_inserted_date', currentDate);
-            this.setState({
-                insertedData: insertedData,
-                loadingForm: false,
-                step: this.state.step + 1
+            ReceivableService.getReceivablesByIds(insertedIds).then(res1 => {
+                let insertedData = res1.data;
+                localStorage.setItem('recent_customer', JSON.stringify(customer));
+                localStorage.setItem('recent_profile', profile);
+                localStorage.setItem('recent_inserted_data', JSON.stringify(insertedData));
+                localStorage.setItem('recent_inserted_date', currentDate);
+                this.setState({
+                    insertedData: insertedData,
+                    loadingForm: false,
+                    step: this.state.step + 1
+                })
+                successAlert(`Import ${insertedIds.length} receivable(s) successfully!`)
+            }).catch(err => {
+                console.log(err);
+                errorAlert('Fail in following steps after inserted receivables! Please try again later!');
             })
-            successAlert(`Import ${insertedData.length} receivable(s) successfully!`)
+        }).catch(err => {
+            console.log(err);
+            errorAlert('Fail to inserted receivables! Please try again later!');
         })
     }
 
@@ -362,7 +371,7 @@ class ImportReceivable extends Component {
         let isValidate = this.IsValidate();
         let data2 = tableData2;
         if (this.state.insertedData !== null && this.state.step === 4) {
-            data2 = pushData2(this.state.insertedData, this.props.collectors, this.props.customers);
+            data2 = pushData2(this.state.insertedData, this.props.collectors);
         }
         let isNewCustomer = this.isNewCustomer();
         let codeValid = this.isCustomerCodeValid();
@@ -371,7 +380,7 @@ class ImportReceivable extends Component {
             cacheCustomer = JSON.parse(cacheCustomer);
         }
         return (<Container className='col-sm-12 row'>
-            <div className="hungdtq-header"><h1>Import receivable</h1>
+            <div className="hungdtq-header"><h1>{this.props.showRecent ? 'Recently added receivables' : 'Import receivable'}</h1>
                 <Divider />
             </div>
             <Form loading={this.state.loadingForm} onSubmit={() => { }} className='col-sm-12 row justify-content-center align-self-center'>
@@ -399,13 +408,6 @@ class ImportReceivable extends Component {
                 {/* Customer */}
                 <div className='form-group col-sm-4' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
                     <label className='bold-text'>Partner</label>
-                    {/* <select ref='selectCustomer' className='form-control col-sm-6' value={this.state.customerId}
-                        onChange={this.updateCustomer}>
-                        <option value={-1}>--</option>
-                        {customers.map((customer) =>
-                            <option value={customer.Id}>{customer.Name}</option>
-                        )}
-                    </select> */}
                     <ComboBox data={customers}
                         dataItemKey='Id'
                         textField='Name'
@@ -448,10 +450,14 @@ class ImportReceivable extends Component {
                         <span><b>Partner</b>: {customer ? customer.Name : null}</span><br />
                         <span><b>Profile</b>: {profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name)}</span>
                     </div> :
-                    <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
+                    (cacheCustomer ? <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
                         <span><b>Partner</b>: {cacheCustomer.Name}</span><br />
                         <span><b>Profile</b>: {localStorage.getItem('recent_profile')}</span>
-                    </div>
+                    </div> : <span style={{ fontSize: '2rem' }}>
+                            No new receivable recently!
+                            <Button color='primary' style={{ marginLeft: '20px' }}
+                                onClick={() => { this.props.history.push('/receivable/add') }}>Add new</Button>
+                        </span>)
                 }
                 {/* START STEP 2 */}
                 {/* File */}
@@ -589,23 +595,19 @@ class SelectCollector extends React.Component {
     }
 }
 
-const pushData2 = (receivableList, collectorList, customerList) => {
+const pushData2 = (receivableList, collectorList) => {
     let rows = [];
     let data = { ...tableData2 };
     if (receivableList) {
         rows = receivableList.map((r, i) => {
-            let debtor = r.Contacts.find(c => c.Type === 0);
-            let customer = customerList.find(cu => cu.Id === r.CustomerId);
             let collector = null;
-            if (r.AssignedCollectors && r.AssignedCollectors.length > 0) {
-                collector = collectorList.find(co => co.Id === r.AssignedCollectors[0].UserId)
-            }
-            let status = describeStatus(r.CollectionProgress.Status);
-            let statusColor = getStatusColor(r.CollectionProgress.Status);
+            collector = collectorList.find(co => co.Id === r.AssignedCollectorId)
+            let status = describeStatus(r.CollectionProgressStatus);
+            let statusColor = getStatusColor(r.CollectionProgressStatus);
             return {
                 No: (i + 1),
-                DebtorName: debtor ? debtor.Name : null,
-                CustomerName: customer ? customer.Name : null,
+                DebtorName: r.DebtorName,
+                CustomerName: r.CustomerName,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Collector: collector ? collector.DisplayName : null,
