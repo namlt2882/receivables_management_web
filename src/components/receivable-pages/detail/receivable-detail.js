@@ -97,7 +97,7 @@ class ReceivableDetail extends Component {
         })
     }
     confirm() {
-        if (window.confirm('This case will be closed?')) {
+        if (window.confirm('Are you sure want to confirm this case?')) {
             ReceivableService.confirm(this.state.receivable.Id).then(res => {
                 this.state.receivable.IsConfirmed = true;
                 this.setState(pre => ({
