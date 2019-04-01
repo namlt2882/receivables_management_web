@@ -10,6 +10,7 @@ import { messages, message } from './message-reducer';
 import { receivableList, newReceiavbleIds, receivableList2 } from './receivable-reducer';
 import { contacts } from './contact-reducer';
 import { collectors } from './collector-reducer';
+import { matchData } from './match-point-reducer'
 
 const appReducers = combineReducers({
     users, user,
@@ -27,7 +28,8 @@ const appReducers = combineReducers({
     customers,
     customer,
     contacts,
-    collectors
+    collectors,
+    matchData
 });
 
 export default appReducers;

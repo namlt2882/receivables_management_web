@@ -178,9 +178,9 @@ class ReceivableList extends Component {
             let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),
-                DebtorName: r.DebtorName,
                 CustomerName: r.CustomerName,
-                CollectorName: collector ? `${collector.FullName} (${collector.Username})` : null,
+                DebtorName: r.DebtorName,
+                CollectorName: collector ? `${collector.FullName}` : null,
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 Status: <Label color={statusColor}>{status}</Label>,
@@ -384,14 +384,14 @@ const data = {
             width: 150
         },
         {
-            label: 'Debtor',
-            field: 'DebtorName',
+            label: 'Partner',
+            field: 'CustomerName',
             sort: 'asc',
             width: 270
         },
         {
-            label: 'Partner',
-            field: 'CustomerName',
+            label: 'Debtor',
+            field: 'DebtorName',
             sort: 'asc',
             width: 270
         },
@@ -408,7 +408,7 @@ const data = {
             width: 270
         },
         {
-            label: 'Payable day',
+            label: 'Start day',
             field: 'PayableDay',
             sort: 'asc',
             width: 200
