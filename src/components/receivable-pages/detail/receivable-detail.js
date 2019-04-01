@@ -20,6 +20,8 @@ import TaskHistory from './task-history';
 import ChangeStatus from '../edit/change-status';
 import EditReceivable from '../edit/edit-receivable';
 import { TaskService } from '../../../services/task-service';
+import ConfirmModal from '../../modal/ConfirmModal';
+import { successAlert, errorAlert } from '../../common/my-menu';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -32,7 +34,8 @@ class ReceivableDetail extends Component {
             currentDate: dateToInt(new Date()),
             collectorList: [],
             customerList: [],
-            todayTask: []
+            todayTask: [],
+            openConfirm: false,
         }
         this.updateReceivable = this.updateReceivable.bind(this);
         this.confirm = this.confirm.bind(this);
@@ -97,14 +100,16 @@ class ReceivableDetail extends Component {
         })
     }
     confirm() {
-        if (window.confirm('Are you sure want to confirm this case?')) {
-            ReceivableService.confirm(this.state.receivable.Id).then(res => {
-                this.state.receivable.IsConfirmed = true;
-                this.setState(pre => ({
-                    receivable: pre.receivable
-                }))
-            })
-        }
+        ReceivableService.confirm(this.state.receivable.Id).then(res => {
+            this.state.receivable.IsConfirmed = true;
+            this.setState(pre => ({
+                receivable: pre.receivable
+            }))
+            successAlert('This case is confirmed!')
+        }).catch(err => {
+            console.error(err);
+            errorAlert('Fail to confirm this receivable! Please try again later!');
+        })
     }
     edit(e) {
         e.preventDefault();
@@ -326,7 +331,14 @@ class ReceivableDetail extends Component {
                                 <tr>
                                     <td></td>
                                     <td>
-                                        <Button color='green' onClick={this.confirm}>Confirm</Button>
+                                        <Button color='green' onClick={() => { this.setState({ openConfirm: true }) }}>Confirm</Button>
+                                        <ConfirmModal
+                                            show={this.state.openConfirm}
+                                            onHide={() => { this.setState({ openConfirm: false }) }}
+                                            header='Confirm'
+                                            body='Are you sure want to confirm this case?'
+                                            callback={this.confirm}
+                                        />
                                     </td>
                                 </tr> : null}
                         </tbody>

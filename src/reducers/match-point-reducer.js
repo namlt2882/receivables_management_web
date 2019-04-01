@@ -131,6 +131,9 @@ export const MCR = 6;
 
 export const calculateMatchPoint = (cppModel, w) => {
     let CR = cppModel.CurrentReceivable;
+    if (CR <= 0) {
+        CR = 1;
+    }
     let matchPoint = MCR / CR + w * cppModel.CPP;
     return matchPoint;
 }
@@ -147,9 +150,9 @@ const getW = (amount) => {
         return 0.12;
     }
     if (amount <= 5000) {
-        return 0.24;
+        return 0.18;
     }
-    return 0.42;
+    return 0.24;
 }
 
 export const convertCurrency = (amount) => {

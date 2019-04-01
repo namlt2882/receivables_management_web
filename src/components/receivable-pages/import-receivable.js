@@ -691,7 +691,9 @@ class SelectCollector extends React.Component {
                 placeholder='Collector'
                 onChange={this.onChangeCollector} />
             <div className='choosen-collector-info'>
-                <span><span style={{ color: 'red' }}>CPP</span>: {selectedCpp ? selectedCpp.CPP.toFixed(2) : ''} | <span style={{ color: 'blue' }}>Current receivable</span>: {selectedCpp ? selectedCpp.CurrentReceivable : ''}</span>
+                <span style={{ display: collectorId ? 'block' : 'none' }}>
+                    <span style={{ color: 'red' }}>CPP</span>: {selectedCpp ? selectedCpp.CPP.toFixed(2) : ''} | <span style={{ color: 'blue' }}>Current receivable</span>: {selectedCpp ? selectedCpp.CurrentReceivable : ''}
+                </span>
             </div>
         </div>)
     }
