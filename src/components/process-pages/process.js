@@ -32,11 +32,18 @@ class Process extends Component {
         }
         var stages = process.Stages;
         var readOnly = this.props.processStatus.readOnly;
+        let showProcessName = this.props.showProcessName;
+        if (!readOnly) {
+            showProcessName = true;
+        }
         return (
             <Container>
                 <Form loading={this.props.formLoading}>
                     {/* Heading */}
-                    <Header className='text-center'>{process.Name}
+                    <Header className='text-center'
+                        style={{
+                            display: showProcessName ? 'block' : 'none'
+                        }}>{process.Name}
                         {readOnly ? null : <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn'
                             onClick={this.toggleUpdateForm} />}
                         <UpdateProcessForm process={process}
@@ -45,13 +52,14 @@ class Process extends Component {
                             updateProcess={this.props.editProcess} />
                     </Header>
                     <Form.Field>
-                        <label>Stages:</label>
-                        <div className="stage-list">
+                        <div className="stage-list row justify-content-center">
                             {
                                 stages.map((stage, i) => <Stage stageId={stage.Id} key={i} />)
                             }
                             {readOnly ? null :
-                                (<Button color='primary' onClick={this.props.addStage}>Add stage</Button>)
+                                [<div className='col-sm-10'>
+                                    <Button color='primary' onClick={this.props.addStage}>Add stage</Button>
+                                </div>]
                             }
                         </div>
                     </Form.Field>

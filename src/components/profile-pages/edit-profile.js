@@ -6,7 +6,7 @@ import { ProcessAction, cancelEditable, enableEditable } from './../../actions/p
 import './profile.scss'
 import Component from '../common/component'
 import { available, PrimaryLoadingPage } from '../common/loading-page';
-import { Container, Button } from 'semantic-ui-react';
+import { Container, Button, Divider } from 'semantic-ui-react';
 import { ProfileService } from '../../services/profile-service'
 
 class EditProfile extends Component {
@@ -49,6 +49,14 @@ class EditProfile extends Component {
         var readOnly = this.props.processStatus.readOnly;
         return (<Container className='col-sm-12 row justify-content-center'>
             <div className='col-sm-12'>
+                <div className="hungdtq-header">
+                    <div>
+                        <div className="d-inline-block hungdtq-header-text">
+                            <h1>{this.props.process.Name}</h1>
+                        </div>
+                    </div>
+                    <Divider />
+                </div>
                 <div className='panel-action' style={{ zIndex: 10, position: 'relative' }}>
                     {readOnly ? <Button color='primary' onClick={this.setEditable}>Edit</Button> :
                         <div>
@@ -58,7 +66,7 @@ class EditProfile extends Component {
                     }
                 </div>
             </div>
-            <Process formLoading={this.state.formLoading} />
+            <Process showProcessName={false} formLoading={this.state.formLoading} />
         </Container>);
     }
 }
