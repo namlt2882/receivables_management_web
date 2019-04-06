@@ -10,6 +10,7 @@ import { numAsDate, dateToInt } from '../../../utils/time-converter';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { errorAlert, successAlert } from '../../common/my-menu';
 import MyToolTip from '../../common/my-tooltip';
+import { MiddlePopup } from '../../common/middle-popup';
 library.add(faPen);
 
 class EditReceivable extends Component {
@@ -114,6 +115,7 @@ class EditReceivable extends Component {
                 if (newCollector) {
                     origin.collector = newCollector;
                 }
+                successAlert('Assign receivable successfully!');
                 this.props.updateReceivable(origin);
                 this.closeModal();
             }).catch(err => {
@@ -167,7 +169,7 @@ class EditReceivable extends Component {
         let componentClass = 'col-sm-12';
         let collectorComponent = null;
         if (receivable.CollectionProgress.Status === 4) {
-            modalClass = 'normal-modal'
+            modalClass = 'big-modal'
             componentClass = 'col-sm-6'
         }
         if (!isPending) {
@@ -190,7 +192,8 @@ class EditReceivable extends Component {
             <FontAwesomeIcon icon='pen' size='sm' color='black' className='icon-btn'
                 id='edit-receivable-info' onClick={this.openModal} />
             <MyToolTip target='edit-receivable-info' message='Edit receivable info' />
-            <Modal isOpen={this.state.modal} className={modalClass}>
+            <Modal isOpen={this.state.modal} className={modalClass}
+                style={{ minHeight: '30rem !important' }}>
                 <ModalHeader>Update information of receivable</ModalHeader>
                 <ModalBody>
                     <Form loading={this.state.loadingForm} onSubmit={this.updateReceivable}>
@@ -209,7 +212,7 @@ class EditReceivable extends Component {
                                         onChange={(e) => { this.setState({ prepaidAmount: parseInt(e.target.value) }) }} />
                                 </Form.Field>
                             </div>
-                            <div className={componentClass}>
+                            <div className={componentClass} ref='start-day'>
                                 {/* Is pending? */}
                                 {receivable.CollectionProgress.Status === 4 ? <Form.Field>
                                     <label>Is Pending?</label>
@@ -220,7 +223,9 @@ class EditReceivable extends Component {
                                 {/* Payable day */}
                                 {receivable.CollectionProgress.Status === 4 && !isPending ? <Form.Field>
                                     <label>Start day:</label>
-                                    <DatePicker min={new Date()} value={this.state.payableDay}
+                                    <DatePicker popup={MiddlePopup}
+                                        popupSettings={{ appendTo: this.refs['start-day'] }}
+                                        min={new Date()} value={this.state.payableDay}
                                         onChange={(e) => {
                                             let val = e.target.value;
                                             this.setState({ payableDay: val });

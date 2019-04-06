@@ -35,6 +35,7 @@
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -121,8 +122,10 @@
 }
 
 .big-modal .modal-body {
+    min-height: 30rem !important;
     max-height: 30rem !important;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .bold-text {
@@ -134,7 +137,7 @@
     margin: 0px 10px 0px 10px;
 }
 
-.icon-btn:focus{
+.icon-btn:focus {
     outline: none;
 }
 
@@ -193,7 +196,7 @@ table.table a {
     box-shadow: 0 2px 4px 0 rgba(34, 36, 38, .15);
 }
 
-.table td:empty::before{
+.table td:empty::before {
     content: '-';
 }
 
@@ -301,42 +304,43 @@ a.active {
     border-radius: 0px !important;
 }
 
-.no-space-side{
+.no-space-side {
     @extend .no-margin-side;
     @extend .no-padding-side;
 }
 
-.no-margin-side{
+.no-margin-side {
     margin-left: 0px !important;
     margin-right: 0px !important;
 }
 
-.no-padding-side{
+.no-padding-side {
     padding-left: 0px !important;
     padding-right: 0px !important;
 }
 
-.full-width{
+.full-width {
     width: 100%;
     box-sizing: border-box;
 }
 
-.border-shadow{
+.border-shadow {
     box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15);
     border: 1.5px solid rgba(34, 36, 38, .15);
 }
-.tableSearchBox{
+
+.tableSearchBox {
     padding-bottom: 5px;
     width: 100%;
 }
 
-.tableSearchBox > input{
+.tableSearchBox>input {
     float: right;
     width: 20rem;
 }
 
 input[type='number'] {
-    -moz-appearance:textfield;
+    -moz-appearance: textfield;
 }
 
 input::-webkit-outer-spin-button,
@@ -344,17 +348,40 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
 }
 
-.error-validation-message{
+.error-validation-message {
     color: red;
 }
 
-.ui.form input:not([type]), .ui.form input[type=date], .ui.form input[type=datetime-local], .ui.form input[type=email], .ui.form input[type=file], .ui.form input[type=number], .ui.form input[type=password], .ui.form input[type=search], .ui.form input[type=tel], .ui.form input[type=text], .ui.form input[type=time], .ui.form input[type=url] {
+.ui.form select,
+.ui.form input:not([type]),
+.ui.form input[type=date],
+.ui.form input[type=datetime-local],
+.ui.form input[type=email],
+.ui.form input[type=file],
+.ui.form input[type=number],
+.ui.form input[type=password],
+.ui.form input[type=search],
+.ui.form input[type=tel],
+.ui.form input[type=text],
+.ui.form input[type=time],
+.ui.form input[type=url] {
     @extend .input-border;
 }
 
-.input-border{
+.input-border {
     border: 1.5px solid #b5bcc9 !important;
 }
-.k-multiselect-wrap, .k-popup, .rcm-form-control{
+
+.input-border:focus {
+    outline: none;
+}
+
+.k-multiselect-wrap,
+.k-popup,
+.rcm-form-control {
+    @extend .input-border;
+}
+
+.dataTables_filter input {
     @extend .input-border;
 }

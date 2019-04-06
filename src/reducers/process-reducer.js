@@ -1,5 +1,5 @@
 import * as Types from '../actions/action-type';
-import { IdGenerator } from '../utils/utility'
+import { IdGenerator } from '../utils/utility';
 
 
 export const ProcessActionTypes = [
@@ -112,6 +112,7 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             return { ...state };
         case Types.SET_PROCESS:
             state = process;
+            localStorage.removeItem('cache_process');
             return { ...state };
         case Types.EDIT_PROCESS:
             state = { ...process };
@@ -160,7 +161,9 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
         case Types.LOAD_CACHE:
             let cacheProcess = JSON.parse(localStorage.getItem('cache_process'));
             localStorage.removeItem('cache_process');
-            state = cacheProcess;
+            if (cacheProcess) {
+                state = cacheProcess;
+            }
             return { ...state };
         default: return { ...state };
     }

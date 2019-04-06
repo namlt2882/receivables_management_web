@@ -1,13 +1,13 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { ProcessAction } from './../../actions/process-action'
-import Stage from './stage'
-import './process.scss'
 import { Modal, ModalBody, ModalFooter } from 'reactstrap';
-import { Container, Header, Form, Button } from 'semantic-ui-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPen } from '@fortawesome/free-solid-svg-icons'
+import { Button, Container, Form, Header } from 'semantic-ui-react';
+import { ProcessAction } from './../../actions/process-action';
+import './process.scss';
+import Stage from './stage';
 library.add(faPen);
 
 class Process extends Component {
@@ -27,13 +27,15 @@ class Process extends Component {
 
     render() {
         var process = this.props.process;
-        if (process) {
+        if (process && !this.props.isPopup) {
             document.title = process.Name;
         }
         var stages = process.Stages;
         var readOnly = this.props.processStatus.readOnly;
-        let showProcessName = this.props.showProcessName;
-        if (!readOnly) {
+        let showProcessName;
+        if (this.props.isPopup) {
+            showProcessName = false;
+        } else {
             showProcessName = true;
         }
         return (

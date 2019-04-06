@@ -129,16 +129,16 @@ class Action extends Component {
         let _60Array = new Array(61).fill(0);
         // get message form
         return (<tr>
-            <td>
+            <td width='5%'>
                 {this.props.no}
             </td>
-            <td>
+            <td width='20%'>
                 {/* Input name */}
                 {action.Type === 3 ? <input value={this.state.name}
                     readOnly={action.Type === 3 ? false : true} required={true} onChange={this.editName} />
                     : <span>{action.Name}</span>}
             </td>
-            <td>
+            <td width='15%'>
                 {/* Select action type */}
                 <select className='form-control' onChange={this.editType} value={this.state.actionType}>
                     {ProcessActionTypes.map(({ type, name }) =>
@@ -147,23 +147,23 @@ class Action extends Component {
                         </option>)}
                 </select>
             </td>
-            <td>
+            <td width='20%' style={{ boxSizing: 'border-box' }}>
                 {/* Start time */}
-                <select value={this.state.hour} onChange={this.editHour}>
+                <select style={{ width: '40%', display: 'inline-block', marginLeft: '10%' }} value={this.state.hour} onChange={this.editHour}>
                     {_24Array.map((tmp, i) =>
                         <option value={i}>{i}</option>)}
                 </select>
-                <select value={this.state.minute} onChange={this.editMinute}>
+                <select style={{ width: '40%', display: 'inline-block', marginRight: '10%' }} value={this.state.minute} onChange={this.editMinute}>
                     {_60Array.map((tmp, i) =>
                         <option value={i}>{i}</option>)}
                 </select>
             </td>
-            <td>
+            <td width='10%'>
                 {/* Frequency */}
                 <input type='number' min='1' max={this.props.duration} value={this.state.frequency}
                     onChange={this.editFrequency} />
             </td>
-            <td>
+            <td width='25%'>
                 {/* Message form */}
                 {action.Type !== 0 && action.Type !== 1 ? null :
                     <select
@@ -177,7 +177,7 @@ class Action extends Component {
                             )}
                     </select>}
             </td>
-            <td>
+            <td width='5%'>
                 {/* Actions */}
                 <FontAwesomeIcon icon='trash-alt' size='sm' color='black' className='icon-btn'
                     onClick={this.deleteAction} />

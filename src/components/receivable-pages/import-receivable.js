@@ -1,36 +1,41 @@
-import React from 'react';
-import { connect } from 'react-redux'
-import { CustomerAction } from './../../actions/customer-action'
-import { ProfileAction } from './../../actions/profile-action'
-import { CollectorAction } from './../../actions/collector-action'
-import XLSX from 'xlsx';
-import { Link } from 'react-router-dom';
-import Component from '../common/component'
-import { available1, PrimaryLoadingPage } from '../common/loading-page';
-import { ReceivableService } from '../../services/receivable-service';
-import { Container, Header, Divider, Form, Button, Step, Icon, Checkbox, Table, Label } from 'semantic-ui-react';
-import { UserService } from '../../services/user-service';
-import { ProfileService } from '../../services/profile-service'
-import { CustomerService } from '../../services/customer-service';
-import { ifNullElseString } from '../../utils/utility';
-import { MDBDataTable } from 'mdbreact'
-import { dateToInt } from '../../utils/time-converter';
-import { UtilityService } from '../../services/utility-service';
-import { numAsDate } from '../../utils/time-converter';
-import { describeStatus, getStatusColor } from './detail/receivable-detail';
-import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { DatePicker } from '@progress/kendo-react-dateinputs';
+import { ComboBox } from '@progress/kendo-react-dropdowns';
+import { MDBDataTable } from 'mdbreact';
+import React from 'react';
 import { NotificationManager } from 'react-notifications';
-import { errorAlert, successAlert, infoAlert } from '../common/my-menu';
-import { MatchPointAction } from './../../actions/match-point-action'
-import { PointService } from '../../services/point-service';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { Modal, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Checkbox, Container, Divider, Form, Icon, Label, Step } from 'semantic-ui-react';
+import XLSX from 'xlsx';
 import { convertCurrency } from '../../reducers/match-point-reducer';
+import { CustomerService } from '../../services/customer-service';
+import { PointService } from '../../services/point-service';
+import { ProfileService } from '../../services/profile-service';
+import { ReceivableService } from '../../services/receivable-service';
+import { UserService } from '../../services/user-service';
+import { UtilityService } from '../../services/utility-service';
+import { dateToInt, numAsDate } from '../../utils/time-converter';
+import { IdGenerator, ifNullElseString } from '../../utils/utility';
+import Component from '../common/component';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
+import { errorAlert, successAlert } from '../common/my-menu';
+import EditProfile from '../profile-pages/edit-profile';
+import { CollectorAction } from './../../actions/collector-action';
+import { CustomerAction } from './../../actions/customer-action';
+import { MatchPointAction } from './../../actions/match-point-action';
+import { ProfileAction } from './../../actions/profile-action';
+import { describeStatus, getStatusColor } from './detail/receivable-detail';
+import { TopPopup } from '../common/top-popup';
 
 class ImportReceivable extends Component {
     constructor(props) {
         super(props);
         let showRecent = this.props.showRecent;
         this.state = {
+            isProfileModified: false,
+            openModal: false,
+            modalContent: null,
             receivableData: null,
             contactData: null,
             fileWarning: '',
@@ -59,29 +64,31 @@ class ImportReceivable extends Component {
         this.createCustomerThenIncreaseStep = this.createCustomerThenIncreaseStep.bind(this);
         this.getAllCollectorCpp = this.getAllCollectorCpp.bind(this);
         this.skipStep1 = this.skipStep1.bind(this);
+        this.viewProfileDetail = this.viewProfileDetail.bind(this);
+        this.closeProfileDetail = this.closeProfileDetail.bind(this);
     }
-
+    //#region Step
     increaseStep() {
         this.setState(pre => ({ step: pre.step + 1 }))
     }
     decreaseStep() {
         this.setState(pre => ({ step: pre.step - 1 }))
     }
-
+    //#endregion
     componentDidMount() {
         document.title = 'Import receivables';
         available1();
         UserService.getCollectors().then(res => {
-            this.props.fetchCollectors(res.data);
+            this.props.setCollectors(res.data);
             this.incrementLoading();
         })
         if (!this.props.showRecent) {
             CustomerService.getAll().then(res => {
-                this.props.fetchCustomers(res.data);
+                this.props.setCustomers(res.data);
                 this.incrementLoading();
             })
             ProfileService.getAll().then(res => {
-                this.props.fetchProfiles(res.data);
+                this.props.setProfiles(res.data);
                 this.incrementLoading();
             })
             UtilityService.getServerDate().then(res => {
@@ -94,7 +101,7 @@ class ImportReceivable extends Component {
             this.incrementLoading(3);
         }
     }
-
+    //#region File
     handleFile = (e) => {
         this.setLoadingForm(true);
         var rABS = true;// true: readAsBinaryString ; false: readAsArrayBuffer
@@ -157,7 +164,7 @@ class ImportReceivable extends Component {
         });
         return receivableData;
     }
-
+    //#endregion
     setCollector(no, collectorId) {
         var validatedData = this.state.validatedData;
         validatedData.map((rei, i) => {
@@ -308,7 +315,17 @@ class ImportReceivable extends Component {
     }
 
     updateProfile(e) {
-        this.setState({ profileId: e.target.value });
+        if (this.state.isProfileModified) {
+            if (!window.confirm('The profile has been modified, if you change profile now all changes will be lost. Do you want to change profile?')) {
+                // not change modified profile
+                return;
+            } else {
+                let profiles = this.props.profiles;
+                profiles = profiles.filter(p => p.Id >= 0);
+                this.props.setProfiles(profiles);
+            }
+        }
+        this.setState({ profileId: e.target.value, isProfileModified: false });
     }
 
     updateCustomer(val) {
@@ -400,12 +417,12 @@ class ImportReceivable extends Component {
             this.setState({ loadingForm: false });
         })
     }
+    //#region Suggestion
     getAllCollectorCpp() {
         this.setState({ isLoadingCpp: true });
         PointService.getAllCollectorCpp().then(res => {
             let data = res.data;
             this.props.setCppList(data);
-            infoAlert('Collector suggestion feature is ON!');
             this.setState({ isLoadingCpp: false });
         }).catch(err => {
             console.error(err);
@@ -413,6 +430,7 @@ class ImportReceivable extends Component {
             this.setState({ isLoadingCpp: false });
         })
     }
+    //#endregion
     skipStep1(isNewCustomer) {
         if (isNewCustomer) {
             this.createCustomerThenIncreaseStep();
@@ -420,6 +438,56 @@ class ImportReceivable extends Component {
             this.increaseStep();
         }
     }
+    //#region Modify profile
+    viewProfileDetail(e) {
+        e.preventDefault();
+        let profileId = parseInt(this.state.profileId);
+        if (profileId < -1) {
+            profileId = undefined;
+        } else {
+            // check loaded profiles
+            let process = this.props.process;
+            if (process && process.Id === profileId) {
+                profileId = undefined;
+            }
+        }
+        let modalContent = <EditProfile key={profileId} profileId={profileId} onChange={() => {
+            this.setState({ isProfileModified: true })
+        }} onSave={(profile) => {
+            if (profile._isModified) {
+                return;
+            } else {
+                profile._isModified = true;
+            }
+            // create new Id
+            let newId = IdGenerator.generateId();
+            if (newId == -1) {
+                newId--;
+            }
+            profile.Id = newId;
+            profile.Name = `${profile.Name} (modified)`;
+            // set selected profile
+            this.setState({ profileId: newId });
+            // update profile list
+            let newProfile = {
+                Id: newId,
+                Name: profile.Name
+            }
+            let profiles = this.props.profiles;
+            profiles.push(newProfile);
+            this.props.setProfiles(profiles);
+        }} isPopup={true} />;
+        this.setState({ openModal: true, modalContent: modalContent });
+
+    }
+    closeProfileDetail() {
+        if (!this.props.processStatus.readOnly) {
+            window.alert('Profile has been modified recently, please save changes first!');
+            return;
+        }
+        this.setState({ openModal: false, modalContent: null });
+    }
+    //#endregion
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />
@@ -462,7 +530,7 @@ class ImportReceivable extends Component {
                 </Step.Group>
                 {/* START STEP 1 */}
                 {/* Customer */}
-                <div className='form-group col-sm-4' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
+                <div className='col-sm-3' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
                     <label className='bold-text'>Partner</label>
                     <ComboBox data={customers}
                         dataItemKey='Id'
@@ -490,14 +558,27 @@ class ImportReceivable extends Component {
                     {this.state.isLoadingCpp ? <i>Loading suggestion data...</i> : null}
                 </div>
                 {/* Profile */}
-                <div className='form-group col-sm-4' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Profile</label>
-                    <select ref='selectProfile' className='form-control' value={this.state.profileId}
-                        onChange={this.updateProfile}>
-                        <option value='-1'>--</option>
-                        {profiles.map((profile) => <option value={profile.Id}>{profile.Name}</option>)}
-                    </select>
+                <div className='col-sm-4 row' style={{ display: this.state.step === 1 ? 'flex' : 'none' }}>
+                    <div className='col-sm-10'>
+                        <label className='bold-text'>Profile</label>
+                        <select ref='selectProfile' className='ui input' value={this.state.profileId}
+                            onChange={this.updateProfile}>
+                            <option value='-1'>--</option>
+                            {profiles.map((profile) => <option value={profile.Id}>{profile.Name}</option>)}
+                        </select>
+                    </div>
+                    <div className='col-sm-2' style={{ marginTop: '30px', display: this.state.profileId != -1 ? 'block' : 'none' }}>
+                        <a href='' onClick={this.viewProfileDetail}>Detail</a>
+                    </div>
                 </div>
+                <Modal isOpen={this.state.openModal} className='big-modal'>
+                    <ModalBody>
+                        {this.state.modalContent}
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color='secondary' onClick={this.closeProfileDetail}>Close</Button>
+                    </ModalFooter>
+                </Modal>
                 {/* END STEP 1 */}
                 {!this.props.showRecent ?
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
@@ -556,11 +637,12 @@ class ImportReceivable extends Component {
                                         <td>{customer ? customer.Name : null}</td>
                                         <td>{debtor ? debtor.Name : null}</td>
                                         <td>{(r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
-                                        <td>
-                                            {!isWaiting ? <DatePicker min={min} value={date} onChange={(e) => {
-                                                let value = e.target.value;
-                                                this.setPayableDay(i, dateToInt(value));
-                                            }} /> : null}
+                                        <td ref={`datepicker-${i}`} style={{ boxSizing: 'border-box' }}>
+                                            {!isWaiting ? <DatePicker popup={TopPopup}
+                                                popupSettings={{ appendTo: this.refs[`datepicker-${i}`] }} min={min} value={date} onChange={(e) => {
+                                                    let value = e.target.value;
+                                                    this.setPayableDay(i, dateToInt(value));
+                                                }} /> : null}
                                         </td>
                                         <td className='suggested'>
                                             {!isWaiting ? <ConnectedSelectCollector
@@ -781,19 +863,21 @@ const mapStateToProps = state => {
         customers: state.customers,
         profiles: state.profiles,
         collectors: state.collectors,
-        matchData: state.matchData
+        matchData: state.matchData,
+        process: state.process,
+        processStatus: state.processStatus
     }
 }
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-        fetchCustomers: (customers) => {
+        setCustomers: (customers) => {
             dispatch(CustomerAction.setCustomers(customers));
         },
-        fetchProfiles: (profiles) => {
+        setProfiles: (profiles) => {
             dispatch(ProfileAction.setProfiles(profiles))
         },
-        fetchCollectors: (collectors) => {
+        setCollectors: (collectors) => {
             collectors.forEach(c => {
                 c.DisplayName = `${c.FirstName} ${c.LastName}`;
                 c.DisplayName2 = `${c.FirstName} ${c.LastName} (${c.Username})`;
