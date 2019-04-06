@@ -1,13 +1,13 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { ProcessAction } from './../../actions/process-action'
-import Stage from './stage'
-import './process.scss'
 import { Modal, ModalBody, ModalFooter } from 'reactstrap';
-import { Container, Header, Form, Button } from 'semantic-ui-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPen } from '@fortawesome/free-solid-svg-icons'
+import { Button, Container, Form, Header } from 'semantic-ui-react';
+import { ProcessAction } from './../../actions/process-action';
+import './process.scss';
+import Stage from './stage';
 library.add(faPen);
 
 class Process extends Component {
@@ -27,16 +27,25 @@ class Process extends Component {
 
     render() {
         var process = this.props.process;
-        if (process) {
+        if (process && !this.props.isPopup) {
             document.title = process.Name;
         }
         var stages = process.Stages;
         var readOnly = this.props.processStatus.readOnly;
+        let showProcessName;
+        if (this.props.isPopup) {
+            showProcessName = false;
+        } else {
+            showProcessName = true;
+        }
         return (
             <Container>
                 <Form loading={this.props.formLoading}>
                     {/* Heading */}
-                    <Header className='text-center'>{process.Name}
+                    <Header className='text-center'
+                        style={{
+                            display: showProcessName ? 'block' : 'none'
+                        }}>{process.Name}
                         {readOnly ? null : <FontAwesomeIcon icon='pen' size='md' color='black' className='icon-btn'
                             onClick={this.toggleUpdateForm} />}
                         <UpdateProcessForm process={process}
@@ -45,13 +54,14 @@ class Process extends Component {
                             updateProcess={this.props.editProcess} />
                     </Header>
                     <Form.Field>
-                        <label>Stages:</label>
-                        <div className="stage-list">
+                        <div className="stage-list row justify-content-center">
                             {
                                 stages.map((stage, i) => <Stage stageId={stage.Id} key={i} />)
                             }
                             {readOnly ? null :
-                                (<Button color='primary' onClick={this.props.addStage}>Add stage</Button>)
+                                [<div className='col-sm-10'>
+                                    <Button color='primary' onClick={this.props.addStage}>Add stage</Button>
+                                </div>]
                             }
                         </div>
                     </Form.Field>

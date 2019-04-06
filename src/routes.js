@@ -95,7 +95,11 @@ const routes = [
     {
         path: '/receivable/:id/view',
         exact: true,
-        main: ({ match, history }) => <ReceivableDetail key={match.params.id} match={match} history={history} />
+        main: ({ match, history }) => {
+            let currentTime = new Date();
+            return <ReceivableDetail key={`${match.params.id}-${currentTime.getMilliseconds()}`}
+                match={match} history={history} />
+        }
     },
     {
         path: '/task',

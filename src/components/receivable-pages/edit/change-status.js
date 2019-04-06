@@ -32,9 +32,9 @@ class ChangeStatus extends Component {
         this.setState({ modal: false });
     }
     confirm(isPayed) {
-        let message = 'The debt is collected successfully. This action will CLOSE this case, confirm action.';
+        let message = 'The debt is collected successfully. This action will CLOSE this case, please confirm this action.';
         if (!isPayed) {
-            message = 'This action will CANCEL this case, confirm action.';
+            message = 'This action will CANCEL this case, please confirm this action.';
         }
         this.setState({
             openConfirm: true,
@@ -63,6 +63,9 @@ class ChangeStatus extends Component {
             } else {
                 infoAlert(successMsg);
             }
+        }).catch(err => {
+            console.error(err);
+            errorAlert('Fail to change status of this receivable! Please try again later!');
         })
     }
     render() {

@@ -16,10 +16,11 @@ class Stage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            displayBody: true,
             openUpdateForm: false
         }
         this.toggleUpdateForm = this.toggleUpdateForm.bind(this);
+        this.groupStageAction = this.groupStageAction.bind(this);
+        this.buildStageDescription = this.buildStageDescription.bind(this);
     }
 
     toggleUpdateForm() {
@@ -36,17 +37,61 @@ class Stage extends Component {
         }
     }
 
-    displayOrCollapse = (e) => {
-        e.preventDefault();
-        var displayBody = !this.state.displayBody;
-        this.setState({ displayBody: displayBody })
+    groupStageAction(stage) {
+        let actions = [];
+        stage.Actions.reduce((acc, action) => {
+            let actionType = action.Type;
+            let actionName = action.Name;
+            let groupAction;
+            if (actionType === 3) {
+                groupAction = acc.find(act => act.type === actionType && act.name === actionName);
+            } else {
+                groupAction = acc.find(act => act.type === actionType);
+            }
+            if (!groupAction) {
+                groupAction = {
+                    type: actionType,
+                    name: actionName,
+                    quantity: Math.floor(stage.Duration / action.Frequency)
+                }
+                acc.push(groupAction);
+            } else {
+                groupAction.quantity = groupAction.quantity + Math.floor(stage.Duration / action.Frequency);
+            }
+            return acc;
+        }, actions);
+        actions.sort((a1, a2) => a1.type - a2.type);
+        return actions;
+    }
+
+    buildStageDescription(groupActions) {
+        let result = '';
+        result = groupActions.flatMap((a, i) => {
+            let description;
+            if (a.type !== 3) {
+                let isAuto = a.type === 0 || a.type === 1;
+                let actionType = ProcessReducer.ProcessActionTypes.find(aOrigin => aOrigin.type === a.type);
+                if (actionType) {
+                    description = `${actionType.name}${isAuto ? ' (auto)' : ''}: ${a.quantity} time(s)`;
+                }
+            } else {
+                description = `${a.name}: ${a.quantity} time(s)`;
+            }
+            return [description, ((i + 1) === groupActions.length ? null : <br />)]
+        });
+        if (result.length == 0) {
+            result = 'No action'
+        }
+        return result;
     }
 
     render() {
         let stage = this.props.process.Stages.find((s) => s.Id == this.props.stageId);
         let durationWarning = stage.Duration <= 0 ? 'Duration must longer than 0 day!' : '';
         var readOnly = this.props.processStatus.readOnly;
-        return (<Container className='process-stage'>
+        let stageActions = this.groupStageAction(stage);
+        let description = this.buildStageDescription(stageActions);
+        return (<div className='process-stage col-sm-3'>
             <Header>
                 <div className='row'>
                     <span className="col-sm-6">{stage.Name}</span>
@@ -62,64 +107,24 @@ class Stage extends Component {
                                         onClick={this.deleteStage} />
                                 </div>
                             }
-                            {this.state.displayBody ?
-                                <a href='' onClick={this.displayOrCollapse}>Collapse</a> :
-                                <a href='' onClick={this.displayOrCollapse}>Expanse</a>}
                         </div>
                     </div>
                     <UpdateStageForm isOpen={this.state.openUpdateForm} stage={stage} toggle={this.toggleUpdateForm} updateStage={this.props.editStage} />
                 </div>
             </Header>
-            <div className='panel-body' ref='body' style={{ display: this.state.displayBody ? 'block' : 'none' }}>
+            <div className='panel-body' ref='body'>
                 <div className='row'>
-                    <div className='stage-info col-sm-3'>
+                    <div className='stage-info col-sm-12'>
                         <div>
                             <div>
                                 <span className='bold-text'>Duration:</span><span>{` ${stage.Duration} day(s)`}</span>
                             </div>
-                            <div className='note'>
-                                Notes:<br />
-                                2 SMS will be sent<br />
-                                2 auto call will be sent<br />
-                                10 visit will be done<br />
-                            </div>
-                        </div>
-                    </div>
-                    <div className='col-sm-9'>
-                        <div class="form-group">
-                            <label className='bold-text'>Action:</label>
-                            {stage.Actions.length > 0 ? <table className='table thin'>
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Name</th>
-                                        <th>Type</th>
-                                        <th>Start time</th>
-                                        <th>Frequency</th>
-                                        <th>Message</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {stage.Actions.map((a, i) => {
-                                        let messageForm = this.props.messageForms.find(mf => mf.Id === a.ProfileMessageFormId);
-                                        return <tr>
-                                            <td>{i + 1}</td>
-                                            <td>{a.Name}</td>
-                                            <td>{describeActionType(a.Name, a.Type)}</td>
-                                            <td>{numAsTime(a.StartTime)}</td>
-                                            <td>{`${a.Frequency} days/time`}</td>
-                                            <td>
-                                                {messageForm ? messageForm.Name : ''}
-                                            </td>
-                                        </tr>
-                                    })}
-                                </tbody>
-                            </table> : null}
+                            <div className='note'>{description}</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </Container>);
+        </div>);
     }
 }
 
@@ -184,7 +189,7 @@ export class UpdateStageForm extends Component {
                     </Form.Field>
                     <Form.Field>
                         <label>Actions:</label>
-                        <table className='table thin'>
+                        {this.state.actions.length > 0 ? <table className='table thin'>
                             <thead>
                                 <tr>
                                     <th>No.</th>
@@ -203,7 +208,9 @@ export class UpdateStageForm extends Component {
                                         deleteAction={this.deleteAction}
                                         duration={this.state.duration} />)}
                             </tbody>
-                        </table>
+                        </table> : <div className='text-center bold-text' style={{ fontSize: '2rem' }}>
+                                <i>No action!</i>
+                            </div>}
                     </Form.Field>
                     <Button color='primary' onClick={this.addAction}>Add Action</Button>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
