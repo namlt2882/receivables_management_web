@@ -1,22 +1,22 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPen, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import Action from './action'
 import { connect } from 'react-redux';
-import { ProcessAction } from './../../actions/process-action'
-import { Container, Header, Form, Button, Table } from 'semantic-ui-react';
-import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
-import { numAsTime } from '../../utils/time-converter'
-import * as ProcessReducer from '../../reducers/process-reducer'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTrashAlt, faPen } from '@fortawesome/free-solid-svg-icons'
-import { describeActionType } from '../receivable-pages/detail/receivable-detail';
+import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Form, Header } from 'semantic-ui-react';
+import * as ProcessReducer from '../../reducers/process-reducer';
+import ConfirmModal from '../modal/ConfirmModal';
+import { ProcessAction } from './../../actions/process-action';
+import Action from './action';
 library.add(faTrashAlt, faPen);
 
 class Stage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            openUpdateForm: false
+            openUpdateForm: false,
+            openConfirm: false
         }
         this.toggleUpdateForm = this.toggleUpdateForm.bind(this);
         this.groupStageAction = this.groupStageAction.bind(this);
@@ -32,9 +32,8 @@ class Stage extends Component {
     }
 
     deleteStage = () => {
-        if (window.confirm('Are you sure to delete this stage?')) {
-            this.props.deleteStage(this.props.stageId);
-        }
+        this.setState({ openConfirm: false });
+        this.props.deleteStage(this.props.stageId);
     }
 
     groupStageAction(stage) {
@@ -104,12 +103,16 @@ class Stage extends Component {
                                         onClick={this.toggleUpdateForm} />
                                     {/* Delete button */}
                                     <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn'
-                                        onClick={this.deleteStage} />
+                                        onClick={() => {
+                                            this.setState({ openConfirm: true });
+                                        }} />
                                 </div>
                             }
                         </div>
                     </div>
-                    <UpdateStageForm isOpen={this.state.openUpdateForm} stage={stage} toggle={this.toggleUpdateForm} updateStage={this.props.editStage} />
+                    <UpdateStageForm isOpen={this.state.openUpdateForm} stage={stage}
+                        toggle={this.toggleUpdateForm} updateStage={this.props.editStage}
+                        deleteStage={this.deleteStage} />
                 </div>
             </Header>
             <div className='panel-body' ref='body'>
@@ -123,6 +126,12 @@ class Stage extends Component {
                         </div>
                     </div>
                 </div>
+                <ConfirmModal
+                    show={this.state.openConfirm}
+                    onHide={() => { this.setState({ openConfirm: false }) }}
+                    header="Confirm to delete stage"
+                    body="Are you sure to delete this stage?"
+                    callback={this.deleteStage} />
             </div>
         </div>);
     }
@@ -144,20 +153,28 @@ export class UpdateStageForm extends Component {
         this.addAction = this.addAction.bind(this);
     }
     closeForm() {
-        this.props.toggle();
         let stage = this.props.stage;
-        this.setState({
-            name: stage.Name,
-            duration: stage.Duration,
-            actions: stage.Actions.map(a => ({ ...a }))
-        })
+        if (stage._isNew) {
+            this.props.deleteStage();
+        } else {
+            this.props.toggle();
+            this.setState({
+                name: stage.Name,
+                duration: stage.Duration,
+                actions: stage.Actions.map(a => ({ ...a }))
+            })
+        }
     }
     updateStage() {
         let stage = this.props.stage;
+        if (stage._isNew) {
+            stage._isNew = false;
+        } else {
+            this.props.toggle();
+        }
         stage.Duration = this.state.duration;
         stage.Actions = this.state.actions;
         this.props.updateStage(stage);
-        this.props.toggle();
     }
     addAction(e) {
         e.preventDefault();
@@ -178,8 +195,8 @@ export class UpdateStageForm extends Component {
     }
     render() {
         let stage = this.props.stage;
-        return (<Modal isOpen={this.props.isOpen} className='big-modal'>
-            <ModalHeader>{this.state.name}</ModalHeader>
+        return (<Modal isOpen={this.props.isOpen || stage._isNew} className='big-modal'>
+            <ModalHeader>{stage._isNew ? `Add new stage: ${this.state.name}` : this.state.name}</ModalHeader>
             <ModalBody>
                 <Form onSubmit={this.updateStage} ref='form'>
                     <Form.Field>
@@ -212,7 +229,7 @@ export class UpdateStageForm extends Component {
                                 <i>No action!</i>
                             </div>}
                     </Form.Field>
-                    <Button color='primary' onClick={this.addAction}>Add Action</Button>
+                    <Button color='primary' style={{ width: '10rem' }} onClick={this.addAction}>Add Action</Button>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
                 </Form>
             </ModalBody>

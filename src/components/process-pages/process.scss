@@ -40,6 +40,9 @@
     border: 1px solid rgb(221, 223, 226);
     padding: 10px;
     margin-bottom: 20px;
-    margin-left: 6rem;
     box-shadow: 0 2px 4px 0 rgba(34, 36, 38, .15);
+}
+
+.stage-list .process-stage:not(:first-child) {
+    margin-left: 6rem;
 }

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Confirm } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import { AuthService } from '../../../services/auth-service';
 import { ReceivableService } from '../../../services/receivable-service';
+import { errorAlert, infoAlert, successAlert } from '../../common/my-menu';
 import ConfirmModal from '../../modal/ConfirmModal';
-import { successAlert, errorAlert, infoAlert } from '../../common/my-menu';
 
 class ChangeStatus extends Component {
     constructor(props) {
@@ -71,14 +71,14 @@ class ChangeStatus extends Component {
     render() {
         return (<div>
             {AuthService.isCollector() ?
-                [<div style={{ marginBottom: '10px', marginLeft: '10%' }}>
+                [<div style={{ marginLeft: '5%', display: 'inline-block' }}>
                     <Button content='Finish' color='blue' icon='check' labelPosition='left'
-                        style={{width:'10rem'}}
+                        style={{ width: '8rem', display: 'inline-block' }}
                         onClick={() => { this.confirm(true) }} />
                 </div>,
-                <div style={{ marginLeft: '10%' }}>
+                <div style={{ marginLeft: '10%', display: 'inline-block' }}>
                     <Button content='Stop' color='red' icon='cancel' labelPosition='left'
-                        style={{width:'10rem'}}
+                        style={{ width: '8rem' }}
                         onClick={() => { this.confirm(false) }} />
                 </div>] : null}
             <ConfirmModal

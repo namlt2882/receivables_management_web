@@ -183,6 +183,7 @@ class ReceivableList extends Component {
                 CollectorName: collector ? `${collector.FullName}` : null,
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
+                CurrentStage: r.Stage,
                 Status: <Label color={statusColor}>{status}</Label>,
                 action: <Link target='_blank' to={`receivable/${r.Id}/view`}>View</Link>
             }
@@ -411,6 +412,11 @@ const data = {
             label: 'Start day',
             field: 'PayableDay',
             sort: 'asc',
+            width: 200
+        },
+        {
+            label: 'Stage',
+            field: 'CurrentStage',
             width: 200
         },
         {

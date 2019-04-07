@@ -212,9 +212,16 @@ table.table a {
     @extend .table;
 }
 
-.info-table {
+.info-card {
     width: 100%;
     @extend .border-shadow;
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 18rem;
+}
+
+.info-table {
+    width: 100%;
 }
 
 .info-table tr {
@@ -223,13 +230,15 @@ table.table a {
 }
 
 .info-table tr>td:first-child {
-    max-width: 100px;
+    width: 50%;
     font-weight: bold;
 }
 
 .info-table td {
     border: none !important;
-    padding: 5px 15px 5px 15px !important;
+    padding: 5px 0px 5px 0px !important;
+    box-sizing: border-box;
+    max-width: 15rem;
 }
 
 .info-table>tbody>tr {
@@ -384,4 +393,16 @@ input::-webkit-inner-spin-button {
 
 .dataTables_filter input {
     @extend .input-border;
+}
+
+.dataTables_length * {
+    display: none;
+}
+
+.button {
+    width: 8rem;
+}
+
+.full-height {
+    height: 100%;
 }

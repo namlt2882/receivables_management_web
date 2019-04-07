@@ -284,90 +284,96 @@ class ReceivableDetail extends Component {
                     {dateNote}</div> : null}
             </div>
 
-            {/* receivable information */}
-            <div className='col-sm-6'>
-                <Container>
-                    <Header>
-                        <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
-                        Receivable Info <Label color={statusColor}>{status}</Label>
-                        {/* Edit info of receivable */}
-                        {receivable.CollectionProgress.Status === 1 || receivable.CollectionProgress.Status === 4 ?
-                            <EditReceivable updateReceivable={this.updateReceivable}
-                                receivable={receivable}
-                                collectorList={this.state.collectorList} /> : null}
-                    </Header>
-                    {/* Receivable info */}
-                    <table className='info-table' style={{ marginBottom: '20px' }} hover>
-                        <tbody>
-                            <tr>
-                                <td>Debt amount:</td>
-                                <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
-                            </tr>
-                            <tr>
-                                <td>Prepaid amount:</td>
-                                <td>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
-                            </tr>
-                            <tr>
-                                <td>Partner:</td>
-                                <td>{receivable.customer ? receivable.customer.Name : null}</td>
-                            </tr>
-                            <tr>
-                                <td>Start day:</td>
-                                <td>{numAsDate(receivable.PayableDay)}</td>
-                            </tr>
-                            <tr>
-                                <td>End day:</td>
-                                <td>
-                                    {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Collector:</td>
-                                <td>
-                                    {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
-                                </td>
-                            </tr>
-                            {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?
-                                <tr>
-                                    <td></td>
-                                    <td>
-                                        <Button color='green' onClick={() => { this.setState({ openConfirm: true }) }}>Confirm</Button>
-                                        <ConfirmModal
-                                            show={this.state.openConfirm}
-                                            onHide={() => { this.setState({ openConfirm: false }) }}
-                                            header='Confirm'
-                                            body='Are you sure want to confirm this case?'
-                                            callback={this.confirm}
-                                        />
-                                    </td>
-                                </tr> : null}
-                        </tbody>
-                    </table>
-                </Container>
-            </div>
+            <div className='col-sm-12 row justify-content-center'>
+                {/* receivable information */}
+                <div className='col-sm-4'>
+                    <Container>
+                        <Header>
+                            <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
+                            Receivable Info <Label color={statusColor}>{status}</Label>
+                            {/* Edit info of receivable */}
+                            {receivable.CollectionProgress.Status === 1 || receivable.CollectionProgress.Status === 4 ?
+                                <EditReceivable updateReceivable={this.updateReceivable}
+                                    receivable={receivable}
+                                    collectorList={this.state.collectorList} /> : null}
+                        </Header>
+                        {/* Receivable info */}
+                        <div className='info-card'>
+                            <table className='info-table'>
+                                <tbody>
+                                    <tr>
+                                        <td>Debt amount:</td>
+                                        <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Prepaid amount:</td>
+                                        <td>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Partner:</td>
+                                        <td>{receivable.customer ? receivable.customer.Name : null}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Start day:</td>
+                                        <td>{numAsDate(receivable.PayableDay)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>End day:</td>
+                                        <td>
+                                            {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Collector:</td>
+                                        <td>
+                                            {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
+                                        </td>
+                                    </tr>
+                                    {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                <Button color='green' onClick={() => { this.setState({ openConfirm: true }) }}>Confirm</Button>
+                                                <ConfirmModal
+                                                    show={this.state.openConfirm}
+                                                    onHide={() => { this.setState({ openConfirm: false }) }}
+                                                    header='Confirm'
+                                                    body='Are you sure want to confirm this case?'
+                                                    callback={this.confirm}
+                                                />
+                                            </td>
+                                        </tr> : null}
+                                </tbody>
+                            </table>
+                        </div>
+                    </Container>
+                </div>
 
-            {/* Current stage */}
-            {/* if current stage not null */}
-            {!isFinished && currentStage != null ? <div className='col-sm-6'>
-                <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage}>
-                    {/* Change status of receivable */}
-                    {receivable.CollectionProgress.Status === 1 ?
-                        <ChangeStatus updateReceivable={this.updateReceivable} receivable={receivable} /> : null}
-                </CurrentStage>
-            </div> : null}
-            {/* contacts */}
-            <div className='col-sm-6'>
-                {/* Debtor */}
-                <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor'
-                    isDebtor={true} contacts={debtor !== null ? [debtor] : []}
-                    style={{ marginBottom: '20px' }}
-                    updateReceivable={this.updateReceivable} />
-            </div>
-            <div className='col-sm-12' style={{ marginTop: '20px' }}>
-                {/* Relatives (only visible for collector)*/}
-                {AuthService.isCollector() ? <Contact isFinished={isFinished} title='Contact list'
-                    isDebtor={false} contacts={contacts}
-                    updateReceivable={this.updateReceivable} receivableId={receivable.Id} /> : null}
+                <div className='col-sm-4'>
+                    {/* Debtor */}
+                    <Contact isFinished={isFinished} style={{ marginBottom: '20px' }} title='Debtor'
+                        isDebtor={true} contacts={debtor !== null ? [debtor] : []}
+                        style={{ marginBottom: '20px' }}
+                        updateReceivable={this.updateReceivable} >
+                        {/* contacts */}
+                        <div className='col-sm-12' style={{ marginTop: '20px' }}>
+                            {/* Relatives (only visible for collector)*/}
+                            <Contact isFinished={isFinished} title='Contact list'
+                                isDebtor={false} contacts={contacts}
+                                updateReceivable={this.updateReceivable} receivableId={receivable.Id} />
+                        </div>
+                    </Contact>
+                </div>
+
+                {/* Current stage */}
+                {/* if current stage not null */}
+                {!isFinished && currentStage != null ? <div className='col-sm-4'>
+                    <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage}>
+                        {/* Change status of receivable */}
+                        {receivable.CollectionProgress.Status === 1 ?
+                            <ChangeStatus updateReceivable={this.updateReceivable} receivable={receivable} /> : null}
+                    </CurrentStage>
+                </div> : null}
             </div>
         </div>);
     }

@@ -32,14 +32,14 @@ class Process extends Component {
         }
         var stages = process.Stages;
         var readOnly = this.props.processStatus.readOnly;
-        let showProcessName;
+        let showProcessName = false;
         if (this.props.isPopup) {
             showProcessName = false;
-        } else {
+        } else if (!readOnly) {
             showProcessName = true;
         }
         return (
-            <Container>
+            <div className='col-sm-12'>
                 <Form loading={this.props.formLoading}>
                     {/* Heading */}
                     <Header className='text-center'
@@ -56,7 +56,7 @@ class Process extends Component {
                     <Form.Field>
                         <div className="stage-list row justify-content-center">
                             {
-                                stages.map((stage, i) => <Stage stageId={stage.Id} key={i} />)
+                                stages.map((stage) => <Stage stageId={stage.Id} key={stage.Id} />)
                             }
                             {readOnly ? null :
                                 [<div className='col-sm-10'>
@@ -66,7 +66,7 @@ class Process extends Component {
                         </div>
                     </Form.Field>
                 </Form>
-            </Container>
+            </div>
         );
     }
 }
