@@ -212,7 +212,7 @@ export class UpdateStageForm extends Component {
                                 <i>No action!</i>
                             </div>}
                     </Form.Field>
-                    <Button color='primary' onClick={this.addAction}>Add Action</Button>
+                    <Button color='primary' style={{ width: '10rem' }} onClick={this.addAction}>Add Action</Button>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
                 </Form>
             </ModalBody>

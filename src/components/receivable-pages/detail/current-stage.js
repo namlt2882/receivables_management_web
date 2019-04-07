@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { numAsDate, compareIntDate } from '../../../utils/time-converter';
-import { describeActionType, describeGroupActionFrequency } from './receivable-detail';
-import { Container, Header, Segment, Grid, Divider } from 'semantic-ui-react';
+import { Container, Divider, Grid, Header, Segment } from 'semantic-ui-react';
 import { AuthService } from '../../../services/auth-service';
+import { compareIntDate, numAsDate } from '../../../utils/time-converter';
 
 class CurrentStage extends Component {
     constructor(props) {
@@ -26,9 +25,9 @@ class CurrentStage extends Component {
             </Header>
             <div className='col-sm-12 row justify-content-center align-self-center'>
                 <Segment className='col-sm-12'>
-                    <Grid columns={AuthService.isManager() ? 1 : 2} relaxed='very'>
+                    <Grid columns='1'>
                         <Grid.Column>
-                            <table className='deco-table' style={{ marginLeft: '20px' }}>
+                            <table className='info-table' style={{ marginLeft: '20px' }}>
                                 <tbody>
                                     <tr>
                                         <td>Stage:</td>
@@ -49,11 +48,11 @@ class CurrentStage extends Component {
                                 </tbody>
                             </table>
                         </Grid.Column>
-                        {AuthService.isManager() ? null : <Grid.Column>
+                        {AuthService.isManager() ? null : [<Grid.Column>
+                            <Divider />
                             {this.props.children}
-                        </Grid.Column>}
+                        </Grid.Column>]}
                     </Grid>
-                    {AuthService.isManager() ? null : <Divider vertical />}
                 </Segment>
                 {/* <div className='col-sm-3'><b>Actions:</b></div>
                     <table className='col-sm-8'>
