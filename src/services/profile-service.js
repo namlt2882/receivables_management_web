@@ -11,7 +11,7 @@ export const ProfileService = {
         return AuthRequest.get('ProfileMessageForm');
     },
     update: (profile) => {
-        return AuthRequest.put('Profile');
+        return AuthRequest.put('Profile', profile);
     },
     getAll: () => {
         return AuthRequest.get('Profile');
