@@ -10,13 +10,15 @@ import { ProfileAction } from './../../actions/profile-action'
 import * as ProcessReducer from '../../reducers/process-reducer'
 import { Button, Container, Divider } from 'semantic-ui-react';
 import { successAlert, errorAlert } from '../common/my-menu';
+import ConfirmModal from '../modal/ConfirmModal';
 
 class AddProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             maxLoading: 1,
-            formLoading: false
+            formLoading: false,
+            openConfirm: false
         }
         this.cancel = this.cancel.bind(this);
         this.createNewProfile = this.createNewProfile.bind(this);
@@ -28,9 +30,8 @@ class AddProfile extends Component {
         this.props.getAllMessageForms().then(res => { this.incrementLoading() })
     }
     cancel() {
-        if (window.confirm('Are you sure? All data you input will be lost!')) {
-            this.props.history.push('/profile')
-        }
+        this.setState({ openConfirm: false });
+        this.props.history.push('/profile')
     }
 
     createNewProfile() {
@@ -62,9 +63,17 @@ class AddProfile extends Component {
                 </div>
                 <div className='panel-action' style={{ zIndex: 10, position: 'relative' }}>
                     <Button color='primary' onClick={this.createNewProfile}>Save</Button>
-                    <Button onClick={this.cancel}>Cancel</Button>
+                    <Button onClick={() => {
+                        this.setState({ openConfirm: true });
+                    }}>Cancel</Button>
                 </div>
             </div>
+            <ConfirmModal
+                show={this.state.openConfirm}
+                onHide={() => { this.setState({ openConfirm: false }) }}
+                header="Confirm"
+                body="Are you sure? All data you input will be lost!"
+                callback={this.cancel} />
             <Process formLoading={this.state.formLoading} />
         </Container >);
     }

@@ -10,6 +10,7 @@ import { ProfileAction } from './../../actions/profile-action';
 import * as ProcessReducer from '../../reducers/process-reducer'
 import './profile.scss';
 import { successAlert, errorAlert } from '../common/my-menu';
+import ConfirmModal from '../modal/ConfirmModal';
 
 class EditProfile extends Component {
     constructor(props) {
@@ -17,7 +18,8 @@ class EditProfile extends Component {
         this.state = {
             maxLoading: 2,
             formLoading: false,
-            isProcessing: false
+            isProcessing: false,
+            openConfirm: false
         }
         this.setEditable = this.setEditable.bind(this);
         this.cancelEdit = this.cancelEdit.bind(this);
@@ -73,12 +75,11 @@ class EditProfile extends Component {
         }
     }
     cancelEdit = () => {
-        if (window.confirm('Are you sure? All data you edited will be lost!')) {
-            if (this.props.isPopup) {
-                this.props.cancelEditable();
-            } else {
-                this.props.history.push(`/profile/${this.props.match.params.id}/view`);
-            }
+        this.setState({ openConfirm: false });
+        if (this.props.isPopup) {
+            this.props.cancelEditable();
+        } else {
+            this.props.history.push(`/profile/${this.props.match.params.id}/view`);
         }
     }
     saveProfile() {
@@ -125,12 +126,21 @@ class EditProfile extends Component {
                                 color='primary'
                                 onClick={this.saveProfile}>Save</Button>
                             <Button loading={this.state.isProcessing} disabled={this.state.isProcessing}
-                                onClick={this.cancelEdit}>Cancel</Button>
+                                onClick={() => {
+                                    this.setState({ openConfirm: true });
+                                }}>Cancel</Button>
                         </div>
                     }
                 </div>
             </div>
             <Process isPopup={this.props.isPopup} formLoading={this.state.formLoading} />
+            <ConfirmModal
+                show={this.state.openConfirm}
+                onHide={() => { this.setState({ openConfirm: false }) }}
+                header="Confirm"
+                body="Are you sure? All data you edited will be lost!"
+                callback={this.cancelEdit}
+            />
         </Container>);
     }
 }

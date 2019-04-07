@@ -27,6 +27,7 @@ import { MatchPointAction } from './../../actions/match-point-action';
 import { ProfileAction } from './../../actions/profile-action';
 import { describeStatus, getStatusColor } from './detail/receivable-detail';
 import { TopPopup } from '../common/top-popup';
+import ConfirmModal from '../modal/ConfirmModal';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -48,7 +49,9 @@ class ImportReceivable extends Component {
             validatedData: null,
             insertedData: showRecent ? JSON.parse(localStorage.getItem('recent_inserted_data')) : null,
             customer: null,
-            isLoadingCpp: false
+            isLoadingCpp: false,
+            openConfirm: false,
+            onConfirm: () => { }
         }
         this.setCollector = this.setCollector.bind(this);
         this.updateProfile = this.updateProfile.bind(this);
@@ -283,6 +286,7 @@ class ImportReceivable extends Component {
         }).catch(err => {
             console.error(err);
             errorAlert('Service unavailable!');
+            this.setLoadingForm(false);
         })
     }
 
@@ -307,25 +311,34 @@ class ImportReceivable extends Component {
             }).catch(err => {
                 console.log(err);
                 errorAlert('Fail in following steps after inserted receivables! Please try again later!');
+                this.setLoadingForm(false);
             })
         }).catch(err => {
             console.log(err);
-            errorAlert('Fail to inserted receivables! Please try again later!');
+            errorAlert('Fail to insert receivables! Please try again later!');
+            this.setLoadingForm(false);
         })
     }
 
     updateProfile(e) {
+        let value = e.target.value;
         if (this.state.isProfileModified) {
-            if (!window.confirm('The profile has been modified, if you change profile now all changes will be lost. Do you want to change profile?')) {
-                // not change modified profile
-                return;
-            } else {
-                let profiles = this.props.profiles;
-                profiles = profiles.filter(p => p.Id >= 0);
-                this.props.setProfiles(profiles);
-            }
+            this.setState({
+                openConfirm: true,
+                onConfirm: () => {
+                    let profiles = this.props.profiles;
+                    profiles = profiles.filter(p => p.Id >= 0);
+                    this.props.setProfiles(profiles);
+                    this.setState({
+                        profileId: value,
+                        isProfileModified: false,
+                        openConfirm: false
+                    });
+                }
+            })
+        } else {
+            this.setState({ profileId: value, isProfileModified: false });
         }
-        this.setState({ profileId: e.target.value, isProfileModified: false });
     }
 
     updateCustomer(val) {
@@ -413,6 +426,7 @@ class ImportReceivable extends Component {
             NotificationManager.success('', `Customer ${customer.Name} has been created!`, 3000, () => { });
             this.increaseStep();
         }).catch(err => {
+            console.error(err);
             errorAlert('Service unavailable!')
             this.setState({ loadingForm: false });
         })
@@ -481,10 +495,6 @@ class ImportReceivable extends Component {
 
     }
     closeProfileDetail() {
-        if (!this.props.processStatus.readOnly) {
-            window.alert('Profile has been modified recently, please save changes first!');
-            return;
-        }
         this.setState({ openModal: false, modalContent: null });
     }
     //#endregion
@@ -576,9 +586,15 @@ class ImportReceivable extends Component {
                         {this.state.modalContent}
                     </ModalBody>
                     <ModalFooter>
-                        <Button color='secondary' onClick={this.closeProfileDetail}>Close</Button>
+                        <Button color='secondary' disabled={!this.props.processStatus.readOnly} onClick={this.closeProfileDetail}>Close</Button>
                     </ModalFooter>
                 </Modal>
+                <ConfirmModal
+                    show={this.state.openConfirm}
+                    onHide={() => { this.setState({ openConfirm: false }) }}
+                    header="Confirm change profile"
+                    body="The profile has been modified, if you change profile now all changes will be lost. Do you want to change profile?"
+                    callback={this.state.onConfirm} />
                 {/* END STEP 1 */}
                 {!this.props.showRecent ?
                     <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
