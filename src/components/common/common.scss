@@ -26,17 +26,8 @@
 }
 
 .navbar-holder {
-    height: 4.5rem;
-    z-index: 1049;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.navbar-holder>.navbar-color {
-    position: fixed;
-    width: 95%;
-    z-index: 1049;
+    height: 5rem;
+    z-index: 1;
 }
 
 .nav-link:hover svg {
