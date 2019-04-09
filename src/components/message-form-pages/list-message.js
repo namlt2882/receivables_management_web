@@ -17,6 +17,7 @@ class ListMessage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            maxLoading: 1,
             filterVal: ""
         };
     }

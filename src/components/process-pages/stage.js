@@ -202,7 +202,7 @@ export class UpdateStageForm extends Component {
                     <Form.Field>
                         <Form.Input label='Stage Duration:' type='number' min='1' name='duration' required={true}
                             ref='inputDuration' value={this.state.duration}
-                            onChange={(e) => { this.setState({ duration: e.target.value }) }} />
+                            onChange={(e) => { this.setState({ duration: parseInt(e.target.value) }) }} />
                     </Form.Field>
                     <Form.Field>
                         <label>Actions:</label>
