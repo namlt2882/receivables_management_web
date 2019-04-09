@@ -61,3 +61,8 @@ export const SET_CONTACTS = 'SET_CONTACTS'
 
 //Collector
 export const SET_COLLECTOR_LIST = 'SET_COLLECTOR_LIST'
+
+//Match Point
+export const SET_MATCH_DATA = 'SET_MATCH_DATA'
+export const SET_CPP_LIST = 'SET_CPP_LIST'
+export const CHANGE_COLLECTOR = 'CHANGE_COLLECTOR'

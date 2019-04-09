@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Confirm } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import { AuthService } from '../../../services/auth-service';
 import { ReceivableService } from '../../../services/receivable-service';
+import { errorAlert, infoAlert, successAlert } from '../../common/my-menu';
 import ConfirmModal from '../../modal/ConfirmModal';
-import { successAlert, errorAlert, infoAlert } from '../../common/my-menu';
 
 class ChangeStatus extends Component {
     constructor(props) {
@@ -32,9 +32,9 @@ class ChangeStatus extends Component {
         this.setState({ modal: false });
     }
     confirm(isPayed) {
-        let message = 'The debt is collected successfully. This action will CLOSE this case, confirm action.';
+        let message = 'The debt is collected successfully. This action will CLOSE this case, please confirm this action.';
         if (!isPayed) {
-            message = 'This action will CANCEL this case, confirm action.';
+            message = 'This action will CANCEL this case, please confirm this action.';
         }
         this.setState({
             openConfirm: true,
@@ -63,17 +63,22 @@ class ChangeStatus extends Component {
             } else {
                 infoAlert(successMsg);
             }
+        }).catch(err => {
+            console.error(err);
+            errorAlert('Fail to change status of this receivable! Please try again later!');
         })
     }
     render() {
         return (<div>
             {AuthService.isCollector() ?
-                [<div style={{ marginBottom: '10px', marginLeft: '20%' }}>
+                [<div style={{ marginLeft: '5%', display: 'inline-block' }}>
                     <Button content='Finish' color='blue' icon='check' labelPosition='left'
+                        style={{ width: '8rem', display: 'inline-block' }}
                         onClick={() => { this.confirm(true) }} />
                 </div>,
-                <div style={{ marginLeft: '20%' }}>
+                <div style={{ marginLeft: '10%', display: 'inline-block' }}>
                     <Button content='Stop' color='red' icon='cancel' labelPosition='left'
+                        style={{ width: '8rem' }}
                         onClick={() => { this.confirm(false) }} />
                 </div>] : null}
             <ConfirmModal

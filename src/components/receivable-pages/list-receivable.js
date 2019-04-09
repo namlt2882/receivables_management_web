@@ -39,6 +39,8 @@ class ReceivableList extends Component {
                 { category: 'Closed', value: 0, color: getStatusColor(5), checked: true, isConfirmed: false },
                 { category: 'Cancel', value: 0, color: getStatusColor(0), checked: true, isConfirmed: false }
             ],
+            sumConfirmed: 0,
+            sumNotConfirmed: 0,
             getConfirmed: true,
             selectedCollector: [],
             selectedCustomer: [],
@@ -151,6 +153,18 @@ class ReceivableList extends Component {
         this.props.fetchReceivableList().then(res => {
             this.incrementLoading();
             this.filterReceivable();
+            let sumNotConfirmed = this.props.receivableList.reduce((acc, r) => {
+                let status = r.CollectionProgressStatus;
+                if (status !== 1 && status !== 4 && !r.IsConfirmed) {
+                    acc = acc + 1;
+                }
+                return acc;
+            }, 0);
+            let sumConfirmed = this.props.receivableList.length - sumNotConfirmed;
+            this.setState({
+                sumConfirmed: sumConfirmed,
+                sumNotConfirmed: sumNotConfirmed
+            })
         });
         this.props.getCollectors().then(res => {
             this.incrementLoading();
@@ -164,13 +178,14 @@ class ReceivableList extends Component {
             let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
             return {
                 No: (i + 1),
-                DebtorName: r.DebtorName,
                 CustomerName: r.CustomerName,
-                CollectorName: collector ? `${collector.FullName} (${collector.Username})` : null,
+                DebtorName: r.DebtorName,
+                CollectorName: collector ? `${collector.FullName}` : null,
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
+                CurrentStage: r.Stage,
                 Status: <Label color={statusColor}>{status}</Label>,
-                action: <Link target='_blank' to={`receivable/${r.Id}/view`}>Detail</Link>
+                action: <Link target='_blank' to={`receivable/${r.Id}/view`}>View</Link>
             }
         });
         data1.rows = rows;
@@ -234,7 +249,7 @@ class ReceivableList extends Component {
             <br />
             {/* Customer filter */}
             {AuthService.isManager() ? <div>
-                <div><b>Customer</b>:</div>
+                <div><b>Partner</b>:</div>
                 <MultiSelect
                     data={this.getNotChoosenCustomer()}
                     onChange={this.onChangeSelectedCustomer}
@@ -270,11 +285,11 @@ class ReceivableList extends Component {
                 striped
                 bordered
                 data={data1} /> :
-                <div>No receivable found!</div>
+                <div style={{ fontSize: '2rem' }}>No receivable found!</div>
         }
         let isManager = AuthService.isManager();
         return (
-            <Container className='col-sm-12 row justify-content-center align-self-center'>
+            <Container className='col-sm-12 row justify-content-center'>
                 <div className="hungdtq-header">
                     <div>
                         <div className="d-inline-block hungdtq-header-text">
@@ -295,19 +310,19 @@ class ReceivableList extends Component {
 
                 </div>
                 <div className='col-sm-12 row justify-content-center align-self-center'>
-                    <Nav tabs className='col-sm-7'>
+                    <Nav tabs className='col-sm-8'>
                         <NavItem>
                             <NavLink className={classnames({ active: this.state.getConfirmed })}
                                 onClick={() => { this.toggleConfirmed(true) }}>
                                 <FontAwesomeIcon icon='check' size='md' color='green'
-                                    className='icon-btn' />Confirmed
+                                    className='icon-btn' />Confirmed ({this.state.sumConfirmed})
                             </NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink className={classnames({ active: !this.state.getConfirmed })}
                                 onClick={() => { this.toggleConfirmed(false); }}>
                                 <FontAwesomeIcon icon='exclamation-circle' size='md' color='orange'
-                                    className='icon-btn' />Not confirmed
+                                    className='icon-btn' />Not confirmed ({this.state.sumNotConfirmed})
                             </NavLink>
                         </NavItem>
                         <div style={{
@@ -317,7 +332,7 @@ class ReceivableList extends Component {
                             <Link to='/receivable/recent-add'>Recent added receivables</Link>
                         </div>
                     </Nav>
-                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }} className='border-shadow col-sm-7 row justify-content-center align-self-center'>
+                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }} className='border-shadow col-sm-8 row justify-content-center align-self-center'>
                         <TabPane tabId='1' className='col-sm-12 row justify-content-center align-self-center'>
                             {this.managerFilterComp()}
                             {this.statusFilterComp()}
@@ -370,14 +385,14 @@ const data = {
             width: 150
         },
         {
-            label: 'Debtor',
-            field: 'DebtorName',
+            label: 'Partner',
+            field: 'CustomerName',
             sort: 'asc',
             width: 270
         },
         {
-            label: 'Customer',
-            field: 'CustomerName',
+            label: 'Debtor',
+            field: 'DebtorName',
             sort: 'asc',
             width: 270
         },
@@ -394,9 +409,14 @@ const data = {
             width: 270
         },
         {
-            label: 'Payable day',
+            label: 'Start day',
             field: 'PayableDay',
             sort: 'asc',
+            width: 200
+        },
+        {
+            label: 'Stage',
+            field: 'CurrentStage',
             width: 200
         },
         {

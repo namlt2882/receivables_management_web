@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Component from '../common/component';
-import { available1 } from '../common/loading-page';
-import { ProfileMessageFormService } from '../../services/profile-message-form-service';
-import { MessageFormAction } from '../../actions/message-form-action';
-import ConfirmModal from '../modal/ConfirmModal';
 import Textarea from 'react-textarea-autosize';
-import { Link } from 'react-router-dom';
+import { Button } from 'semantic-ui-react';
+import { MessageFormAction } from '../../actions/message-form-action';
+import { ProfileMessageFormService } from '../../services/profile-message-form-service';
+import Component from '../common/component';
+import { available1, PrimaryLoadingPage } from '../common/loading-page';
+import ConfirmModal from '../modal/ConfirmModal';
+import { successAlert, errorAlert } from '../common/my-menu'
 
 const messageLength = 200;
 const amount = "[AMOUNT]";
@@ -22,6 +23,7 @@ class MessageActionPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            maxLoading: 1,
             modalShow: false,
             message: '',
             profileMessageForm: {
@@ -127,22 +129,22 @@ class MessageActionPage extends Component {
         this.setState({ modalShow: false });
         if (this.state.Id) {
             ProfileMessageFormService.update(this.state.profileMessageForm).then(res => {
-                if (res.status === 200) {
-                    this.setState({
-                        viewMode: 0
-                    });
-                    this.props.history.push(`/messages/${this.props.match.params.id}/view`);
-                } else {
-                    prompt('Failed to execute action');
-                }
+                this.setState({
+                    viewMode: 0
+                });
+                this.props.history.push(`/messages/${this.props.match.params.id}/view`);
+                successAlert(`The ${this.state.Type === 0 ? 'SMS' : 'Phone call'} message "${this.state.Name}" has been updated!`)
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Failed to execute this action, please try again later!');
             });
         } else {
             ProfileMessageFormService.create(this.state.profileMessageForm).then(res => {
-                if (res.status === 200) {
-                    this.props.history.push(`/messages/`);
-                } else if (res.status) {
-                    prompt('Failed to execuaction');
-                }
+                this.props.history.push(`/messages/`);
+                successAlert(`The ${this.state.Type === 0 ? 'SMS' : 'Phone call'} message "${this.state.Name}" has been created!`)
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Failed to execute this action, please try again later!');
             });
         }
 
@@ -150,9 +152,9 @@ class MessageActionPage extends Component {
 
     openModal() {
 
-        let {nameInputErr, contentInputErr} = this.state;
+        let { nameInputErr, contentInputErr } = this.state;
 
-        if (nameInputErr || contentInputErr){
+        if (nameInputErr || contentInputErr) {
             return;
         }
 
@@ -261,11 +263,16 @@ class MessageActionPage extends Component {
                         contentInputErr: false
                     });
                 });
+            } else {
+                this.incrementLoading();
             }
         }
     }
 
     render() {
+        if (this.isLoading()) {
+            return <PrimaryLoadingPage />
+        }
         var viewMode = this.state.viewMode;
         let modalClose = () => {
             this.setState({
@@ -284,8 +291,10 @@ class MessageActionPage extends Component {
                                 <h1>{this.state.title}</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
-                                <div className="btn btn-rcm-primary rcm-btn">
-                                    <Link to="/messages"><i class="fas fa-arrow-left"></i></Link>
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                    this.props.history.push('/messages');
+                                }}>
+                                    <a><i class="fas fa-arrow-left"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -405,11 +414,26 @@ class MessageActionPage extends Component {
                                         <tr>
                                             <td className="MessageDetailTable-Col1"></td>
                                             <td className="MessageDetailTable-Col2"></td>
-                                            <td className="MessageDetailTable-Col3">
-                                                <button style={{ display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</button>
-                                                <button style={{ display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</button>
-                                                <button style={{ width: '10rem' }} style={{ display: viewMode === 2 ? 'inline-block' : 'none' }} className="btn btn-rcm-primary" onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</button>
-                                                <button style={{ display: viewMode !== 0 ? 'inline-block' : 'none', width: '5rem' }} className="btn btn-rcm-secondary" onClick={this.onClear}>Reset</button>
+                                            <td className="MessageDetailTable-Col3" style={{ paddingTop: '1.5rem' }}>
+                                                {/* Edit button */}
+                                                <Button color='primary' style={{
+                                                    display: viewMode === 0 ? 'inline-block' : 'none', width: '10rem'
+                                                }} onClick={(e) => { e.stopPropagation(); this.changeMode() }}>Edit</Button>
+
+                                                {/* Save button */}
+                                                <Button color='primary' style={{
+                                                    display: viewMode === 1 ? 'inline-block' : 'none', width: '10rem'
+                                                }} onClick={(e) => { e.stopPropagation(); this.openModal() }}>Save</Button>
+
+                                                {/* Submit button */}
+                                                <Button color='primary' style={{ width: '10rem' }} style={{
+                                                    display: viewMode === 2 ? 'inline-block' : 'none'
+                                                }} onClick={(e) => { e.stopPropagation(); this.openModal() }}>Submit</Button>
+
+                                                {/* Reset button */}
+                                                <Button style={{
+                                                    display: viewMode !== 0 ? 'inline-block' : 'none', width: '10rem'
+                                                }} onClick={this.onClear}>Reset</Button>
                                             </td>
                                         </tr>
                                     </tbody>

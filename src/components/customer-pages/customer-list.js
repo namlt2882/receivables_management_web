@@ -1,12 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Component from '../common/component';
-import { available } from '../common/loading-page';
-import { Link } from 'react-router-dom';
-import { CustomerService } from '../../services/customer-service';
 import { CustomerAction } from '../../actions/customer-action';
-import { PrimaryLoadingPage } from '../common/loading-page';
-
+import { CustomerService } from '../../services/customer-service';
+import Component from '../common/component';
+import { available, PrimaryLoadingPage } from '../common/loading-page';
 import './customer.scss';
 
 class CustomerList extends Component {
@@ -65,7 +62,7 @@ class CustomerList extends Component {
             return <PrimaryLoadingPage />
         }
 
-        var customers = this.props.customers;
+        var { customers } = this.props;
         var { filterVal } = this.state;
 
         var index = 1;
@@ -80,8 +77,10 @@ class CustomerList extends Component {
                                 <h1>Partner management</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
-                                <div className="btn btn-rcm-primary rcm-btn">
-                                    <Link to="/customers/add"><i className="fas fa-plus"></i></Link>
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
+                                    this.props.history.push('/customers/add');
+                                }}>
+                                    <a><i className="fas fa-plus"></i></a>
                                 </div>
                             </div>
                         </div>

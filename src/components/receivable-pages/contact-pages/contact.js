@@ -1,38 +1,33 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPen, faTrashAlt, faUserFriends, faUserInjured, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
-import { Button, Container, Header, Table } from 'semantic-ui-react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserInjured, faUserFriends, faPen, faTrashAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { Container, Header, Button } from 'semantic-ui-react';
 import { AuthService } from '../../../services/auth-service';
+import AddContact from './add-contact';
 import EditContact from './edit-contact';
-import MyToolTip from '../../common/my-tooltip';
+import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+import { NotificationContainer } from 'react-notifications';
 library.add(faUserInjured, faUserFriends, faPen, faTrashAlt, faUserPlus);
 
 class Contact extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dropdownOpen: false,
-            mouseIn: false
-        };
-        this.toggle = this.toggle.bind(this);
+            openModal: false
+        }
+        this.openModal = this.openModal.bind(this);
     }
-    toggle() {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen
-        });
-    }
-    edit(e) {
+    openModal(e) {
         e.preventDefault();
-    }
-    add(e) {
-        e.preventDefault();
+        this.setState({ openModal: true });
     }
     render() {
         let contacts = this.props.contacts;
         let addable = true;
         let isFinished = this.props.isFinished;
         let debtor = null;
+        let receivableId = this.props.receivableId;
         if (this.props.isDebtor) {
             // will add if debtor not existed
             if (contacts == 0) {
@@ -46,17 +41,17 @@ class Contact extends Component {
         return (
             <Container style={this.props.style}>
                 <Header>
-                    <FontAwesomeIcon icon={this.props.isDebtor ? 'user-injured' : 'user-friends'}
-                        color='black' size='md' style={{ marginRight: '10px' }} />
-                    {this.props.title}
-                    {AuthService.isCollector() && !isFinished && this.props.isDebtor ? <div style={{ width: '30px', float: 'right', paddingRight: '20px' }}>
-                        <EditContact contact={debtor} updateReceivable={updateReceivable} />
-                    </div> : null}
+                    {this.props.isDebtor ? [
+                        <FontAwesomeIcon icon={this.props.isDebtor ? 'user-injured' : 'user-friends'}
+                            color='black' size='md' style={{ marginRight: '10px' }} />,
+                        this.props.title,
+                        (AuthService.isCollector() && !isFinished ? <div style={{ width: '30px', float: 'right', paddingRight: '20px' }}>
+                            <EditContact contact={debtor} updateReceivable={updateReceivable} />
+                        </div> : null)] : null}
                 </Header>
-                {addable && !isFinished ? <FontAwesomeIcon icon='user-plus' size='md' color='black' className='icon-btn'
-                    onClick={this.add} /> : null}
+                {addable && !isFinished ? <AddContact receivableId={receivableId} updateReceivable={updateReceivable} /> : null}
                 {this.props.isDebtor ? this.props.contacts.map((contact) =>
-                    (<table hover className='info-table'>
+                    (<div className='info-card'><table className='info-table'>
                         <tbody>
                             <tr>
                                 <td>Id:</td>
@@ -74,8 +69,28 @@ class Contact extends Component {
                                 <td>Address:</td>
                                 <td>{contact.Address}</td>
                             </tr>
+                            <tr>
+                                <td colSpan='2'>
+                                    <a href='' onClick={this.openModal}>Contact list</a>
+                                </td>
+                            </tr>
                         </tbody>
-                    </table>)) : <table className='table thin'>
+                    </table>
+                        <Modal isOpen={this.state.openModal} className='big-modal'>
+                            <NotificationContainer />
+                            <ModalHeader className='bold-text'>
+                                Contact list
+                            </ModalHeader>
+                            <ModalBody>
+                                {this.props.children}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color='secondary' onClick={() => {
+                                    this.setState({ openModal: false });
+                                }}>Close</Button>
+                            </ModalFooter>
+                        </Modal>
+                    </div>)) : <table className='table thin'>
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -94,12 +109,14 @@ class Contact extends Component {
                                 <td>{c.Phone}</td>
                                 <td>{c.Address}</td>
                                 <td>
-                                    {!isFinished ?
-                                        [<EditContact contact={c} updateReceivable={updateReceivable} />,
-                                        <FontAwesomeIcon icon='trash-alt' size='md' color='black' className='icon-btn' />]
-                                        : null}
+                                    {!isFinished && AuthService.isCollector() ?
+                                        [<EditContact contact={c} updateReceivable={updateReceivable} />]
+                                        : <p>&nbsp;</p>}
                                 </td>
                             </tr>))}
+                            {this.props.contacts.length == 0 ? <tr>
+                                <td colSpan='6' className='text-center'>No contact found!</td>
+                            </tr> : null}
                         </tbody>
                     </table>}
             </Container>);

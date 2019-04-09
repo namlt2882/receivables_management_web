@@ -53,7 +53,7 @@ class NewAssignedReceivable extends Component {
         }
         let data1 = this.pushDataToTable();
         return (
-            <Container className='col-sm-12 row justify-content-center align-self-center'>
+            <Container className='col-sm-12 row justify-content-center'>
                 <div className="hungdtq-header">
                     <h1> You have just been assigned for {this.props.newReceiavbleIds.length} receivable(s)</h1>
                 </div>

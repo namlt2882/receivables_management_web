@@ -125,6 +125,7 @@ class Notification extends React.Component {
         this.type11Action = this.type11Action.bind(this);
         this.type12Action = this.type12Action.bind(this);
         this.getAction = this.getAction.bind(this);
+        this.start = this.start.bind(this);
     }
 
     componentDidMount() {
@@ -150,6 +151,7 @@ class Notification extends React.Component {
                 .configureLogging(signalR.LogLevel.Information)
                 .withHubProtocol(protocol)
                 .build();
+            connection.serverTimeoutInMilliseconds = 86400000;//1 day
             connection.on('Notify', (notification) => {
                 this.setState(pre => ({ unseenNoti: ++pre.unseenNoti }));
                 notification = JSON.parse(notification);
@@ -164,8 +166,25 @@ class Notification extends React.Component {
             }).catch(err => {
                 console.error(err.toString())
             })
+            connection.onclose(async () => {
+                await this.start();
+            });
         })
     }
+
+    start = async () => {
+        let connection = this.state.connection;
+        if (connection) {
+            try {
+                await connection.start();
+                console.log("connected");
+            } catch (err) {
+                console.log(err);
+                setTimeout(() => this.start(), 5000);
+            }
+        }
+    };
+
 
     getAction({ Id, Type, NData, IsSeen }) {
         let action = () => { };

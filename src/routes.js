@@ -30,7 +30,7 @@ const routes = [
     {
         path: '/users/add',
         exact: true,
-        main: ({ history }) => <UserActionPage history={history} />
+        main: ({ match, history }) => <UserActionPage match={match} history={history} />
     },
     {
         path: '/users/:id/edit',
@@ -70,7 +70,7 @@ const routes = [
     {
         path: '/messages/add',
         exact: true,
-        main: ({ match, history }) => <MessageActionPage history={history} />
+        main: ({ match, history }) => <MessageActionPage match={match} history={history} />
     },
     {
         path: '/messages/:id/view',
@@ -95,7 +95,11 @@ const routes = [
     {
         path: '/receivable/:id/view',
         exact: true,
-        main: ({ match, history }) => <ReceivableDetail key={match.params.id} match={match} history={history} />
+        main: ({ match, history }) => {
+            let currentTime = new Date();
+            return <ReceivableDetail key={`${match.params.id}-${currentTime.getMilliseconds()}`}
+                match={match} history={history} />
+        }
     },
     {
         path: '/task',
@@ -115,7 +119,7 @@ const routes = [
     {
         path: '/customers/add',
         exact: true,
-        main: ({ match, history }) => <CustomerActionPage history={history} />
+        main: ({ match, history }) => <CustomerActionPage match={match} history={history} />
     },
     {
         path: '/customers/:id/view',
