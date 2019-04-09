@@ -361,3 +361,49 @@ input::-webkit-inner-spin-button {
 .error-validation-message {
     color: red;
 }
+
+.ui.form select,
+.ui.form input:not([type]),
+.ui.form input[type=date],
+.ui.form input[type=datetime-local],
+.ui.form input[type=email],
+.ui.form input[type=file],
+.ui.form input[type=number],
+.ui.form input[type=password],
+.ui.form input[type=search],
+.ui.form input[type=tel],
+.ui.form input[type=text],
+.ui.form input[type=time],
+.ui.form input[type=url] {
+    @extend .input-border;
+}
+
+.input-border {
+    border: 1.5px solid #b5bcc9 !important;
+}
+
+.input-border:focus {
+    outline: none;
+}
+
+.k-multiselect-wrap,
+.k-popup,
+.rcm-form-control {
+    @extend .input-border;
+}
+
+.dataTables_filter input {
+    @extend .input-border;
+}
+
+.dataTables_length * {
+    display: none;
+}
+
+.button {
+    width: 8rem;
+}
+
+.full-height {
+    height: 100%;
+}
