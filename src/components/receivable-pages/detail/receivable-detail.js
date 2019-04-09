@@ -97,6 +97,8 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             })
         }).catch(err => {
+            console.error(err);
+            errorAlert('Service unavailable, please try again later!');
         })
     }
     confirm() {
