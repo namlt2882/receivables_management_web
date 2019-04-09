@@ -28,6 +28,8 @@ import { ProfileAction } from './../../actions/profile-action';
 import { describeStatus, getStatusColor } from './detail/receivable-detail';
 import { TopPopup } from '../common/top-popup';
 import ConfirmModal from '../modal/ConfirmModal';
+import * as ProcessReducer from '../../reducers/process-reducer'
+import { ProcessAction } from '../../actions/process-action';
 
 class ImportReceivable extends Component {
     constructor(props) {
@@ -292,7 +294,19 @@ class ImportReceivable extends Component {
 
     insertReceivable() {
         this.setLoadingForm(true);
-        ReceivableService.create(this.state.validatedData).then(res => {
+        let currentProfile = this.props.process;
+        let profile = new ProcessReducer.Process().toProfile(currentProfile);
+        let profileId = parseInt(this.state.profileId);
+        if (profile.Id == undefined) {
+            profile.Id = currentProfile._originId;
+            profileId = currentProfile._originId;
+        }
+        let validatedData = this.state.validatedData;
+        validatedData.forEach(r => {
+            r.ProfileId = profileId;
+            r.Profile = profile;
+        });
+        ReceivableService.create(validatedData).then(res => {
             let insertedIds = res.data;
             let currentDate = this.state.currentDate;
             let customer = this.state.customer;
@@ -406,7 +420,7 @@ class ImportReceivable extends Component {
             return isValidated;
         }
     }
-    createCustomerThenIncreaseStep() {
+    createCustomerThenIncreaseStep(callback = () => { }) {
         this.setState({ loadingForm: true });
         let customer = this.state.customer;
         let data = {
@@ -418,13 +432,12 @@ class ImportReceivable extends Component {
         CustomerService.create(data).then(res => {
             let newCustomer = res.data;
             customer.Id = newCustomer.Id;
+            // add new customer to list
             this.props.addCustomer(customer);
-            this.setState({
-                loadingForm: false,
-                customer: customer
-            });
+            // set current customer
+            this.setState({ customer: customer });
+            callback();
             NotificationManager.success('', `Customer ${customer.Name} has been created!`, 3000, () => { });
-            this.increaseStep();
         }).catch(err => {
             console.error(err);
             errorAlert('Service unavailable!')
@@ -446,10 +459,29 @@ class ImportReceivable extends Component {
     }
     //#endregion
     skipStep1(isNewCustomer) {
+        let callbackIfSuccess = () => {
+            let profile = this.props.process;
+            // get profile if profile does not got
+            if (profile.Id != this.state.profileId) {
+                ProfileService.getDetail(parseInt(this.state.profileId)).then(res2 => {
+                    profile = res2.data;
+                    this.props.setProfile(profile);
+                    this.setState({ loadingForm: false });
+                    this.increaseStep();
+                }).catch(err => {
+                    console.error(err);
+                    errorAlert('Some thing went wrong, please try again!');
+                    this.setState({ loadingForm: false });
+                })
+            } else {
+                this.setState({ loadingForm: false });
+                this.increaseStep();
+            }
+        }
         if (isNewCustomer) {
-            this.createCustomerThenIncreaseStep();
+            this.createCustomerThenIncreaseStep(callbackIfSuccess);
         } else {
-            this.increaseStep();
+            callbackIfSuccess();
         }
     }
     //#region Modify profile
@@ -478,6 +510,7 @@ class ImportReceivable extends Component {
             if (newId == -1) {
                 newId--;
             }
+            profile._originId = profile.Id;
             profile.Id = newId;
             profile.Name = `${profile.Name} (modified)`;
             // set selected profile
@@ -892,6 +925,9 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         setProfiles: (profiles) => {
             dispatch(ProfileAction.setProfiles(profiles))
+        },
+        setProfile: (profile) => {
+            dispatch(ProcessAction.setProcess(profile));
         },
         setCollectors: (collectors) => {
             collectors.forEach(c => {
