@@ -22,13 +22,14 @@ import EditReceivable from '../edit/edit-receivable';
 import { TaskService } from '../../../services/task-service';
 import ConfirmModal from '../../modal/ConfirmModal';
 import { successAlert, errorAlert } from '../../common/my-menu';
+import { ProfileService } from '../../../services/profile-service';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 7,
+            maxLoading: 8,
             receivable: null,
             currentStage: null,
             currentDate: dateToInt(new Date()),
@@ -36,6 +37,7 @@ class ReceivableDetail extends Component {
             customerList: [],
             todayTask: [],
             openConfirm: false,
+            profile: null
         }
         this.updateReceivable = this.updateReceivable.bind(this);
         this.confirm = this.confirm.bind(this);
@@ -96,6 +98,14 @@ class ReceivableDetail extends Component {
                 this.setState({ customerList: res5.data });
                 this.incrementLoading();
             })
+            if (receivable.CollectionProgress) {
+                ProfileService.getDetail(receivable.CollectionProgress.ProfileId).then(res6 => {
+                    this.setState({ profile: res6.data });
+                    this.incrementLoading();
+                })
+            } else {
+                this.incrementLoading();
+            }
         }).catch(err => {
             console.error(err);
             errorAlert('Service unavailable, please try again later!');
@@ -329,6 +339,16 @@ class ReceivableDetail extends Component {
                                         <td>Collector:</td>
                                         <td>
                                             {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Profile:</td>
+                                        <td>
+                                            {this.state.profile ?
+                                                (AuthService.isManager() ? <a target='_blank'
+                                                    href={`/profile/${this.state.profile.Id}/view`}>
+                                                    {this.state.profile.Name}
+                                                </a> : this.state.profile.Name) : null}
                                         </td>
                                     </tr>
                                     {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?

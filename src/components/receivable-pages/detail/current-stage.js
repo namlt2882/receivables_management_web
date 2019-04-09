@@ -27,7 +27,7 @@ class CurrentStage extends Component {
                 <Segment className='col-sm-12'>
                     <Grid columns='1'>
                         <Grid.Column>
-                            <table className='info-table' style={{ marginLeft: '20px' }}>
+                            <table className='info-table'>
                                 <tbody>
                                     <tr>
                                         <td>Stage:</td>

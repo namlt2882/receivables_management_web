@@ -659,7 +659,7 @@ class ImportReceivable extends Component {
                 {this.state.validatedData !== null && this.state.step === 3 ?
                     <Container>
                         <Divider />
-                        <table className='table'>
+                        <table className='table text-center'>
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -711,7 +711,7 @@ class ImportReceivable extends Component {
                     </Container> : null}
                 {/* START STEP 4 */}
                 {this.state.insertedData !== null && this.state.step === 4 ?
-                    <Container>
+                    <Container className='middle-content-table'>
                         <Divider />
                         <MDBDataTable
                             className='hide-last-row'
@@ -823,7 +823,7 @@ class SelectCollector extends React.Component {
                 onChange={this.onChangeCollector} />
             <div className='choosen-collector-info'>
                 <span style={{ display: collectorId ? 'block' : 'none' }}>
-                    <span style={{ color: 'red' }}>CPP</span>: {selectedCpp ? selectedCpp.CPP.toFixed(2) : ''} | <span style={{ color: 'blue' }}>Current receivable</span>: {selectedCpp ? selectedCpp.CurrentReceivable : ''}
+                    <span style={{ color: 'red' }}>CPP</span>: {selectedCpp ? selectedCpp.CPP.toFixed(2) : ''} | <span style={{ color: 'blue' }}>CR</span>: {selectedCpp ? selectedCpp.CurrentReceivable : ''}
                 </span>
             </div>
         </div>)

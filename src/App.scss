@@ -217,11 +217,11 @@ table.table a {
     @extend .border-shadow;
     padding: 20px;
     margin-bottom: 20px;
-    min-height: 18rem;
+    min-height: 20rem;
 }
 
 .info-table {
-    width: 100%;
+    // width: 100%;
 }
 
 .info-table tr {
@@ -406,4 +406,8 @@ input::-webkit-inner-spin-button {
 
 .full-height {
     height: 100%;
+}
+
+.middle-content-table .table td {
+    text-align: center;
 }

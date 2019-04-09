@@ -55,7 +55,7 @@ class ActionHistory extends React.Component {
                         return <div>
                             {i >= 1 ? <Divider /> : null}
                             <span><h3>{stage.Name}</h3></span>
-                            <table className='table thin' striped>
+                            <table className='table thin text-center'>
                                 <thead>
                                     <tr>
                                         <th>Type</th>

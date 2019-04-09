@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { ProfileAction } from '../../actions/profile-action';
-import { ProcessAction } from '../../actions/process-action';
 import { Link } from 'react-router-dom';
-import Component from '../common/component'
-import { available, PrimaryLoadingPage } from '../common/loading-page'
-import { Container, Button, Header, Table, Form, Divider } from 'semantic-ui-react';
-import * as ProcessReducer from '../../reducers/process-reducer'
-import { Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Container, Divider, Form } from 'semantic-ui-react';
+import { ProcessAction } from '../../actions/process-action';
+import { ProfileAction } from '../../actions/profile-action';
+import * as ProcessReducer from '../../reducers/process-reducer';
 import { ProfileService } from '../../services/profile-service';
+import Component from '../common/component';
+import { available, PrimaryLoadingPage } from '../common/loading-page';
 
 class ProfileList extends Component {
 
@@ -44,26 +44,26 @@ class ProfileList extends Component {
         var profiles = this.props.profiles;
         return (
             <Container className='col-sm-12 row justify-content-center'>
-                <div className='col-sm-12'>
-                <div className="hungdtq-header">
-                    <div>
-                        <div className="d-inline-block hungdtq-header-text">
-                            <h1>Profiles</h1>
-                        </div>
-                        <div className="d-inline-block hungdtq-headerbtn-container">
-                            <div className="btn btn-rcm-primary rcm-btn" onClick={this.toggleAddForm}>
-                                <a><i className="fas fa-plus"></i></a>
+                <div className='col-sm-12 middle-content-table'>
+                    <div className="hungdtq-header">
+                        <div>
+                            <div className="d-inline-block hungdtq-header-text">
+                                <h1>Profiles</h1>
                             </div>
-                        </div></div>
-                    <Divider />
-                </div>
+                            <div className="d-inline-block hungdtq-headerbtn-container">
+                                <div className="btn btn-rcm-primary rcm-btn" onClick={this.toggleAddForm}>
+                                    <a><i className="fas fa-plus"></i></a>
+                                </div>
+                            </div></div>
+                        <Divider />
+                    </div>
                     <table className="table">
                         <thead>
                             <tr>
                                 <th>Id</th>
                                 <th>Profile name</th>
                                 {/* <th>Customer</th> */}
-                                <th>Actions</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>

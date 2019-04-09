@@ -370,7 +370,7 @@ class ReceivableList extends Component {
                         </div>
                     </div>
                 </div>
-                <div className='col-sm-12'>
+                <div className='col-sm-12 middle-content-table'>
                     {tableComponent}
                 </div>
             </Container>);
