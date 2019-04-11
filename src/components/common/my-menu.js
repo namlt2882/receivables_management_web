@@ -75,12 +75,14 @@ class MyProfile extends React.Component {
     }
 
     render() {
+        let name = localStorage.getItem('username');
         return (<NavItem className='nav-icon'>
             <div style={{ paddingTop: '2px' }}>
                 <Dropdown isOpen={this.props.dropdownProfile} toggle={this.props.toggleProfile}
                     className='my-profile'>
                     <DropdownToggle className='transparent-button'>
-                        <FontAwesomeIcon icon='user-circle' color='white' size='lg' />
+                        <FontAwesomeIcon icon='user-circle' color='#3778c2' size='lg' />
+                        <span className='username'>{name}</span>
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
                         <div className='col-sm-10' style={{ cursor: 'default' }}>
@@ -209,8 +211,11 @@ class Notification extends React.Component {
                     openModal: true
                 });
             }
-            //send IsSeen = true
+            //send if IsSeen = false
             if (!IsSeen) {
+                this.setState(pre => ({
+                    unseenNoti: --pre.unseenNoti
+                }))
                 NotificationService.toggleSeen(Id).then(res => {
                     let noti = this.state.notifications.find(n => n.Id === Id);
                     if (noti) {
@@ -272,8 +277,7 @@ class Notification extends React.Component {
         } else {
             this.setState({
                 dropdownNoti: true,
-                mouseInNoti: true,
-                unseenNoti: 0
+                mouseInNoti: true
             });
         }
     }

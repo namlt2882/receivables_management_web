@@ -7,6 +7,7 @@ import Component from '../common/component';
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import ConfirmModal from '../modal/ConfirmModal';
 import { successAlert, errorAlert } from '../common/my-menu'
+import { AuthService } from '../../services/auth-service';
 
 const lastnameChangeMessageErr = "Last name is required";
 const firstnameChangeMessageErr = "First name is required";
@@ -291,13 +292,13 @@ class UserDetailPage extends Component {
                             <div className="d-inline-block hungdtq-header-text">
                                 <h1>{this.state.viewMode === 0 ? 'User detail' : 'New user'}</h1>
                             </div>
-                            <div className="d-inline-block hungdtq-headerbtn-container">
+                            {AuthService.isAdmin() ? <div className="d-inline-block hungdtq-headerbtn-container">
                                 <div className="btn btn-rcm-primary rcm-btn" onClick={() => {
                                     this.props.history.push('/users');
                                 }}>
                                     <a><i className="fas fa-arrow-left"></i></a>
                                 </div>
-                            </div>
+                            </div> : null}
                         </div>
                         <hr></hr>
                     </div>
