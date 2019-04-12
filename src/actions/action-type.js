@@ -17,6 +17,7 @@ export const SEARCH_MESSAGE = 'SEARCH_MESSAGE';
 
 // Profile
 export const SET_PROFILE_LIST = 'SET_PROFILE_LIST';
+export const SET_PROFILE = 'SET_PROFILE';
 export const GET_PROFILE = 'GET_PROFILE';
 export const ADD_PROFILE = 'ADD_PROFILE';
 export const EDIT_PROFILE = 'EDIT_PROFILE';

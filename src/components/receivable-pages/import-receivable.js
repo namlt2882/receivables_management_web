@@ -2,12 +2,12 @@ import { DatePicker } from '@progress/kendo-react-dateinputs';
 import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { MDBDataTable } from 'mdbreact';
 import React from 'react';
-import { NotificationManager } from 'react-notifications';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Modal, ModalBody, ModalFooter } from 'reactstrap';
 import { Button, Checkbox, Container, Divider, Form, Icon, Label, Step } from 'semantic-ui-react';
 import XLSX from 'xlsx';
+import { ProcessAction } from '../../actions/process-action';
 import { convertCurrency } from '../../reducers/match-point-reducer';
 import { CustomerService } from '../../services/customer-service';
 import { PointService } from '../../services/point-service';
@@ -16,61 +16,50 @@ import { ReceivableService } from '../../services/receivable-service';
 import { UserService } from '../../services/user-service';
 import { UtilityService } from '../../services/utility-service';
 import { dateToInt, numAsDate } from '../../utils/time-converter';
-import { IdGenerator, ifNullElseString } from '../../utils/utility';
+import { ifNullElseString } from '../../utils/utility';
 import Component from '../common/component';
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
 import { errorAlert, successAlert } from '../common/my-menu';
+import { TopPopup } from '../common/top-popup';
+import ConfirmModal from '../modal/ConfirmModal';
 import EditProfile from '../profile-pages/edit-profile';
 import { CollectorAction } from './../../actions/collector-action';
 import { CustomerAction } from './../../actions/customer-action';
 import { MatchPointAction } from './../../actions/match-point-action';
 import { ProfileAction } from './../../actions/profile-action';
 import { describeStatus, getStatusColor } from './detail/receivable-detail';
-import { TopPopup } from '../common/top-popup';
-import ConfirmModal from '../modal/ConfirmModal';
-import * as ProcessReducer from '../../reducers/process-reducer'
-import { ProcessAction } from '../../actions/process-action';
 
 class ImportReceivable extends Component {
     constructor(props) {
         super(props);
         let showRecent = this.props.showRecent;
         this.state = {
-            isProfileModified: false,
             openModal: false,
             modalContent: null,
             receivableData: null,
             contactData: null,
             fileWarning: '',
+            profileId: -1,
             selectCollector: null,
-            profileId: '-1',
             loadingForm: false,
-            maxLoading: 4,
-            step: showRecent ? 4 : 1,
+            maxLoading: 5,
+            step: showRecent ? 3 : 1,
             currentDate: dateToInt(new Date()),
             validatedData: null,
             insertedData: showRecent ? JSON.parse(localStorage.getItem('recent_inserted_data')) : null,
-            customer: null,
-            isLoadingCpp: false,
-            openConfirm: false,
-            onConfirm: () => { }
+            onConfirm: () => { },
+            errorLine: 0,
+            originLine: 0
         }
         this.setCollector = this.setCollector.bind(this);
-        this.updateProfile = this.updateProfile.bind(this);
-        this.updateCustomer = this.updateCustomer.bind(this);
         this.validateReceivables = this.validateReceivables.bind(this);
         this.increaseStep = this.increaseStep.bind(this);
         this.decreaseStep = this.decreaseStep.bind(this);
         this.insertReceivable = this.insertReceivable.bind(this);
         this.setPayableDay = this.setPayableDay.bind(this);
-        this.isNewCustomer = this.isNewCustomer.bind(this);
-        this.changeNewCustomerCode = this.changeNewCustomerCode.bind(this);
-        this.isCustomerCodeValid = this.isCustomerCodeValid.bind(this);
-        this.createCustomerThenIncreaseStep = this.createCustomerThenIncreaseStep.bind(this);
-        this.getAllCollectorCpp = this.getAllCollectorCpp.bind(this);
-        this.skipStep1 = this.skipStep1.bind(this);
         this.viewProfileDetail = this.viewProfileDetail.bind(this);
         this.closeProfileDetail = this.closeProfileDetail.bind(this);
+        this.onChangeProfile = this.onChangeProfile.bind(this);
     }
     //#region Step
     increaseStep() {
@@ -93,7 +82,21 @@ class ImportReceivable extends Component {
                 this.incrementLoading();
             })
             ProfileService.getAll().then(res => {
-                this.props.setProfiles(res.data);
+                let profiles = res.data;
+                this.props.setCustomers(profiles);
+                this.setState(pre => ({
+                    maxLoading: pre.maxLoading + profiles.length
+                }))
+                profiles.forEach((profile) => {
+                    ProfileService.getDetail(profile.Id).then(res2 => {
+                        this.props.setProfile(res2.data);
+                        this.incrementLoading();
+                    }).catch(err => {
+                        console.error(err);
+                        errorAlert('Error occur, please try again later!');
+                    })
+                })
+                this.props.setProfiles(profiles);
                 this.incrementLoading();
             })
             UtilityService.getServerDate().then(res => {
@@ -101,9 +104,16 @@ class ImportReceivable extends Component {
                 this.setState({ currentDate: currentDate });
                 this.incrementLoading();
             })
-            this.getAllCollectorCpp();
+            PointService.getAllCollectorCpp().then(res => {
+                let data = res.data;
+                this.props.setCppList(data);
+                this.incrementLoading();
+            }).catch(err => {
+                console.error(err);
+                errorAlert('Collector suggestion feature is OFF!');
+            })
         } else {
-            this.incrementLoading(3);
+            this.incrementLoading(4);
         }
     }
     //#region File
@@ -138,14 +148,18 @@ class ImportReceivable extends Component {
             }
             const receivableData = XLSX.utils.sheet_to_json(receivableSheet);
             const contactData = XLSX.utils.sheet_to_json(contactSheet);
+            // map contact
             let tmp = this.mapContactToReceivable(receivableData, contactData);
             this.setState({
                 receivableData: tmp,
-                contactData: contactData
+                contactData: contactData,
+                errorLine: receivableData.length - tmp.length,
+                originLine: receivableData.length
             })
             this.setState({ fileWarning: '' })
-            this.increaseStep();
-            this.validateReceivables();
+            this.validateReceivables(() => {
+                this.increaseStep();
+            });
         }
         try {
             if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
@@ -154,20 +168,26 @@ class ImportReceivable extends Component {
     }
 
     mapContactToReceivable = (receivableData, contactData) => {
-        receivableData.map((rei) => {
+        let rs = receivableData.map((rei) => {
             rei.CollectorId = null;
             rei.Debtor = null;
             rei.Contacts = [];
-            rei.Profile = this.state.selectedProfile;
-            rei.Customer = this.state.selectedCustomer;
-        })
+            rei.Profile = null;
+            let partnerCode = rei.PartnerCode;
+            if (partnerCode !== undefined && partnerCode !== null) {
+                partnerCode = partnerCode.toUpperCase();
+            }
+            rei.Customer = this.props.customers
+                .find(c => c.Code.toUpperCase() == partnerCode);
+            return rei;
+        }).filter(rei => rei.Customer);
         contactData.map((contact) => {
             if (contact.IsDebtor === true) {
                 receivableData[contact.ReceivableNo - 1].Debtor = contact;
             }
             receivableData[contact.ReceivableNo - 1].Contacts.push(contact);
         });
-        return receivableData;
+        return rs;
     }
     //#endregion
     setCollector(no, collectorId) {
@@ -211,13 +231,12 @@ class ImportReceivable extends Component {
         this.setState({ validatedData: validatedData })
     }
 
-    validateReceivables() {
+    validateReceivables(callback = () => { }) {
         this.setLoadingForm(true);
         let currentDate = this.state.currentDate.toString();
         let year = parseInt(currentDate.substring(0, 4));
         let month = parseInt(currentDate.substring(4, 6));
         let day = parseInt(currentDate.substring(6));
-        let payableDay = '' + year + (month < 10 ? '0' + month : month) + (day < 10 ? '0' + day : day);
         var list = this.state.receivableData.map((rei) => {
             return {
                 "Contacts": rei.Contacts.map((contact) => {
@@ -246,11 +265,11 @@ class ImportReceivable extends Component {
                     }
                 }),
                 "PayableDay": currentDate,
-                "ProfileId": this.state.profileId == '-1' ? null : parseInt(this.state.profileId),
+                "ProfileId": -1,
                 "CollectorId": rei.CollectorId,
                 "PrepaidAmount": rei.PrepaidAmount,
                 "DebtAmount": rei.DebtAmount,
-                "CustomerId": this.state.customer.Id,
+                "CustomerId": rei.Customer.Id,
                 "LocationId": null
             };
         })
@@ -260,6 +279,10 @@ class ImportReceivable extends Component {
                 r.Contacts.map(c => {
                     delete c.ReceivableId;
                 })
+            })
+            // remove profile id
+            resData.forEach(r => {
+                r.ProfileId = null;
             })
             // start suggest collector
             let matchData = this.props.matchData;
@@ -280,11 +303,13 @@ class ImportReceivable extends Component {
                 });
                 this.props.setMatchData(matchData);
             }
-            this.setState({
-                validatedData: resData
-            })
+            this.setState(pre => ({
+                validatedData: resData,
+                errorLine: pre.errorLine + (list.length - resData.length)
+            }))
             //end suggest collector
             this.setLoadingForm(false);
+            callback();
         }).catch(err => {
             console.error(err);
             errorAlert('Service unavailable!');
@@ -294,26 +319,16 @@ class ImportReceivable extends Component {
 
     insertReceivable() {
         this.setLoadingForm(true);
-        let currentProfile = this.props.process;
-        let profile = new ProcessReducer.Process().toProfile(currentProfile);
-        let profileId = parseInt(this.state.profileId);
-        if (profile.Id == undefined) {
-            profile.Id = currentProfile._originId;
-            profileId = currentProfile._originId;
-        }
         let validatedData = this.state.validatedData;
-        validatedData.forEach(r => {
-            r.ProfileId = profileId;
-            r.Profile = profile;
-        });
         ReceivableService.create(validatedData).then(res => {
             let insertedIds = res.data;
             let currentDate = this.state.currentDate;
-            let customer = this.state.customer;
-            let profile = this.props.profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name);
+
             ReceivableService.getReceivablesByIds(insertedIds).then(res1 => {
                 let insertedData = res1.data;
-                localStorage.setItem('recent_profile', profile);
+                insertedData.forEach(r => {
+                    r.Profile = this.props.profiles.find(p => p.Id === r.ProfileId);
+                })
                 localStorage.setItem('recent_inserted_data', JSON.stringify(insertedData));
                 localStorage.setItem('recent_inserted_date', currentDate);
                 this.setState({
@@ -334,85 +349,14 @@ class ImportReceivable extends Component {
         })
     }
 
-    updateProfile(e) {
-        let value = e.target.value;
-        if (this.state.isProfileModified) {
-            this.setState({
-                openConfirm: true,
-                onConfirm: () => {
-                    let profiles = this.props.profiles;
-                    profiles = profiles.filter(p => p.Id >= 0);
-                    this.props.setProfiles(profiles);
-                    this.setState({
-                        profileId: value,
-                        isProfileModified: false,
-                        openConfirm: false
-                    });
-                }
-            })
-        } else {
-            this.setState({ profileId: value, isProfileModified: false });
-        }
-    }
-
-    updateCustomer(val) {
-        this.setState({
-            customer: val
-        });
-    }
-
-    changeNewCustomerCode(e) {
-        let val = e.target.value;
-        let customer = this.state.customer;
-        if (val) {
-            val = val.replace(/\s/g, '');
-            val = val.toUpperCase();
-            e.target.value = val;
-        }
-        customer.Code = val;
-        this.setState({ customer: customer });
-    }
-
-    isNewCustomer() {
-        let customer = this.state.customer;
-        if (customer) {
-            return !customer.Id;
-        } else return false;
-    }
-
-    isCustomerCodeValid() {
-        if (!this.isNewCustomer()) {
-            return true;
-        }
-        let customer = this.state.customer;
-        let code = customer.Code;
-        if (code === '' || !code) {
-            return false
-        }
-        if (this.props.customers.find(c => c.Code === code)) {
-            return false
-        }
-        return true
-    }
-
-    warningCustomerCode() {
-        let customer = this.state.customer;
-        let code = customer.Code;
-        if (code === '') {
-            return 'Code can not be empty'
-        }
-        if (this.props.customers.find(c => c.Code === code)) {
-            return 'This code is already existed'
-        }
-        return null;
-    }
-
     IsValidate() {
         if (this.state.validatedData === null) {
             return false;
         } else {
             var isValidated = !this.state.validatedData
                 .some((r) => {
+                    if (!r.Profile) return true;
+                    if (!r.ProfileId) return true;
                     if (r.PayableDay) {
                         return r.CollectorId === null;
                     } else return false;
@@ -420,71 +364,18 @@ class ImportReceivable extends Component {
             return isValidated;
         }
     }
-    createCustomerThenIncreaseStep(callback = () => { }) {
-        this.setState({ loadingForm: true });
-        let customer = this.state.customer;
-        let data = {
-            Code: customer.Code,
-            Name: customer.Name,
-            Phone: '',
-            Address: ''
+
+    onChangeProfile(receivableNo, profileId) {
+        let validatedData = this.state.validatedData;
+        let profile = null;
+        if (profileId !== null) {
+            profile = this.props.profiles.find(p => p.Id == profileId);
         }
-        CustomerService.create(data).then(res => {
-            let newCustomer = res.data;
-            customer.Id = newCustomer.Id;
-            // add new customer to list
-            this.props.addCustomer(customer);
-            // set current customer
-            this.setState({ customer: customer });
-            callback();
-            NotificationManager.success('', `Customer ${customer.Name} has been created!`, 3000, () => { });
-        }).catch(err => {
-            console.error(err);
-            errorAlert('Service unavailable!')
-            this.setState({ loadingForm: false });
-        })
+        validatedData[receivableNo].ProfileId = profileId;
+        validatedData[receivableNo].Profile = profile;
+        this.setState({ validatedData: validatedData });
     }
-    //#region Suggestion
-    getAllCollectorCpp() {
-        this.setState({ isLoadingCpp: true });
-        PointService.getAllCollectorCpp().then(res => {
-            let data = res.data;
-            this.props.setCppList(data);
-            this.setState({ isLoadingCpp: false });
-        }).catch(err => {
-            console.error(err);
-            errorAlert('Collector suggestion feature is OFF!');
-            this.setState({ isLoadingCpp: false });
-        })
-    }
-    //#endregion
-    skipStep1(isNewCustomer) {
-        let callbackIfSuccess = () => {
-            let profile = this.props.process;
-            // get profile if profile does not got
-            if (profile.Id != this.state.profileId) {
-                ProfileService.getDetail(parseInt(this.state.profileId)).then(res2 => {
-                    profile = res2.data;
-                    this.props.setProfile(profile);
-                    this.setState({ loadingForm: false });
-                    this.increaseStep();
-                }).catch(err => {
-                    console.error(err);
-                    errorAlert('Some thing went wrong, please try again!');
-                    this.setState({ loadingForm: false });
-                })
-            } else {
-                this.setState({ loadingForm: false });
-                this.increaseStep();
-            }
-        }
-        if (isNewCustomer) {
-            this.createCustomerThenIncreaseStep(callbackIfSuccess);
-        } else {
-            callbackIfSuccess();
-        }
-    }
-    //#region Modify profile
+
     viewProfileDetail(e) {
         e.preventDefault();
         let profileId = parseInt(this.state.profileId);
@@ -497,123 +388,44 @@ class ImportReceivable extends Component {
                 profileId = undefined;
             }
         }
-        let modalContent = <EditProfile key={profileId} profileId={profileId} onChange={() => {
-            this.setState({ isProfileModified: true })
-        }} onSave={(profile) => {
-            if (profile._isModified) {
-                return;
-            } else {
-                profile._isModified = true;
-            }
-            // create new Id
-            let newId = IdGenerator.generateId();
-            if (newId == -1) {
-                newId--;
-            }
-            profile._originId = profile.Id;
-            profile.Id = newId;
-            profile.Name = `${profile.Name} (modified)`;
-            // set selected profile
-            this.setState({ profileId: newId });
-            // update profile list
-            let newProfile = {
-                Id: newId,
-                Name: profile.Name
-            }
-            let profiles = this.props.profiles;
-            profiles.push(newProfile);
-            this.props.setProfiles(profiles);
-        }} isPopup={true} />;
+        let modalContent = <EditProfile key={profileId} profileId={profileId} isPopup={true} />;
         this.setState({ openModal: true, modalContent: modalContent });
-
     }
     closeProfileDetail() {
         this.setState({ openModal: false, modalContent: null });
     }
-    //#endregion
+
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />
         }
-        let customers = this.props.customers;
-        let customer = this.state.customer;
-        let profiles = this.props.profiles;
         let isValidate = this.IsValidate();
         let data2 = tableData2;
-        if (this.state.insertedData !== null && this.state.step === 4) {
+        if (this.state.insertedData !== null && this.state.step === 3) {
             data2 = pushData2(this.state.insertedData, this.props.collectors);
         }
-        let isNewCustomer = this.isNewCustomer();
-        let codeValid = this.isCustomerCodeValid();
         let cacheData = localStorage.getItem('recent_inserted_data');
         return (<Container className='col-sm-12 row'>
             <div className="hungdtq-header"><h1>{this.props.showRecent ? 'Recently added receivables' : 'Import receivable'}</h1>
                 <Divider />
             </div>
             <Form loading={this.state.loadingForm} onSubmit={() => { }} className='col-sm-12 row justify-content-center align-self-center'>
-                <Step.Group size='mini' className='col-sm-10' style={{ display: this.state.step === 4 ? 'none' : 'flex' }}>
+                <Step.Group size='mini' className='col-sm-10' style={{ display: this.state.step === 3 ? 'none' : 'flex' }}>
                     <Step active={this.state.step === 1}>
-                        <Icon name='info' />
-                        <Step.Content>
-                            <Step.Title>Choose customer and profile</Step.Title>
-                        </Step.Content>
-                    </Step>
-                    <Step active={this.state.step === 2}>
                         <Icon name='file' />
                         <Step.Content>
                             <Step.Title>Choose import file</Step.Title>
                         </Step.Content>
                     </Step>
-                    <Step active={this.state.step === 3}>
+                    <Step active={this.state.step === 2}>
                         <Icon name='download' />
                         <Step.Content>
                             <Step.Title>Insert</Step.Title>
                         </Step.Content>
                     </Step>
                 </Step.Group>
-                {/* START STEP 1 */}
-                {/* Customer */}
-                <div className='col-sm-3' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Partner</label>
-                    <ComboBox data={customers}
-                        dataItemKey='Id'
-                        textField='Name'
-                        placeholder='Partner'
-                        value={customer}
-                        className='form-control'
-                        allowCustom={true}
-                        onChange={(e) => {
-                            let val = e.target.value;
-                            this.updateCustomer(val);
-                        }} />
-                    {isNewCustomer ?
-                        [<label className='bold-text'><br />Code for new Partner:&nbsp;{customer.Name}</label>,
-                        <input type='text' className='form-control' value={customer.Code}
-                            onChange={this.changeNewCustomerCode} />,
-                        <span style={{ color: 'red' }}><i>{this.warningCustomerCode()}</i><br /></span>] : null}
-                    <Button color='primary' className='margin-btn'
-                        loading={this.state.isLoadingCpp}
-                        disabled={this.state.isLoadingCpp || (customer === null
-                            || this.state.profileId === '-1' || !codeValid)}
-                        onClick={() => {
-                            this.skipStep1(isNewCustomer);
-                        }}>Next</Button>
-                    {this.state.isLoadingCpp ? <i>Loading suggestion data...</i> : null}
-                </div>
-                {/* Profile */}
-                <div className='col-sm-4 row' style={{ display: this.state.step === 1 ? 'flex' : 'none' }}>
-                    <div className='col-sm-10'>
-                        <label className='bold-text'>Profile</label>
-                        <select ref='selectProfile' className='ui input' value={this.state.profileId}
-                            onChange={this.updateProfile}>
-                            <option value='-1'>--</option>
-                            {profiles.map((profile) => <option value={profile.Id}>{profile.Name}</option>)}
-                        </select>
-                    </div>
-                    <div className='col-sm-2' style={{ marginTop: '30px', display: this.state.profileId != -1 ? 'block' : 'none' }}>
-                        <a href='' onClick={this.viewProfileDetail}>Detail</a>
-                    </div>
-                </div>
+
+                {/* profile detail */}
                 <Modal isOpen={this.state.openModal} className='big-modal'>
                     <ModalBody>
                         {this.state.modalContent}
@@ -628,35 +440,37 @@ class ImportReceivable extends Component {
                     header="Confirm change profile"
                     body="The profile has been modified, if you change profile now all changes will be lost. Do you want to change profile?"
                     callback={this.state.onConfirm} />
-                {/* END STEP 1 */}
-                {!this.props.showRecent ?
-                    <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
-                        <span><b>Profile</b>: {profiles.filter(p => p.Id === parseInt(this.state.profileId)).map(p => p.Name)}</span>
-                    </div> :
-                    (cacheData ? <div className='col-sm-8' style={{ display: this.state.step !== 1 ? 'block' : 'none' }}>
-                        <span><b>Profile</b>: {localStorage.getItem('recent_profile')}</span>
-                    </div> : <span style={{ fontSize: '2rem' }}>
-                            No new receivable recently!
+
+                {this.props.showRecent == true && !cacheData ?
+                    <span style={{ fontSize: '2rem' }}>
+                        No new receivable recently!
                             <Button color='primary' style={{ marginLeft: '20px' }}
-                                onClick={() => { this.props.history.push('/receivable/add') }}>Add new</Button>
-                        </span>)
-                }
-                {/* START STEP 2 */}
+                            onClick={() => { this.props.history.push('/receivable/add') }}>Add new</Button>
+                    </span> : null}
+                {/* START STEP 1 */}
                 {/* File */}
-                <div className='form-group col-sm-8' style={{ display: this.state.step === 2 ? 'block' : 'none' }}>
-                    <label className='bold-text'>Files</label>
+                <div className='form-group col-sm-8' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
+                    <label className='bold-text'>Choose Files</label>
                     <input type='file' onChange={this.handleFile} />
                     <span className='warning-text'>{this.state.fileWarning}<br /></span>
                 </div>
-                {/* END STEP 2 */}
-                {/* START STEP 3 */}
+                {/* END STEP 1 */}
+                {/* START STEP 2 */}
                 {/* Action */}
-                <div className='col-sm-8' style={{ display: this.state.step === 3 ? 'block' : 'none' }}>
+                <div className='col-sm-8' style={{ display: this.state.step === 2 ? 'block' : 'none' }}>
                     <Button color='primary'
                         disabled={!isValidate} onClick={this.insertReceivable}>Save</Button>
+                    <span style={{
+                        color: 'red',
+                        display: this.state.errorLine > 0 ? 'block' : 'none',
+                        fontStyle: 'italic',
+                        float: 'right'
+                    }}>
+                        Error line: {this.state.errorLine} line(s)
+                    </span>
                 </div>
-                {/* END STEP 3 */}
-                {this.state.validatedData !== null && this.state.step === 3 ?
+                {/* END STEP 2 */}
+                {this.state.validatedData !== null && this.state.step === 2 ?
                     <Container>
                         <Divider />
                         <table className='table text-center'>
@@ -666,6 +480,7 @@ class ImportReceivable extends Component {
                                     <th>Partner</th>
                                     <th>Debtor</th>
                                     <th>Debt Amount</th>
+                                    <th>Profile</th>
                                     <th>Start date</th>
                                     <th>Collector</th>
                                     <th>Pending</th>
@@ -686,6 +501,23 @@ class ImportReceivable extends Component {
                                         <td>{customer ? customer.Name : null}</td>
                                         <td>{debtor ? debtor.Name : null}</td>
                                         <td>{(r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                        <td>
+                                            <select style={{ maxWidth: '12rem' }} value={r.ProfileId}
+                                                onChange={(e) => {
+                                                    let value = e.target.value;
+                                                    if (value == '-1') {
+                                                        value = null;
+                                                    } else {
+                                                        value = parseInt(value);
+                                                    }
+                                                    this.onChangeProfile(i, value);
+                                                }}>
+                                                <option value='-1'>--</option>
+                                                {this.props.profiles.map(profile =>
+                                                    <option value={profile.Id}>{profile.Name}</option>
+                                                )}
+                                            </select>
+                                        </td>
                                         <td ref={`datepicker-${i}`} style={{ boxSizing: 'border-box' }}>
                                             {!isWaiting ? <DatePicker popup={TopPopup}
                                                 popupSettings={{ appendTo: this.refs[`datepicker-${i}`] }} min={min} value={date} onChange={(e) => {
@@ -709,8 +541,8 @@ class ImportReceivable extends Component {
                             </tbody>
                         </table>
                     </Container> : null}
-                {/* START STEP 4 */}
-                {this.state.insertedData !== null && this.state.step === 4 ?
+                {/* START STEP 3 */}
+                {this.state.insertedData !== null && this.state.step === 3 ?
                     <Container className='middle-content-table'>
                         <Divider />
                         <MDBDataTable
@@ -734,7 +566,7 @@ class PendingCheckbox extends React.Component {
     render() {
 
         return (<div>
-            <Checkbox label='Is Pending?' checked={this.state.isWaiting}
+            <Checkbox label='Pending' checked={this.state.isWaiting}
                 onChange={(e, data) => {
                     if (data.checked) {
                         this.props.setPayableDay(this.props.no, null);
@@ -816,7 +648,7 @@ class SelectCollector extends React.Component {
                     : <span>Not found any match collector!</span>}
             </div>
             <ComboBox data={this.props.collectors} allowCustom={false}
-                defaultValue={selectedCollector}
+                value={selectedCollector}
                 dataItemKey='Id'
                 textField='DisplayName2'
                 placeholder='Collector'
@@ -839,11 +671,13 @@ const pushData2 = (receivableList, collectorList) => {
             collector = collectorList.find(co => co.Id === r.AssignedCollectorId)
             let status = describeStatus(r.CollectionProgressStatus);
             let statusColor = getStatusColor(r.CollectionProgressStatus);
+            let profile = r.Profile;
             return {
                 No: (i + 1),
                 CustomerName: r.CustomerName,
                 DebtorName: r.DebtorName,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
+                Profile: profile ? profile.Name : null,
                 PayableDay: numAsDate(r.PayableDay),
                 Collector: collector ? collector.DisplayName : null,
                 Status: <Label color={statusColor}>{status}</Label>,
@@ -869,7 +703,7 @@ const tableData2 = {
             width: 270
         },
         {
-            label: 'Debtor name',
+            label: 'Debtor',
             field: 'DebtorName',
             sort: 'asc',
             width: 270
@@ -879,6 +713,12 @@ const tableData2 = {
             field: 'DebtAmount',
             sort: 'asc',
             width: 270
+        },
+        {
+            label: 'Profile',
+            field: 'Profile',
+            sort: 'asc',
+            width: 200
         },
         {
             label: 'Start day',
@@ -948,6 +788,9 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         changeCollector: (oldCollectorId, newCollectorId) => {
             dispatch(MatchPointAction.changeCollector(oldCollectorId, newCollectorId));
+        },
+        setProfile: (profile) => {
+            dispatch(ProfileAction.setProfile(profile));
         }
     }
 }
