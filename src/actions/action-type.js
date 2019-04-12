@@ -33,6 +33,7 @@ export const SAVE_CACHE = 'SAVE_CACHE';
 export const LOAD_CACHE = 'LOAD_CACHE';
 export const SUBMIT_FORM = 'SUBMIT_FORM';
 export const FINISH_SUBMIT_FORM = 'FINISH_SUBMIT_FORM';
+export const CLONE_PROCESS = 'CLONE_PROCESS';
 
 //Stage
 export const ADD_STAGE = 'ADD_STAGE';

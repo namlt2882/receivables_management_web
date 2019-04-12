@@ -32,6 +32,10 @@ export const ProcessAction = {
             type: Types.SAVE_CACHE
         }
     },
+    cloneProcess: (processName) => ({
+        type: Types.CLONE_PROCESS,
+        processName
+    }),
     //process status
     setEditable: () => {
         return {

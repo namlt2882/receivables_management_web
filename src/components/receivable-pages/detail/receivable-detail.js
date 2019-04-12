@@ -129,7 +129,7 @@ class ReceivableDetail extends Component {
     changeStatus(e) {
         e.preventDefault();
     }
-    groupAction(actions, stageDuration) {
+    groupAction(actions, stageDuration, startDate) {
         let groupActions = actions.reduce((group, action) => {
             let found = group.find(a => a.Name === action.Name || a.Type === action.type);
             if (found) {
@@ -143,14 +143,16 @@ class ReceivableDetail extends Component {
                     group.push({
                         Name: action.Name,
                         Quantity: 1,
-                        Type: action.Type
+                        Type: action.Type,
+                        Frequency: compareIntDate(startDate, action.ExcutionDay)
                     })
                 }
             } else {
                 group.push({
                     Name: action.Name,
                     Quantity: 1,
-                    Type: action.Type
+                    Type: action.Type,
+                    Frequency: compareIntDate(startDate, action.ExcutionDay)
                 })
             }
             return group;
@@ -160,7 +162,9 @@ class ReceivableDetail extends Component {
         //count frequency
         groupActions.forEach(a => {
             let frequency = stageDuration / a.Quantity;
-            a.Frequency = frequency;
+            if (a.Quantity > 1) {
+                a.Frequency = frequency;
+            }
         })
         return groupActions;
     }
@@ -206,7 +210,7 @@ class ReceivableDetail extends Component {
                 return a1.ExcutionDay - a2.ExcutionDay
             });
             //group actions
-            stage.OriginalActions = this.groupAction(stage.Actions, stage.Duration);
+            stage.OriginalActions = this.groupAction(stage.Actions, stage.Duration, stage.startDate);
         })
         return currentStage;
     }
