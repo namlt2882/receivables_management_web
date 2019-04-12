@@ -242,9 +242,13 @@ class ReceivableDetail extends Component {
         //get first date of process
         let totalDay = 0;
         let startDate = 0;
+        let totalDuration = stages.reduce((acc, s) => acc + s.Duration, 0);
         if (stages.length > 0) {
             startDate = stages[0].startDate;
             totalDay = compareIntDate(startDate, this.state.currentDate);
+            if (totalDay > totalDuration) {
+                totalDay = totalDuration;
+            }
         }
 
         // get end date of process
@@ -257,6 +261,9 @@ class ReceivableDetail extends Component {
         if (isFinished) {
             let tmp = compareIntDate(startDate, receivable.ClosedDay) + 1;
             tmp = tmp < 0 ? 0 : tmp;
+            if (tmp > totalDuration) {
+                tmp = totalDuration;
+            }
             dateNote = `The process last ${tmp} day(s)`;
         } else if (totalDay < 0) {
             let tmp = Math.abs(totalDay);

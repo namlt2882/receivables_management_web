@@ -81,21 +81,8 @@ class ImportReceivable extends Component {
                 this.props.setCustomers(res.data);
                 this.incrementLoading();
             })
-            ProfileService.getAll().then(res => {
+            ProfileService.getAllWithDetail().then(res => {
                 let profiles = res.data;
-                this.props.setCustomers(profiles);
-                this.setState(pre => ({
-                    maxLoading: pre.maxLoading + profiles.length
-                }))
-                profiles.forEach((profile) => {
-                    ProfileService.getDetail(profile.Id).then(res2 => {
-                        this.props.setProfile(res2.data);
-                        this.incrementLoading();
-                    }).catch(err => {
-                        console.error(err);
-                        errorAlert('Error occur, please try again later!');
-                    })
-                })
                 this.props.setProfiles(profiles);
                 this.incrementLoading();
             })
@@ -611,9 +598,17 @@ class SelectCollector extends React.Component {
         let convertedAmount = this.props.convertedAmount;
         let suggestedCollector = [];
         let selectedCpp;
+        let cpp;
         if (convertedAmount) {
             let series = matchData.matchSeries.find(series => series.isMatch(convertedAmount));
             selectedCpp = series.cppModels.find(cpp => cpp.CollectorId === collectorId);
+            if (selectedCpp) {
+                if (selectedCpp.TotalReceivableCount >= 3) {
+                    cpp = selectedCpp.CPP.toFixed(2);
+                } else {
+                    cpp = ' - ';
+                }
+            }
             let maxCpp = series.cppModels.length;
             if (maxCpp > 4) {
                 maxCpp = 4;
@@ -633,8 +628,8 @@ class SelectCollector extends React.Component {
                         <table style={{ width: '100%', fontSize: '0.8rem' }}>
                             {suggestedCollector.map(sc => <tr>
                                 <td>{`${sc._collector.FirstName} ${sc._collector.LastName}`}</td>
-                                <td>CPP:{sc.CPP.toFixed(2)}</td>
-                                <td>CR:{sc.CurrentReceivable}</td>
+                                <td><span style={{ color: 'red' }}>CPP</span>: {sc.TotalReceivableCount >= 3 ? sc.CPP.toFixed(2) : '- '}</td>
+                                <td><span style={{ color: 'blue' }}>CR</span>: {sc.CurrentReceivable}</td>
                                 <td>
                                     {collectorId === sc.CollectorId ?
                                         <Icon bordered inverted name='check' color='green' />
@@ -655,7 +650,7 @@ class SelectCollector extends React.Component {
                 onChange={this.onChangeCollector} />
             <div className='choosen-collector-info'>
                 <span style={{ display: collectorId ? 'block' : 'none' }}>
-                    <span style={{ color: 'red' }}>CPP</span>: {selectedCpp ? selectedCpp.CPP.toFixed(2) : ''} | <span style={{ color: 'blue' }}>CR</span>: {selectedCpp ? selectedCpp.CurrentReceivable : ''}
+                    <span style={{ color: 'red' }}>CPP</span>: {cpp} | <span style={{ color: 'blue' }}>CR</span>: {selectedCpp ? selectedCpp.CurrentReceivable : ''}
                 </span>
             </div>
         </div>)
