@@ -94,18 +94,24 @@
 
 .my-profile .btn-secondary {
     @extend .transparent-button;
+    padding: 5px;
+}
+
+.my-profile .username {
+    padding: 0rem 1rem 0rem 1rem;
+    color: #3778c2;
+}
+
+.my-profile>button:first-child {
+    background-color: white !important;
 }
 
 .transparent-button {
-    background-color: transparent !important;
+    background-color: transparent;
     border: none !important;
     padding: 0px !important;
     outline: none !important;
     border-radius: 50px;
-}
-
-.transparent-button:active {
-    @extend .transparent-button;
 }
 
 .transparent-button:focus {

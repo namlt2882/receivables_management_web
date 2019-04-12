@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button, Container, Divider } from 'semantic-ui-react';
+import { Button, Container, Divider, Form } from 'semantic-ui-react';
 import Process from '../../components/process-pages/process';
 import { ProfileService } from '../../services/profile-service';
 import Component from '../common/component';
@@ -11,6 +11,7 @@ import * as ProcessReducer from '../../reducers/process-reducer'
 import './profile.scss';
 import { successAlert, errorAlert } from '../common/my-menu';
 import ConfirmModal from '../modal/ConfirmModal';
+import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 class EditProfile extends Component {
     constructor(props) {
@@ -19,11 +20,21 @@ class EditProfile extends Component {
             maxLoading: 2,
             formLoading: false,
             isProcessing: false,
-            openConfirm: false
+            openConfirm: false,
+            isOpenCloneForm: false
         }
         this.setEditable = this.setEditable.bind(this);
         this.cancelEdit = this.cancelEdit.bind(this);
         this.saveProfile = this.saveProfile.bind(this);
+        this.cloneNewProfile = this.cloneNewProfile.bind(this);
+        this.toggleCloneForm = this.toggleCloneForm.bind(this);
+    }
+    toggleCloneForm() {
+        this.setState(pre => ({ isOpenCloneForm: !pre.isOpenCloneForm }))
+    }
+    cloneNewProfile(name) {
+        this.props.cloneProcess(name);
+        this.props.history.push('/profile/add')
     }
     componentDidMount() {
         if (!this.props.isPopup) {
@@ -120,7 +131,11 @@ class EditProfile extends Component {
                     <Divider />
                 </div>
                 <div className='panel-action' style={{ zIndex: 10, position: 'relative' }}>
-                    {readOnly ? <Button color='primary' onClick={this.setEditable}>Edit</Button> :
+                    {readOnly ?
+                        <div>
+                            <Button color='primary' onClick={this.setEditable}>Edit</Button>
+                            <Button onClick={this.toggleCloneForm}>Clone</Button>
+                        </div> :
                         <div>
                             <Button loading={this.state.isProcessing} disabled={this.state.isProcessing}
                                 color='primary'
@@ -141,9 +156,50 @@ class EditProfile extends Component {
                 body="Are you sure? All data you edited will be lost!"
                 callback={this.cancelEdit}
             />
+            <CloneProfileForm cloneNewProfile={this.cloneNewProfile} toggle={this.toggleCloneForm} isOpen={this.state.isOpenCloneForm} />
         </Container>);
     }
 }
+
+class CloneProfileForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: ''
+        }
+        this.cloneNewProfile = this.cloneNewProfile.bind(this);
+        this.closeForm = this.closeForm.bind(this);
+    }
+    cloneNewProfile(e) {
+        e.preventDefault();
+        this.props.cloneNewProfile(this.state.name);
+    }
+    closeForm() {
+        this.props.toggle();
+        this.setState({ name: '' })
+    }
+    render() {
+        return (<Modal isOpen={this.props.isOpen}>
+            <ModalHeader>Clone this profile</ModalHeader>
+            <ModalBody>
+                {/* Input name */}
+                <Form action='/' onSubmit={this.cloneNewProfile} ref='form'>
+                    <Form.Field>
+                        <Form.Input label='Profile Name:' value={this.state.name} required={true}
+                            onChange={(e) => { this.setState({ name: e.target.value }) }}
+                            placeholder='name of profile' />
+                    </Form.Field>
+                    <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
+                </Form>
+            </ModalBody>
+            <ModalFooter>
+                <Button type='submit' color='primary' onClick={() => { this.refs.btnSubmit.click() }}>OK</Button>
+                <Button color='secondary' onClick={this.closeForm}>Cancel</Button>
+            </ModalFooter>
+        </Modal>);
+    }
+}
+
 const mapStateToProps = state => {
     return {
         process: state.process,
@@ -163,6 +219,9 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         setMessageForms: (messageForms) => {
             dispatch(ProfileAction.setMessageForms(messageForms));
+        },
+        cloneProcess: (processName) => {
+            dispatch(ProcessAction.cloneProcess(processName));
         }
     }
 }

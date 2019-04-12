@@ -20,6 +20,7 @@ export class MatchData {
                     CollectorId: cpp.CollectorId,
                     CPP: cpp.CPP,
                     CurrentReceivable: cpp.CurrentReceivable,
+                    TotalReceivableCount: cpp.TotalReceivableCount,
                     MatchPoint: calculateMatchPoint(cpp, w), //calculate match point
                     series: series
                 }
@@ -127,14 +128,12 @@ export const matchData = (state = new MatchData(),
     }
 }
 
-export const MCR = 6;
-
 export const calculateMatchPoint = (cppModel, w) => {
     let CR = cppModel.CurrentReceivable;
     if (CR <= 0) {
         CR = 1;
     }
-    let matchPoint = MCR / CR + w * cppModel.CPP;
+    let matchPoint = (10 * w * cppModel.CPP) / CR;
     return matchPoint;
 }
 
@@ -144,15 +143,15 @@ export const sortCpp = (cpp1, cpp2) => {
 
 const getW = (amount) => {
     if (amount <= 1000) {
-        return 0.06;
+        return 0.075;
     }
     if (amount <= 3000) {
-        return 0.12;
+        return 0.075;
     }
     if (amount <= 5000) {
-        return 0.18;
+        return 0.15;
     }
-    return 0.24;
+    return 0.3;
 }
 
 export const convertCurrency = (amount) => {

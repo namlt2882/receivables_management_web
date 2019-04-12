@@ -22,13 +22,14 @@ import EditReceivable from '../edit/edit-receivable';
 import { TaskService } from '../../../services/task-service';
 import ConfirmModal from '../../modal/ConfirmModal';
 import { successAlert, errorAlert } from '../../common/my-menu';
+import { ProfileService } from '../../../services/profile-service';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            maxLoading: 7,
+            maxLoading: 8,
             receivable: null,
             currentStage: null,
             currentDate: dateToInt(new Date()),
@@ -36,6 +37,7 @@ class ReceivableDetail extends Component {
             customerList: [],
             todayTask: [],
             openConfirm: false,
+            profile: null
         }
         this.updateReceivable = this.updateReceivable.bind(this);
         this.confirm = this.confirm.bind(this);
@@ -96,6 +98,14 @@ class ReceivableDetail extends Component {
                 this.setState({ customerList: res5.data });
                 this.incrementLoading();
             })
+            if (receivable.CollectionProgress) {
+                ProfileService.getDetail(receivable.CollectionProgress.ProfileId).then(res6 => {
+                    this.setState({ profile: res6.data });
+                    this.incrementLoading();
+                })
+            } else {
+                this.incrementLoading();
+            }
         }).catch(err => {
             console.error(err);
             errorAlert('Service unavailable, please try again later!');
@@ -119,7 +129,7 @@ class ReceivableDetail extends Component {
     changeStatus(e) {
         e.preventDefault();
     }
-    groupAction(actions, stageDuration) {
+    groupAction(actions, stageDuration, startDate) {
         let groupActions = actions.reduce((group, action) => {
             let found = group.find(a => a.Name === action.Name || a.Type === action.type);
             if (found) {
@@ -133,14 +143,16 @@ class ReceivableDetail extends Component {
                     group.push({
                         Name: action.Name,
                         Quantity: 1,
-                        Type: action.Type
+                        Type: action.Type,
+                        Frequency: compareIntDate(startDate, action.ExcutionDay)
                     })
                 }
             } else {
                 group.push({
                     Name: action.Name,
                     Quantity: 1,
-                    Type: action.Type
+                    Type: action.Type,
+                    Frequency: compareIntDate(startDate, action.ExcutionDay)
                 })
             }
             return group;
@@ -150,7 +162,9 @@ class ReceivableDetail extends Component {
         //count frequency
         groupActions.forEach(a => {
             let frequency = stageDuration / a.Quantity;
-            a.Frequency = frequency;
+            if (a.Quantity > 1) {
+                a.Frequency = frequency;
+            }
         })
         return groupActions;
     }
@@ -196,7 +210,7 @@ class ReceivableDetail extends Component {
                 return a1.ExcutionDay - a2.ExcutionDay
             });
             //group actions
-            stage.OriginalActions = this.groupAction(stage.Actions, stage.Duration);
+            stage.OriginalActions = this.groupAction(stage.Actions, stage.Duration, stage.startDate);
         })
         return currentStage;
     }
@@ -228,9 +242,13 @@ class ReceivableDetail extends Component {
         //get first date of process
         let totalDay = 0;
         let startDate = 0;
+        let totalDuration = stages.reduce((acc, s) => acc + s.Duration, 0);
         if (stages.length > 0) {
             startDate = stages[0].startDate;
             totalDay = compareIntDate(startDate, this.state.currentDate);
+            if (totalDay > totalDuration) {
+                totalDay = totalDuration;
+            }
         }
 
         // get end date of process
@@ -243,6 +261,9 @@ class ReceivableDetail extends Component {
         if (isFinished) {
             let tmp = compareIntDate(startDate, receivable.ClosedDay) + 1;
             tmp = tmp < 0 ? 0 : tmp;
+            if (tmp > totalDuration) {
+                tmp = totalDuration;
+            }
             dateNote = `The process last ${tmp} day(s)`;
         } else if (totalDay < 0) {
             let tmp = Math.abs(totalDay);
@@ -329,6 +350,16 @@ class ReceivableDetail extends Component {
                                         <td>Collector:</td>
                                         <td>
                                             {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Profile:</td>
+                                        <td>
+                                            {this.state.profile ?
+                                                (AuthService.isManager() ? <a target='_blank'
+                                                    href={`/profile/${this.state.profile.Id}/view`}>
+                                                    {this.state.profile.Name}
+                                                </a> : this.state.profile.Name) : null}
                                         </td>
                                     </tr>
                                     {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?

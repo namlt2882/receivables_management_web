@@ -96,7 +96,8 @@ const resetStageIndex = (stages) => {
     })
 }
 
-export const process = (state = new Process(), { type, order, stageId, actionId, process, stage, action }) => {
+export const process = (state = new Process(), { type, order, stageId, actionId, process, stage, action,
+    processName }) => {
     let stage1;
     let action1;
     if (stageId) {
@@ -116,6 +117,16 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
         case Types.EDIT_PROCESS:
             state = { ...process };
             return { ...state };
+        case Types.CLONE_PROCESS:
+            state.Id = IdGenerator.generateId();
+            state.Name = processName;
+            state.Stages.forEach(s => {
+                s.Id = IdGenerator.generateId();
+                s.Actions.forEach(a => {
+                    a.Id = IdGenerator.generateId();
+                })
+            })
+            return { ...state };
         //STAGE
         case Types.ADD_STAGE:
             //deep copy by jquery
@@ -129,6 +140,7 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             state.Stages.push(newStage);
             state.Stages.forEach((s, i) => {
                 s.Name = 'Stage ' + (i + 1);
+                s.Sequence = (i + 1);
             })
             return { ...state };
         case Types.EDIT_STAGE:
@@ -141,6 +153,7 @@ export const process = (state = new Process(), { type, order, stageId, actionId,
             state.Stages = state.Stages.filter((s) => s.Id !== stageId);
             state.Stages.forEach((s, i) => {
                 s.Name = 'Stage ' + (i + 1);
+                s.Sequence = (i + 1);
             })
             return state;
         //ACTION

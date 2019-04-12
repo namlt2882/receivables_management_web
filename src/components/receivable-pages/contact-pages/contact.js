@@ -90,7 +90,7 @@ class Contact extends Component {
                                 }}>Close</Button>
                             </ModalFooter>
                         </Modal>
-                    </div>)) : <table className='table thin'>
+                    </div>)) : <table className='table thin text-center'>
                         <thead>
                             <tr>
                                 <th>#</th>

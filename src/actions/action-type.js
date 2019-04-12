@@ -17,6 +17,7 @@ export const SEARCH_MESSAGE = 'SEARCH_MESSAGE';
 
 // Profile
 export const SET_PROFILE_LIST = 'SET_PROFILE_LIST';
+export const SET_PROFILE = 'SET_PROFILE';
 export const GET_PROFILE = 'GET_PROFILE';
 export const ADD_PROFILE = 'ADD_PROFILE';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
@@ -33,6 +34,7 @@ export const SAVE_CACHE = 'SAVE_CACHE';
 export const LOAD_CACHE = 'LOAD_CACHE';
 export const SUBMIT_FORM = 'SUBMIT_FORM';
 export const FINISH_SUBMIT_FORM = 'FINISH_SUBMIT_FORM';
+export const CLONE_PROCESS = 'CLONE_PROCESS';
 
 //Stage
 export const ADD_STAGE = 'ADD_STAGE';

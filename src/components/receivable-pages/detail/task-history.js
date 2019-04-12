@@ -34,7 +34,7 @@ class TaskHistory extends React.Component {
                     {`Today tasks (${todayTask.length})`}
                 </ModalHeader>
                 <ModalBody>
-                    {todayTask.length > 0 ? <table className='table thin' striped>
+                    {todayTask.length > 0 ? <table className='table thin text-center'>
                         <thead>
                             <tr>
                                 <th>#</th>

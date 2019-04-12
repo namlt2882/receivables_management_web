@@ -32,3 +32,9 @@ table td {
 table th {
   font-size: 1rem;
 }
+
+.btn-secondary:not([disabled]):not(.disabled):active,
+.btn-secondary:not([disabled]):not(.disabled).active,
+.show>.btn-secondary.dropdown-toggle {
+    background-color: white !important;
+}

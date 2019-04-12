@@ -7,6 +7,12 @@ export const ProfileAction = {
             profiles
         }
     },
+    setProfile: (profile) => {
+        return {
+            type: Types.SET_PROFILE,
+            profile
+        }
+    },
     setMessageForms: (messageForms) => {
         return {
             type: Types.SET_MESSAGE_LIST,

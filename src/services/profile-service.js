@@ -15,5 +15,8 @@ export const ProfileService = {
     },
     getAll: () => {
         return AuthRequest.get('Profile');
+    },
+    getAllWithDetail: () => {
+        return AuthRequest.get('Profile/GetAllWithDetail');
     }
 }
