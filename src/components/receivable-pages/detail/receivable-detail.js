@@ -192,7 +192,7 @@ class ReceivableDetail extends Component {
                 stage.isCurrentStage = true;
                 stage.isIncommingStage = false;
                 stage.percent = (rsStartDay * 1.0 / stage.Duration) * 100;
-                currentStage = stage;
+                currentStage = rsEndDay < 0 ? stage : null;
             } else if (rsStartDay < 0) {
                 //incomming stage
                 stage.percent = 0;
@@ -235,7 +235,8 @@ class ReceivableDetail extends Component {
         // check progrecess finished
         let isFinished = false;
         if (receivable) {
-            isFinished = receivable.ClosedDay !== null;
+            let status = receivable.CollectionProgress.Status;
+            isFinished = status === 0 || status === 5 || status === 2;
         }
         //get current stage
         let currentStage = this.calculateStage(stages, receivable.PayableDay, receivable.ClosedDay);
@@ -400,13 +401,13 @@ class ReceivableDetail extends Component {
 
                 {/* Current stage */}
                 {/* if current stage not null */}
-                {!isFinished && currentStage != null ? <div className='col-sm-4'>
-                    <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage}>
-                        {/* Change status of receivable */}
-                        {receivable.CollectionProgress.Status === 1 ?
-                            <ChangeStatus updateReceivable={this.updateReceivable} receivable={receivable} /> : null}
-                    </CurrentStage>
-                </div> : null}
+                {receivable.CollectionProgress.Status === 1 || receivable.CollectionProgress.Status === 2 ?
+                    <div className='col-sm-4' style={{ display: !currentStage && AuthService.isManager() ? 'none' : 'block' }}>
+                        <CurrentStage currentDate={this.state.currentDate} currentStage={currentStage}>
+                            {/* Change status of receivable */}
+                            <ChangeStatus updateReceivable={this.updateReceivable} receivable={receivable} />
+                        </CurrentStage>
+                    </div> : null}
             </div>
         </div>);
     }
