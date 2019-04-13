@@ -1,14 +1,12 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faExclamationCircle, faRedo } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MultiSelect } from '@progress/kendo-react-dropdowns';
-import classnames from 'classnames';
 import { MDBDataTable } from 'mdbreact';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
-import { Checkbox, Container, Divider, Label } from 'semantic-ui-react';
+import { Nav, TabContent, TabPane, NavItem, NavLink } from 'reactstrap';
+import { Button, Checkbox, Container, Divider, Label, Segment, Icon } from 'semantic-ui-react';
 import { CollectorAction } from '../../actions/collector-action';
 import { CustomerAction } from '../../actions/customer-action';
 import { ReceivableAction } from '../../actions/receivable-action';
@@ -19,18 +17,21 @@ import { compareIntDate, numAsDate } from '../../utils/time-converter';
 import Component from '../common/component';
 import { available, PrimaryLoadingPage } from '../common/loading-page';
 import { compareStatus, describeStatus, getStatusColor } from './detail/receivable-detail';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import classnames from 'classnames';
 library.add(faCheck, faExclamationCircle, faRedo);
 
 class ReceivableList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            showFilter: true,
             maxLoading: 2,
             receivableList: [],
             series: [
                 { category: 'Collecting', value: 0, color: getStatusColor(1), checked: true, isConfirmed: false },
                 { category: 'Pending', value: 0, color: getStatusColor(4), checked: true, isConfirmed: false },
-                { category: 'Done', value: 0, color: getStatusColor(2), checked: true, isConfirmed: true },
+                // { category: 'Done', value: 0, color: getStatusColor(2), checked: true, isConfirmed: true },
                 { category: 'Closed', value: 0, color: getStatusColor(5), checked: true, isConfirmed: true },
                 { category: 'Cancel', value: 0, color: getStatusColor(0), checked: true, isConfirmed: true }
             ],
@@ -176,6 +177,15 @@ class ReceivableList extends Component {
             let status = describeStatus(r.CollectionProgressStatus);
             let statusColor = getStatusColor(r.CollectionProgressStatus);
             let collector = this.props.collectors.find(c => c.Id === r.AssignedCollectorId);
+            let confirmComponent = null;
+            if ((r.CollectionProgressStatus == 0 || r.CollectionProgressStatus == 2 ||
+                r.CollectionProgressStatus == 5) && !r.IsConfirmed) {
+                confirmComponent = <span style={{
+                    color: 'red',
+                    display: 'block',
+                    fontStyle: 'italic'
+                }}>Not confirm</span>
+            }
             return {
                 No: (i + 1),
                 CustomerName: r.CustomerName,
@@ -184,7 +194,8 @@ class ReceivableList extends Component {
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 CurrentStage: r.Stage,
-                Status: <Label color={statusColor}>{status}</Label>,
+                Status: [<Label color={statusColor}>{status}</Label>,
+                    confirmComponent],
                 action: <Link target='_blank' to={`receivable/${r.Id}/view`}>View</Link>
             }
         });
@@ -216,7 +227,7 @@ class ReceivableList extends Component {
     }
 
     statusFilterComp() {
-        return <div className='col-sm-12' style={{ marginTop: '10px' }}>
+        return <div className='col-sm-7' style={{ marginTop: '10px', float: 'left' }}>
             <div>
                 {this.currentSeries().map(s => <div style={{
                     padding: '5px',
@@ -236,7 +247,7 @@ class ReceivableList extends Component {
         </div>
     }
     managerFilterComp() {
-        return <div className='col-sm-8' style={{ paddingTop: '20px' }}>
+        return <div className='col-sm-5' style={{ padding: '20px 20px 0px 0px', float: 'left' }}>
             {/* Collector filter */}
             {AuthService.isManager() ? <div>
                 <div><b>Collector</b>:</div>
@@ -306,60 +317,47 @@ class ReceivableList extends Component {
                     </div>
                     <Divider />
                 </div>
-                <div className='col-sm-12 row' style={{ display: isManager ? 'block' : 'none' }}>
-
-                </div>
-                <div className='col-sm-12 row justify-content-center align-self-center'>
-                    <Nav tabs className='col-sm-8'>
+                <div className='col-sm-12 row justify-content-center align-self-center'
+                    style={{ display: this.state.showFilter ? 'flex' : 'none' }}>
+                    <Nav tabs className='col-sm-10'>
                         <NavItem>
-                            <NavLink className={classnames({ active: this.state.getConfirmed })}
-                                onClick={() => { this.toggleConfirmed(true) }}>
-                                <FontAwesomeIcon icon='check' size='md' color='green'
-                                    className='icon-btn' />Confirmed ({this.state.sumConfirmed})
+                            <NavLink className={classnames({ active: true })}>
+                                <Icon name='filter' />
+                                Filter
                             </NavLink>
                         </NavItem>
-                        <NavItem>
-                            <NavLink className={classnames({ active: !this.state.getConfirmed })}
-                                onClick={() => { this.toggleConfirmed(false); }}>
-                                <FontAwesomeIcon icon='exclamation-circle' size='md' color='orange'
-                                    className='icon-btn' />Not confirmed ({this.state.sumNotConfirmed})
-                            </NavLink>
-                        </NavItem>
-                        <div style={{
-                            position: 'absolute', top: 0, right: 0,
-                            display: isManager ? 'block' : 'none'
-                        }}>
-                            <Link to='/receivable/recent-add'>Recent added receivables</Link>
-                        </div>
                     </Nav>
-                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }} className='border-shadow col-sm-8 row justify-content-center align-self-center'>
+                    <TabContent activeTab='1' style={{ paddingBottom: '20px', borderTop: 'none' }}
+                        className='border-shadow col-sm-10 row justify-content-center'>
                         <TabPane tabId='1' className='col-sm-12 row justify-content-center align-self-center'>
+                            <div style={{
+                                margin: '10px 0px 0px 15px',
+                                display: isManager ? 'block' : 'none'
+                            }}>
+                                <Link to='/receivable/recent-add'>Recent added receivables</Link>
+                            </div>
+                            <div style={{
+                                position: 'absolute', top: '10px', right: 0
+                            }}>
+                                <Button icon='window minimize' color='primary' style={{ width: 'auto' }}
+                                    onClick={() => {
+                                        this.setState({ showFilter: false });
+                                    }} />
+                            </div>
                             {this.managerFilterComp()}
+                            <div className='col-sm-6' style={{ float: 'left' }}>
+                                <Segment compact>
+                                    <Checkbox toggle label='Show not confirmed receivable?'
+                                        checked={!this.state.getConfirmed}
+                                        onChange={(e, data) => {
+                                            let value = !data.checked;
+                                            this.toggleConfirmed(value);
+                                        }} />
+                                </Segment>
+                            </div>
                             {this.statusFilterComp()}
                         </TabPane>
                     </TabContent>
-
-                    {/* <div className='col-sm-8'>
-                        <Chart pannable={{ lock: 'x' }} zoomable={{
-                            mousewheel: { lock: 'x' },
-                            selection: { lock: 'x' }
-                        }} style={{ width: 600, height: 250 }}
-                            onSeriesClick={(e) => {
-                                if (e.nativeEvent.event.ctrlKey) {
-                                    this.addStatus(e.category);
-                                } else this.chooseStatus(e.category);
-                            }}>
-                            <ChartTitle text="Quantity of receivables" />
-                            <ChartTooltip />
-                            <ChartSeries>
-                                <ChartSeriesItem type="bar" gap={3} data={this.state.series}
-                                    field='value' categoryField='category' colorField='color'
-                                    style='smooth'>
-                                    <ChartSeriesItemTooltip background='gray' />
-                                </ChartSeriesItem>
-                            </ChartSeries>
-                        </Chart>
-                    </div> */}
                 </div >
                 <div className='col-sm-12 hungdtq-header'>
                     <div className='float-right'>
@@ -367,6 +365,13 @@ class ReceivableList extends Component {
                             style={{ zIndex: 10, position: 'relative' }}
                             onClick={this.refreshData}>
                             <a><i class="fas fa-redo"></i></a>
+                        </div>
+                        <div className='btn btn-rcm-primary rcm-btn'
+                            style={{ zIndex: 10, position: 'relative' }}
+                            onClick={() => {
+                                this.setState(pre => ({ showFilter: !pre.showFilter }));
+                            }}>
+                            <a><i class="fas fa-filter"></i></a>
                         </div>
                     </div>
                 </div>
