@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Modal, ModalBody, ModalFooter } from 'reactstrap';
-import { Button, Container, Form, Header } from 'semantic-ui-react';
+import { Button, Form, Header } from 'semantic-ui-react';
 import { ProcessAction } from './../../actions/process-action';
 import './process.scss';
 import Stage from './stage';
@@ -111,6 +111,38 @@ export class UpdateProcessForm extends Component {
             </ModalFooter>
         </Modal>);
     }
+}
+
+export const validateProcess = (process) => {
+    if (process.Stages.length === 0) {
+        return 'A Profile must has at least 1 stage!'
+    }
+    return null;
+}
+export const validateStage = (stage) => {
+    if (stage.Actions.length === 0) {
+        return 'A Stage must has at least 1 action!'
+    }
+    return null;
+}
+
+export const validateAction = (action, actions) => {
+    let type = action.Type;
+    if (type == 0 || type == 1) {
+        let actionType = type == 0 ? 'SMS' : 'Phone call';
+        if (!action.ProfileMessageFormId) {
+            return `[${actionType}] action need an attached Message form.`
+        }
+    } else if (type == 3) {
+        let curIndex = actions.findIndex(a => a.Id === action.Id);
+        let nextIndex = actions.findIndex(a => a.Name == action.Name && a.Id !== action.Id);
+        if (curIndex != -1 && nextIndex != -1) {
+            if (curIndex > nextIndex) {
+                return `[${action.Name}] is already existed.`
+            }
+        }
+    }
+    return null;
 }
 
 const mapStateToProps = state => {

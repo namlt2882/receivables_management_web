@@ -4,11 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { Button, Form, Header } from 'semantic-ui-react';
+import { Button, Form, Header, Message } from 'semantic-ui-react';
 import * as ProcessReducer from '../../reducers/process-reducer';
 import ConfirmModal from '../modal/ConfirmModal';
 import { ProcessAction } from './../../actions/process-action';
 import Action from './action';
+import { validateAction, validateStage } from './process';
 library.add(faTrashAlt, faPen);
 
 class Stage extends Component {
@@ -195,6 +196,14 @@ export class UpdateStageForm extends Component {
     }
     render() {
         let stage = this.props.stage;
+        let validateStageMsg = validateStage({ Actions: this.state.actions });
+        let actionValidate = true;
+        this.state.actions.forEach(a => {
+            a._validateActionMsg = validateAction(a, this.state.actions);
+            if (actionValidate) {
+                actionValidate = a._validateActionMsg == null;
+            }
+        });
         return (<Modal isOpen={this.props.isOpen || stage._isNew} className='big-modal'>
             <ModalHeader>{stage._isNew ? `Add new stage: ${this.state.name}` : this.state.name}</ModalHeader>
             <ModalBody>
@@ -219,11 +228,19 @@ export class UpdateStageForm extends Component {
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.state.actions.map((action, i) =>
-                                    <Action action={action} key={i} no={i + 1}
+                                {this.state.actions.map((action, i) => {
+                                    return [<Action action={action} key={i} no={i + 1}
                                         updateAction={this.updateAction}
                                         deleteAction={this.deleteAction}
-                                        duration={this.state.duration} />)}
+                                        duration={this.state.duration} />,
+                                    action._validateActionMsg ? <tr>
+                                        <td colspan='7'>
+                                            <Message size='mini' negative>
+                                                <Message.Header>{action._validateActionMsg}</Message.Header>
+                                            </Message>
+                                        </td>
+                                    </tr> : null]
+                                })}
                             </tbody>
                         </table> : <div className='text-center bold-text' style={{ fontSize: '2rem' }}>
                                 <i>No action!</i>
@@ -234,7 +251,10 @@ export class UpdateStageForm extends Component {
                 </Form>
             </ModalBody>
             <ModalFooter>
-                <Button type='submit' color='primary' onClick={() => { this.refs.btnSubmit.click() }}>OK</Button>
+                {validateStageMsg ? <Message size='mini' negative>
+                    <Message.Header>{validateStageMsg}</Message.Header>
+                </Message> : null}
+                <Button style={{ marginLeft: '10px' }} disabled={validateStageMsg || actionValidate == false} type='submit' color='primary' onClick={() => { this.refs.btnSubmit.click() }}>OK</Button>
                 <Button onClick={this.closeForm} color='secondary'>Cancel</Button>
             </ModalFooter>
         </Modal>);

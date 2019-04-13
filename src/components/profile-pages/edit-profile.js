@@ -1,17 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button, Container, Divider, Form } from 'semantic-ui-react';
-import Process from '../../components/process-pages/process';
+import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Container, Divider, Form, Message } from 'semantic-ui-react';
+import Process, { validateProcess } from '../../components/process-pages/process';
+import * as ProcessReducer from '../../reducers/process-reducer';
 import { ProfileService } from '../../services/profile-service';
 import Component from '../common/component';
 import { available, available1, PrimaryLoadingPage } from '../common/loading-page';
+import { errorAlert, successAlert } from '../common/my-menu';
+import ConfirmModal from '../modal/ConfirmModal';
 import { cancelEditable, enableEditable, ProcessAction } from './../../actions/process-action';
 import { ProfileAction } from './../../actions/profile-action';
-import * as ProcessReducer from '../../reducers/process-reducer'
 import './profile.scss';
-import { successAlert, errorAlert } from '../common/my-menu';
-import ConfirmModal from '../modal/ConfirmModal';
-import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 class EditProfile extends Component {
     constructor(props) {
@@ -120,6 +120,7 @@ class EditProfile extends Component {
             return <PrimaryLoadingPage />
         }
         var readOnly = this.props.processStatus.readOnly;
+        let validateProcessMsg = validateProcess(this.props.process);
         return (<Container className='col-sm-12 row justify-content-center'>
             <div className='col-sm-12'>
                 <div className="hungdtq-header">
@@ -137,13 +138,17 @@ class EditProfile extends Component {
                             <Button onClick={this.toggleCloneForm}>Clone</Button>
                         </div> :
                         <div>
-                            <Button loading={this.state.isProcessing} disabled={this.state.isProcessing}
+                            <Button loading={this.state.isProcessing}
+                                disabled={this.state.isProcessing || validateProcessMsg}
                                 color='primary'
                                 onClick={this.saveProfile}>Save</Button>
                             <Button loading={this.state.isProcessing} disabled={this.state.isProcessing}
                                 onClick={() => {
                                     this.setState({ openConfirm: true });
                                 }}>Cancel</Button>
+                            {validateProcessMsg ? <Message size='mini' negative>
+                                <Message.Header>{validateProcessMsg}</Message.Header>
+                            </Message> : null}
                         </div>
                     }
                 </div>
