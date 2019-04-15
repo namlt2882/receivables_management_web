@@ -325,6 +325,11 @@ class ReceivableDetail extends Component {
                         <div className='info-card'>
                             <table className='info-table'>
                                 <tbody>
+                                    {isFinished && receivable.CollectionProgress.Status === 2 ? <tr>
+                                        <td colSpan='2' className='text-center'>
+                                            <i style={{ color: 'red' }}>NOT CONFIRM!!</i>
+                                        </td>
+                                    </tr> : null}
                                     <tr>
                                         <td>Debt amount:</td>
                                         <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
@@ -363,7 +368,7 @@ class ReceivableDetail extends Component {
                                                 </a> : this.state.profile.Name) : null}
                                         </td>
                                     </tr>
-                                    {isFinished && !receivable.IsConfirmed && AuthService.isManager() ?
+                                    {isFinished && receivable.CollectionProgress.Status !== 2 && !receivable.IsConfirmed && AuthService.isManager() ?
                                         <tr>
                                             <td></td>
                                             <td>
