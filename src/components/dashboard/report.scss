@@ -1,0 +1,40 @@
+.report-card{
+    min-width: 15rem !important;
+    color: white;
+    font-weight: bold !important;
+    border-radius: 30px !important;
+    text-align: center;
+}
+
+.report-card .card-body{
+    padding: 0px !important;
+}
+
+.report-card .card-body .card-text{
+    color: white !important;
+    font-size: 5rem !important;
+}
+
+.report-card-day-number{
+    font-size: 10rem !important;
+}
+
+.report-card-day-title{
+    background-color: #3778c2 !important;
+    color: white;
+    font-weight: bold !important;
+    height: 3rem;
+    margin: 0px;
+    text-align: center;
+    line-height: 3rem !important;
+    margin: 0px !important;
+}
+
+.recent-deck{
+    width: 90%;
+    margin: 0px !important;
+}
+
+.report-card-body{
+    background-color: #6db1ea42 !important;
+}

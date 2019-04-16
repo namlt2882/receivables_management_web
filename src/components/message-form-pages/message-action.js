@@ -12,6 +12,8 @@ import { successAlert, errorAlert } from '../common/my-menu'
 const messageLength = 200;
 const amount = "[AMOUNT]";
 const name = "[NAME]";
+const partnerName = '[PARTNER]';
+
 
 const nameChangeMessageErr = 'Name must have 10 to 255 characters.';
 const contentChangeMessageErr = 'Content must have at least 200 characters and contains [AMOUNT], [NAME] tag';
@@ -376,7 +378,8 @@ class MessageActionPage extends Component {
 
                                                     <div className="d-inline float-left message-edit-count">
                                                         <i>Tags: </i>
-                                                        <button className="btn btn-rcm-secondary btn-rotate" onClick={(e) => this.addLabelToMessage(name)}> NAME </button>
+                                                        <button className="btn btn-rcm-secondary btn-rotate" onClick={(e) => this.addLabelToMessage(partnerName)}> PARTNER NAME </button>
+                                                        <button className="btn btn-rcm-secondary btn-rotate" onClick={(e) => this.addLabelToMessage(name)}> DEBTOR NAME </button>
                                                         <button className="btn btn-rcm-secondary btn-rotate" onClick={(e) => this.addLabelToMessage(amount)}> AMOUNT </button>
                                                     </div>
                                                     <div className="d-inline float-right">

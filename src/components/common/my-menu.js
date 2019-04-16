@@ -52,9 +52,9 @@ class MyMenu extends Component {
                             </Link>
                         </NavbarBrand>
                         <Nav className="ml-auto" navbar>
-                            <ConnectedNotification history={this.props.history} dropdownProfile={this.state.dropdownProfile} />
                             <MyProfileWithRouter dropdownProfile={this.state.dropdownProfile}
                                 toggleProfile={this.toggleProfile} />
+                            <ConnectedNotification history={this.props.history} dropdownProfile={this.state.dropdownProfile} />
                         </Nav>
                     </Navbar>
                 </div>
@@ -80,14 +80,10 @@ class MyProfile extends React.Component {
             <div style={{ paddingTop: '2px' }}>
                 <Dropdown isOpen={this.props.dropdownProfile} toggle={this.props.toggleProfile}
                     className='my-profile'>
-                    <DropdownToggle className='transparent-button'>
-                        <FontAwesomeIcon icon='user-circle' color='#3778c2' size='lg' />
-                        <span className='username'>{name}</span>
+                    <DropdownToggle className='transparent-button' style={{ boxShadow: 'none' }}>
+                        <strong>{name} <i className="fas fa-angle-down"></i></strong>
                     </DropdownToggle>
                     <DropdownMenu className='nav-icon-panel row justify-content-center align-self-center'>
-                        <div className='col-sm-10' style={{ cursor: 'default' }}>
-                            Hi, <b>{localStorage.getItem('username')}</b><br />
-                        </div>
                         <DropdownItem onClick={() => { this.props.history.push(`/users/${localStorage.id}/view`) }}>
                             My profile
                             </DropdownItem>
