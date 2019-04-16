@@ -65,10 +65,13 @@ class TodayTask extends Component {
                                                 {t.Status === 3 ? 'Late' : ""}
                                             </p>
                                             <p style={{ display: t.Status === 1 ? 'block' : 'none' }} className="btn btn-primary">
-                                                {t.Status === 1 ? 'In order' : ""}
+                                                {t.Status === 1 ? 'Doing' : ""}
                                             </p>
-                                            <p style={{ display: t.Status === 0 ? 'block' : 'none' }} className="btn btn-success">
+                                            <p style={{ backgroundColor: 'red', color: 'white', display: t.Status === 0 ? 'block' : 'none' }} className="btn">
                                                 {t.Status === 0 ? 'Cancel' : ""}
+                                            </p>
+                                            <p style={{ display: t.Status === 2 ? 'block' : 'none' }} className="btn btn-success">
+                                                {t.Status === 2 ? 'Done' : ""}
                                             </p>
                                         </td>
                                     </tr>)}

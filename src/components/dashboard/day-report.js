@@ -21,7 +21,7 @@ class RecentTable extends Component {
                 <div className="hungdtq-Container">
                     <CardGroup className='deck recent-deck'>
                         <Card
-                            style={{ width: "20%", maxHeight:'21em' }}
+                            style={{ width: "15%", maxHeight:'21em' }}
                             bg="light"
                         >
                             <Card.Title className="report-card-day-title">New today</Card.Title>
@@ -32,7 +32,7 @@ class RecentTable extends Component {
                             </Card.Body>
                         </Card>
                         <Card
-                            style={{ width: "78%" }}
+                            style={{ width: "75%" }}
                             bg="light"
                         >
                             <Card.Title className="report-card-day-title">
