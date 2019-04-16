@@ -15,8 +15,8 @@ import {
     ChartSeriesItem
 } from '@progress/kendo-react-charts';
 
-import "react-tabs/style/react-tabs.css";
 import DetailReport from './detail-report';
+import { AuthService } from '../../services/auth-service';
 
 
 
@@ -37,7 +37,12 @@ class Dashboard extends Component {
     componentDidMount() {
         available(resolve => setTimeout(resolve, 400));
         document.title = 'Dashboard';
-
+        if (AuthService.isAdmin()) {
+            this.props.history.push('/users');
+        }
+        if (AuthService.isCollector()) {
+            this.props.history.push('/task');
+        }
         if (this.state.role == ROLE_MANAGER) {
             ReportService.getOverallReport().then(res => {
                 this.setState({
@@ -46,8 +51,6 @@ class Dashboard extends Component {
                 this.incrementLoading()
             }
             );
-        } else if (this.state.role == ROLE_COLLECTOR) {
-
         }
 
     }
@@ -59,7 +62,7 @@ class Dashboard extends Component {
             let status = this.describeStatus(receivable.Status);
             return {
                 No: (index + 1),
-                
+
                 PartnerName: receivable.PartnerName,
                 DebtorName: receivable.DebtorName,
                 CollectorName: receivable.CollectorName,
@@ -210,7 +213,7 @@ class Dashboard extends Component {
                     </div>
                     {renderComponent}
                     <hr></hr>
-                    <DetailReport/>
+                    <DetailReport />
                 </div>
             </div>
 

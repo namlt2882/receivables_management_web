@@ -87,7 +87,7 @@ const menus = [
         to: '/',
         exact: true,
         icon: 'chart-line',
-        roles: ['Collector', 'Admin', 'Manager']
+        roles: ['Manager']
     },
     {
         name: 'Task',
