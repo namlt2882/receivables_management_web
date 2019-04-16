@@ -10,23 +10,30 @@ class CurrentStage extends Component {
     }
     render() {
         let currentStage = this.props.currentStage;
-        let remainDay = compareIntDate(this.props.currentDate, currentStage.endDate);
-        let dayMark = ` (${remainDay} day left)`;
-        if (remainDay === 0) {
-            dayMark = ' (will end Today)'
+        let remainDay = 0;
+        let dayMark = '';
+        if (currentStage) {
+            remainDay = compareIntDate(this.props.currentDate, currentStage.endDate);
+            if (remainDay > 0) {
+                dayMark = ` (${remainDay} day left)`;
+            }
+            if (remainDay === 0) {
+                dayMark = ' (will end Today)'
+            }
         }
 
-
-        return (<Container className='row current-stage' style={{ margin: '0px 0px 15px 0px' }}>
-            <Header>Current stage
-            <span style={{ fontSize: '1rem', fontStyle: 'italic' }}>
+        return (<Container className='row current-stage' style={{
+            margin: '0px 0px 15px 0px'
+        }}>
+            <Header>{currentStage ? 'Current stage' : <span>&nbsp;</span>}
+                <span style={{ fontSize: '1rem', fontStyle: 'italic' }}>
                     {dayMark}
                 </span>
             </Header>
             <div className='col-sm-12 row justify-content-center align-self-center'>
                 <Segment className='col-sm-12'>
                     <Grid columns='1'>
-                        <Grid.Column>
+                        {currentStage ? <Grid.Column>
                             <table className='info-table'>
                                 <tbody>
                                     <tr>
@@ -47,24 +54,13 @@ class CurrentStage extends Component {
                                     </tr>
                                 </tbody>
                             </table>
-                        </Grid.Column>
-                        {AuthService.isManager() ? null : [<Grid.Column>
-                            <Divider />
+                        </Grid.Column> : null}
+                        {AuthService.isCollector() ? [<Grid.Column>
+                            {currentStage ? <Divider /> : null}
                             {this.props.children}
-                        </Grid.Column>]}
+                        </Grid.Column>] : null}
                     </Grid>
                 </Segment>
-                {/* <div className='col-sm-3'><b>Actions:</b></div>
-                    <table className='col-sm-8'>
-                        <tbody>
-                            {currentStage.OriginalActions.map(oa => {
-                                return <tr>
-                                    <td>{describeActionType(oa.Name, oa.Type)}</td>
-                                    <td>{describeGroupActionFrequency(oa.Frequency)}</td>
-                                </tr>
-                            })}
-                        </tbody>
-                    </table> */}
             </div>
         </Container>);
     }

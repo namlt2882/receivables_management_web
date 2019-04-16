@@ -71,7 +71,7 @@ export class Stage {
 export class Process {
     Id = IdGenerator.generateId();
     Name = 'New Process';
-    Stages = [new Stage()];
+    Stages = [];
     toProfile(process) {
         let tmp = new Stage();
         let rs = {

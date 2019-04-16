@@ -106,6 +106,7 @@ class ImportReceivable extends Component {
     //#region File
     handleFile = (e) => {
         this.setLoadingForm(true);
+        this.setState({ fileWarning: '' })
         var rABS = true;// true: readAsBinaryString ; false: readAsArrayBuffer
         var files = e.target.files, f = files[0];
         var reader = new FileReader();
@@ -143,14 +144,19 @@ class ImportReceivable extends Component {
                 errorLine: receivableData.length - tmp.length,
                 originLine: receivableData.length
             })
-            this.setState({ fileWarning: '' })
-            this.validateReceivables(() => {
-                this.increaseStep();
-            });
+            if (tmp.length > 0) {
+                this.validateReceivables(() => {
+                    this.increaseStep();
+                });    
+            } else {
+                this.setState({ fileWarning: 'Not found any validated rows in import file, please check import file again!' });
+            }
         }
         try {
             if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
-        } catch (e) { }
+        } catch (e) {
+            console.error(e);
+        }
         this.setLoadingForm(false);
     }
 
@@ -162,7 +168,7 @@ class ImportReceivable extends Component {
             rei.Profile = null;
             let partnerCode = rei.PartnerCode;
             if (partnerCode !== undefined && partnerCode !== null) {
-                partnerCode = partnerCode.toUpperCase();
+                partnerCode = ('' + partnerCode).toUpperCase();
             }
             rei.Customer = this.props.customers
                 .find(c => c.Code.toUpperCase() == partnerCode);
@@ -438,7 +444,7 @@ class ImportReceivable extends Component {
                 {/* File */}
                 <div className='form-group col-sm-8' style={{ display: this.state.step === 1 ? 'block' : 'none' }}>
                     <label className='bold-text'>Choose Files</label>
-                    <input type='file' onChange={this.handleFile} />
+                    <input type='file' key={Date.now()} onChange={this.handleFile} />
                     <span className='warning-text'>{this.state.fileWarning}<br /></span>
                 </div>
                 {/* END STEP 1 */}
@@ -453,7 +459,7 @@ class ImportReceivable extends Component {
                         fontStyle: 'italic',
                         float: 'right'
                     }}>
-                        Error line: {this.state.errorLine} line(s)
+                        Error line: {`${this.state.errorLine}/${this.state.originLine}`} line(s)
                     </span>
                 </div>
                 {/* END STEP 2 */}

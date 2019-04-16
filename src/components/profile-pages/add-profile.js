@@ -1,16 +1,16 @@
 import React from 'react';
-import Process from '../../components/process-pages/process'
 import { connect } from 'react-redux';
-import { ProcessAction, enableEditable } from './../../actions/process-action'
-import './profile.scss'
-import Component from '../common/component'
+import { Button, Container, Divider, Message } from 'semantic-ui-react';
+import Process, { validateProcess } from '../../components/process-pages/process';
+import * as ProcessReducer from '../../reducers/process-reducer';
+import { ProfileService } from '../../services/profile-service';
+import Component from '../common/component';
 import { available, PrimaryLoadingPage } from '../common/loading-page';
-import { ProfileService } from '../../services/profile-service'
-import { ProfileAction } from './../../actions/profile-action'
-import * as ProcessReducer from '../../reducers/process-reducer'
-import { Button, Container, Divider } from 'semantic-ui-react';
-import { successAlert, errorAlert } from '../common/my-menu';
+import { errorAlert, successAlert } from '../common/my-menu';
 import ConfirmModal from '../modal/ConfirmModal';
+import { enableEditable, ProcessAction } from './../../actions/process-action';
+import { ProfileAction } from './../../actions/profile-action';
+import './profile.scss';
 
 class AddProfile extends Component {
     constructor(props) {
@@ -51,6 +51,7 @@ class AddProfile extends Component {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />
         }
+        let validateProcessMsg = validateProcess(this.props.process);
         return (<Container className='col-sm-12 row justify-content-center'>
             <div className='col-sm-12'>
                 <div className="hungdtq-header">
@@ -62,10 +63,13 @@ class AddProfile extends Component {
                     <Divider />
                 </div>
                 <div className='panel-action' style={{ zIndex: 10, position: 'relative' }}>
-                    <Button color='primary' onClick={this.createNewProfile}>Save</Button>
+                    <Button color='primary' disabled={validateProcessMsg} onClick={this.createNewProfile}>Save</Button>
                     <Button onClick={() => {
                         this.setState({ openConfirm: true });
                     }}>Cancel</Button>
+                    {validateProcessMsg ? <Message size='mini' negative>
+                        <Message.Header>{validateProcessMsg}</Message.Header>
+                    </Message> : null}
                 </div>
             </div>
             <ConfirmModal
@@ -74,7 +78,8 @@ class AddProfile extends Component {
                 header="Confirm"
                 body="Are you sure? All data you input will be lost!"
                 callback={this.cancel} />
-            <Process formLoading={this.state.formLoading} />
+            <Process formLoading={this.state.formLoading}>
+            </Process>
         </Container >);
     }
 }

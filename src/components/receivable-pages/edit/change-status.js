@@ -15,7 +15,8 @@ class ChangeStatus extends Component {
             status: this.props.receivable.CollectionProgress.Status,
             openConfirm: false,
             confirmMessage: '',
-            changeStatus: () => { }
+            changeStatus: () => { },
+            header: ''
         }
         this.openForm = this.openForm.bind(this);
         this.closeModal = this.closeModal.bind(this);
@@ -32,22 +33,25 @@ class ChangeStatus extends Component {
         this.setState({ modal: false });
     }
     confirm(isPayed) {
-        let message = 'The debt is collected successfully. This action will CLOSE this case, please confirm this action.';
+        let message = 'This action means the receivable is SUCCESSFULLY collected and will be CLOSED. Please confirm this action.';
+        let header = 'Confirm to close this receivable'
         if (!isPayed) {
-            message = 'This action will CANCEL this case, please confirm this action.';
+            message = 'This action means the receivable is FAIL to collect and will be CANCEL. Please confirm this action.';
+            header = 'Confirm to cancel this receivable'
         }
         this.setState({
             openConfirm: true,
             confirmMessage: message,
             changeStatus: () => {
                 this.changeStatus(isPayed);
-            }
+            },
+            header: header
         });
     }
     changeStatus(isPayed) {
-        let successMsg = 'This receivable has been cancel!';
+        let successMsg = 'This receivable has been CANCEL!';
         if (isPayed) {
-            successMsg = 'This receivable has been closed!';
+            successMsg = 'This receivable has been CLOSED!';
         }
         let data = {
             Id: this.state.receivable.Id,
@@ -58,14 +62,10 @@ class ChangeStatus extends Component {
             this.state.receivable.CollectionProgress.Status = rs.Status;
             this.state.receivable.ClosedDay = rs.ClosedTime;
             this.props.updateReceivable(this.state.receivable);
-            if (isPayed) {
-                successAlert(successMsg);
-            } else {
-                infoAlert(successMsg);
-            }
+            successAlert(successMsg);
         }).catch(err => {
             console.error(err);
-            errorAlert('Fail to change status of this receivable! Please try again later!');
+            errorAlert('Service unvailable! Please try again later!');
         })
     }
     render() {
@@ -84,7 +84,7 @@ class ChangeStatus extends Component {
             <ConfirmModal
                 show={this.state.openConfirm}
                 onHide={() => { this.setState({ openConfirm: false }) }}
-                header='Confirm'
+                header={this.state.header}
                 body={this.state.confirmMessage}
                 callback={this.state.changeStatus} />
         </div>);

@@ -1,3 +1,4 @@
+import { MDBDataTable } from 'mdbreact';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -20,6 +21,7 @@ class ProfileList extends Component {
         }
         this.toggleAddForm = this.toggleAddForm.bind(this);
         this.addNewProfile = this.addNewProfile.bind(this);
+        this.pushData = this.pushData.bind(this);
     }
     toggleAddForm() {
         this.setState(pre => ({ isOpenAddForm: !pre.isOpenAddForm }))
@@ -37,11 +39,22 @@ class ProfileList extends Component {
         this.props.updateProcess(process);
         this.props.history.push('/profile/add')
     }
+    pushData() {
+        let newData = { ...data };
+        newData.rows = this.props.profiles.map((profile, i) => {
+            return {
+                No: (i + 1),
+                Name: profile.Name,
+                Actions: <Link to={`/profile/${profile.Id}/view`}>View</Link>
+            }
+        })
+        return newData;
+    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />
         }
-        var profiles = this.props.profiles;
+        let data1 = this.pushData();
         return (
             <Container className='col-sm-12 row justify-content-center'>
                 <div className='col-sm-12 middle-content-table'>
@@ -57,26 +70,11 @@ class ProfileList extends Component {
                             </div></div>
                         <Divider />
                     </div>
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Profile name</th>
-                                {/* <th>Customer</th> */}
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {profiles.map((profile) => (<tr>
-                                <td>{profile.Id}</td>
-                                <td>{profile.Name}</td>
-                                {/* <td>{profile.customer !== null ? profile.customer.name : ''}</td> */}
-                                <td>
-                                    <Link to={`/profile/${profile.Id}/view`}>View</Link>
-                                </td>
-                            </tr>))}
-                        </tbody>
-                    </table>
+                    <MDBDataTable
+                        className='hide-last-row'
+                        striped
+                        bordered
+                        data={data1} />
                 </div>
                 <AddNewProfileForm addNewProfile={this.addNewProfile} toggle={this.toggleAddForm} isOpen={this.state.isOpenAddForm} />
             </Container>);
@@ -122,6 +120,27 @@ class AddNewProfileForm extends Component {
             </ModalFooter>
         </Modal>);
     }
+}
+
+const data = {
+    columns: [
+        {
+            label: '#',
+            field: 'No',
+            width: 50
+        },
+        {
+            label: 'Profile Name',
+            field: 'Name',
+            width: 300
+        },
+        {
+            label: '',
+            field: 'Actions',
+            width: 50
+        },
+    ],
+    rows: []
 }
 
 const mapStateToProps = state => {
