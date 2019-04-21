@@ -54,20 +54,20 @@ class Contact extends Component {
                     (<div className='info-card'><table className='info-table'>
                         <tbody>
                             <tr>
-                                <td>Id:</td>
-                                <td>{contact.IdNo}</td>
+                                <td>Id</td>
+                                <td>: {contact.IdNo}</td>
                             </tr>
                             <tr>
-                                <td>Name:</td>
-                                <td>{contact.Name}</td>
+                                <td>Name</td>
+                                <td>: {contact.Name}</td>
                             </tr>
                             <tr>
-                                <td>Phone:</td>
-                                <td>{contact.Phone}</td>
+                                <td>Phone</td>
+                                <td>: {contact.Phone}</td>
                             </tr>
                             <tr>
-                                <td>Address:</td>
-                                <td>{contact.Address}</td>
+                                <td>Address</td>
+                                <td>: {contact.Address}</td>
                             </tr>
                             <tr>
                                 <td colSpan='2'>

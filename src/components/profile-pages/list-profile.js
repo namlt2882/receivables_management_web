@@ -61,7 +61,7 @@ class ProfileList extends Component {
                     <div className="hungdtq-header">
                         <div>
                             <div className="d-inline-block hungdtq-header-text">
-                                <h1>Profiles</h1>
+                                <h1>Procedures</h1>
                             </div>
                             <div className="d-inline-block hungdtq-headerbtn-container">
                                 <div className="btn btn-rcm-primary rcm-btn" onClick={this.toggleAddForm}>
@@ -102,14 +102,14 @@ class AddNewProfileForm extends Component {
     }
     render() {
         return (<Modal isOpen={this.props.isOpen}>
-            <ModalHeader>Add new profile</ModalHeader>
+            <ModalHeader>Add new procedure</ModalHeader>
             <ModalBody>
                 {/* Input name */}
                 <Form action='/' onSubmit={this.addNewProfile} ref='form'>
                     <Form.Field>
-                        <Form.Input label='Profile Name:' value={this.state.name} required={true}
+                        <Form.Input label='Procedure Name:' value={this.state.name} required={true}
                             onChange={(e) => { this.setState({ name: e.target.value }) }}
-                            placeholder='name of profile' />
+                            placeholder='name of procedure' />
                     </Form.Field>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
                 </Form>
@@ -130,13 +130,13 @@ const data = {
             width: 50
         },
         {
-            label: 'Profile Name',
+            label: 'Procedure Name',
             field: 'Name',
             width: 300
         },
         {
             label: '',
-            field: 'Actions',
+            field: '',
             width: 50
         },
     ],

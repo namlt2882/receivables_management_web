@@ -111,7 +111,7 @@ const menus = [
         roles: ['Admin']
     },
     {
-        name: 'Profile',
+        name: 'Procedure',
         to: '/profile',
         exact: false,
         icon: 'chalkboard-teacher',
@@ -125,7 +125,7 @@ const menus = [
         roles: ['Manager']
     },
     {
-        name: 'Customer',
+        name: 'Partner',
         to: '/customers',
         exact: false,
         icon: 'address-book',

@@ -399,7 +399,7 @@ class ImportReceivable extends Component {
         }
         let cacheData = localStorage.getItem('recent_inserted_data');
         return (<Container className='col-sm-12 row'>
-            <div className="hungdtq-header"><h1>{this.props.showRecent ? 'Recently added receivables' : 'Import receivable'}</h1>
+            <div className="hungdtq-header"><h1>{this.props.showRecent ? 'Recently added receivables' : 'Import receivables'}</h1>
                 <Divider />
             </div>
             <Form loading={this.state.loadingForm} onSubmit={() => { }} className='col-sm-12 row justify-content-center align-self-center'>
@@ -473,7 +473,7 @@ class ImportReceivable extends Component {
                                     <th>Partner</th>
                                     <th>Debtor</th>
                                     <th>Debt Amount</th>
-                                    <th>Profile</th>
+                                    <th>Procedure</th>
                                     <th>Start date</th>
                                     <th>Collector</th>
                                     <th>Pending</th>
@@ -716,7 +716,7 @@ const tableData2 = {
             width: 270
         },
         {
-            label: 'Profile',
+            label: 'Procedure',
             field: 'Profile',
             sort: 'asc',
             width: 200

@@ -37,20 +37,20 @@ class CurrentStage extends Component {
                             <table className='info-table'>
                                 <tbody>
                                     <tr>
-                                        <td>Stage:</td>
-                                        <td>{currentStage.Name}</td>
+                                        <td>Stage</td>
+                                        <td>: {currentStage.Name}</td>
                                     </tr>
                                     <tr>
-                                        <td>Duration:</td>
-                                        <td>{currentStage.Duration} day(s)</td>
+                                        <td>Duration</td>
+                                        <td>: {currentStage.Duration} day(s)</td>
                                     </tr>
                                     <tr>
-                                        <td>Start at:</td>
-                                        <td>{numAsDate(currentStage.startDate)}</td>
+                                        <td>Start at</td>
+                                        <td>: {numAsDate(currentStage.startDate)}</td>
                                     </tr>
                                     <tr>
-                                        <td>End at:</td>
-                                        <td>{numAsDate(currentStage.endDate)}</td>
+                                        <td>End at</td>
+                                        <td>: {numAsDate(currentStage.endDate)}</td>
                                     </tr>
                                 </tbody>
                             </table>
