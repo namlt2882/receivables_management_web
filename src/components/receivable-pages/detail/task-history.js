@@ -40,6 +40,7 @@ class TaskHistory extends React.Component {
                                 <th>#</th>
                                 <th>Task</th>
                                 <th>Start time</th>
+                                {/* <th>Evidence</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -47,6 +48,7 @@ class TaskHistory extends React.Component {
                                 <td>{i + 1}</td>
                                 <td>{describeActionType(t.Name, t.Type)}</td>
                                 <td>{numAsTime(t.StartTime)}</td>
+                                {/* <td><a target='_blank' href=''></a></td> */}
                             </tr>))}
                         </tbody>
                     </table> : null}
