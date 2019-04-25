@@ -12,5 +12,8 @@ export const UserService = {
     },
     addCollector: (collector) => {
         return AuthRequest.post('User/', collector)
+    },
+    getGroupByCollector: () => {
+        return AuthRequest.get('Receivable/GetReceivableGroupByCollector/')
     }
 }

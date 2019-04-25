@@ -14,7 +14,8 @@ class OverallReport extends Component {
     render() {
         return (
             <div className="hungdtq-Wrapper">
-                <div className="hungdtq-Container">
+                <div style={{ display: "inline", float: "left" }}>
+
                     <CardDeck className="deck">
                         <Card
                             className="report-card"
@@ -23,67 +24,81 @@ class OverallReport extends Component {
                             <Card.Body>
                                 <Card.Text>
                                     {this.props.NumberOfCanceledReceivables}
-                                  </Card.Text>
+                                </Card.Text>
                             </Card.Body>
                             <Card.Footer>
                                 Canceled
                             </Card.Footer>
                         </Card>
-                        <Card
-                            className="report-card"
-                            bg="warning"
-                        >
-                            <Card.Body>
-                                <Card.Text>
-                                    {this.props.NumberOfPendingReceivables}
-                                </Card.Text>
-                            </Card.Body>
-                            <Card.Footer>
-                                Pending
+                        <div>
+
+                            <Card
+                                className="report-card"
+                                bg="warning"
+                            >
+                                <Card.Body>
+                                    <Card.Text>
+                                        {this.props.NumberOfPendingReceivables}
+                                    </Card.Text>
+                                </Card.Body>
+                                <Card.Footer>
+                                    Pending
                             </Card.Footer>
-                        </Card>
-                        <Card
-                            className="report-card"
-                            bg="info"
-                        >
-                            <Card.Body>
-                                <Card.Text>
-                                    {this.props.NumberOfDoneReceivables}
-                                </Card.Text>
-                            </Card.Body>
-                            <Card.Footer>
-                                Complete the process
+                            </Card>
+                            <Card
+                                className="report-card"
+                                bg="info"
+                            >
+                                <Card.Body>
+                                    <Card.Text>
+                                        {this.props.NumberOfDoneReceivables}
+                                    </Card.Text>
+                                </Card.Body>
+                                <Card.Footer>
+                                    Complete the process
                             </Card.Footer>
-                        </Card>
-                        <Card
-                            className="report-card"
-                            bg="primary"
-                        >
-                            <Card.Body>
-                                <Card.Text>
-                                    {this.props.NumberOfCollectingReceivables}
-                                </Card.Text>
-                            </Card.Body>
-                            <Card.Footer>
-                                In collecting progress
+                            </Card>
+                        </div>
+
+
+                        <div>
+                            <Card
+                                className="report-card"
+                                bg="primary"
+                            >
+                                <Card.Body>
+                                    <Card.Text>
+                                        {this.props.NumberOfCollectingReceivables}
+                                    </Card.Text>
+                                </Card.Body>
+                                <Card.Footer>
+                                    In collecting progress
                             </Card.Footer>
-                        </Card>
-                        <Card
-                            className="report-card"
-                            bg="success"
-                        >
-                            <Card.Body>
-                                <Card.Text>
-                                    {this.props.NumberOfRecoveredReceivables}
-                                </Card.Text>
-                            </Card.Body>
-                            <Card.Footer>
-                                Closed
+                            </Card>
+                            <Card
+                                className="report-card"
+                                bg="success"
+                            >
+                                <Card.Body>
+                                    <Card.Text>
+                                        {this.props.NumberOfRecoveredReceivables}
+                                    </Card.Text>
+                                </Card.Body>
+                                <Card.Footer>
+                                    Closed
                             </Card.Footer>
-                        </Card>
+                            </Card>
+                        </div>
+
                     </CardDeck>
                 </div>
-            </div>
+
+                <div style={{ display: "inline", float: "left" }}>
+                    {this.props.renderReportData}
+
+                </div>
+            </div >
+
         );
     }
 }
