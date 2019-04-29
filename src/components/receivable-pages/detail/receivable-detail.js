@@ -297,7 +297,7 @@ class ReceivableDetail extends Component {
                 </div>
                 <div className='col-sm-12'>
                     <SmsPhonecallHistory stages={receivable.CollectionProgress.Stages} /><br />
-                    <TaskHistory stages={receivable.CollectionProgress.Stages} /><br/>
+                    <TaskHistory stages={receivable.CollectionProgress.Stages} /><br />
                     {isFinished ? null : <TodayTask todayTask={this.state.todayTask} />}
                 </div>
             </div>
@@ -317,7 +317,7 @@ class ReceivableDetail extends Component {
                     <Container>
                         <Header>
                             <FontAwesomeIcon icon='credit-card' color='black' size='md' style={{ marginRight: '10px' }} />
-                            Receivable Info <Label color={statusColor}>{status}</Label>
+                            Receivable Info <Label style={{ backgroundColor: statusColor, color: 'white' }}>{status}</Label>
                             {/* Edit info of receivable */}
                             {receivable.CollectionProgress.Status === 1 || receivable.CollectionProgress.Status === 4 ?
                                 <EditReceivable updateReceivable={this.updateReceivable}
@@ -441,17 +441,20 @@ export const getStatusColor = (status) => {
     switch (status) {
         case 0:
             // Cancel
-            statusColor = 'red';
+            statusColor = '#dc3545';
             break;
-        case 1: statusColor = 'green';
+        case 1: statusColor = '#007bff';
             break;
         case 2:
             // Done
-            statusColor = 'blue';
+            statusColor = '#17a2b8';
             break;
         case 4:
             // Pending
-            statusColor = 'orange';
+            statusColor = '#ffc107';
+            break;
+            // Closed
+        case 5: statusColor = '#28a745';
             break;
     }
     return statusColor;
