@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom';
 import { Form, Button, Message } from 'semantic-ui-react';
 import { AuthService, isLoggedIn } from '../../services/auth-service';
 import Component from './component';
+import { available1 } from './loading-page';
 library.add(faKey, faUser);
 
 class LoginPage extends Component {
@@ -24,6 +25,11 @@ class LoginPage extends Component {
         this.changeUsername = this.changeUsername.bind(this);
         this.changePassword = this.changePassword.bind(this);
         this.setIsLoggedIn = this.setIsLoggedIn.bind(this);
+    }
+
+    componentDidMount() {
+        document.title = "Login"
+        available1();
     }
 
     setIsLoggedIn = (val) => {

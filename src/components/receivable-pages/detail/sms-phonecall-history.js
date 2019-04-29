@@ -3,7 +3,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reacts
 import { numAsDate, numAsTime } from '../../../utils/time-converter';
 import { Button, Divider, Label } from 'semantic-ui-react';
 
-class ActionHistory extends React.Component {
+class SmsPhonecallHistory extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -122,4 +122,4 @@ const describeActionStatus = (status) => {
     }
 }
 
-export default ActionHistory;
+export default SmsPhonecallHistory;

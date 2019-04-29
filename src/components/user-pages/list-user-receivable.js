@@ -1,15 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+import { MDBDataTable } from 'mdbreact';
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { UserAction } from '../../actions/user-action';
 import { UserService } from '../../services/user-service';
 import Component from '../common/component';
 import { available1, PrimaryLoadingPage } from '../common/loading-page';
-import UserItem from './user-item';
-import UserList from './user-list-component';
 import './user.scss';
-import { Link } from 'react-router-dom';
-import { MDBDataTable } from 'mdbreact';
 
 
 class ListUserWithReceivable extends Component {
@@ -18,7 +16,8 @@ class ListUserWithReceivable extends Component {
         super(props);
         this.state = {
             maxLoading: 1,
-            filterVal: ""
+            filterVal: "",
+            user: null
         };
     }
 

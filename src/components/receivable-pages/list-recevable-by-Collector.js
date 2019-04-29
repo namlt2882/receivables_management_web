@@ -1,24 +1,18 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faExclamationCircle, faRedo } from '@fortawesome/free-solid-svg-icons';
-import { MultiSelect } from '@progress/kendo-react-dropdowns';
+import classnames from 'classnames';
 import { MDBDataTable } from 'mdbreact';
 import React from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Nav, TabContent, TabPane, NavItem, NavLink } from 'reactstrap';
-import { Button, Checkbox, Container, Divider, Label, Segment, Icon } from 'semantic-ui-react';
-import { CollectorAction } from '../../actions/collector-action';
-import { CustomerAction } from '../../actions/customer-action';
-import { ReceivableAction } from '../../actions/receivable-action';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { Button, Checkbox, Container, Divider, Icon, Label, Segment } from 'semantic-ui-react';
 import { AuthService } from '../../services/auth-service';
 import { ReceivableService } from '../../services/receivable-service';
 import { UserService } from '../../services/user-service';
-import { compareIntDate, numAsDate } from '../../utils/time-converter';
+import { numAsDate } from '../../utils/time-converter';
 import Component from '../common/component';
 import { available, PrimaryLoadingPage } from '../common/loading-page';
-import { compareStatus, describeStatus, getStatusColor } from './detail/receivable-detail';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classnames from 'classnames';
+import { describeStatus, getStatusColor } from './detail/receivable-detail';
 library.add(faCheck, faExclamationCircle, faRedo);
 
 class ReceivableListByCollector extends Component {
@@ -26,7 +20,7 @@ class ReceivableListByCollector extends Component {
         super(props);
         this.state = {
             showFilter: true,
-            maxLoading: 1,
+            maxLoading: 2,
             receivableList: [],
             series: [
                 { category: 'Collecting', value: 0, color: getStatusColor(1), checked: true, isConfirmed: false },
@@ -45,7 +39,8 @@ class ReceivableListByCollector extends Component {
             getConfirmed: true,
             selectedCollector: [],
             selectedCustomer: [],
-            isRefreshing: false
+            isRefreshing: false,
+            user: null
         }
         this.statusFilterComp = this.statusFilterComp.bind(this);
 
@@ -87,7 +82,7 @@ class ReceivableListByCollector extends Component {
                         onChange={(e, data) => {
                             this.toggleStatus(s.category, data.checked);
                         }} />
-                    <Label color={s.color} style={{ cursor: 'pointer' }} onClick={() => {
+                    <Label style={{ cursor: 'pointer', backgroundColor: s.color, color: 'white' }} onClick={() => {
                         let checked = !s.checked;
                         this.toggleStatus(s.category, checked);
                     }}>{`${s.category} (${s.value})`}</Label>
@@ -111,6 +106,14 @@ class ReceivableListByCollector extends Component {
                     this.filterReceivable()
                 });
             }
+            UserService.getCollectorDetail(match.params.collectorId).then(res => {
+                let user = res.data;
+                this.setState({
+                    user: user
+                })
+                document.title = `Receivable of ${user.FirstName} ${user.LastName}`
+                this.incrementLoading();
+            })
         }
 
     }
@@ -201,9 +204,9 @@ class ReceivableListByCollector extends Component {
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 CurrentStage: `${r.Stage} (${r.ProgressPercent}%)`,
-                Status: [<Label color={statusColor}>{status}</Label>,
+                Status: [<Label style={{ backgroundColor: statusColor, color: 'white' }}>{status}</Label>,
                     confirmComponent],
-                action: <Link target='_blank' to={`receivable/${r.Id}/receivable`}>View</Link>
+                action: <Link target='_blank' to={`/receivable/${r.Id}/view`}>View</Link>
             }
         });
         data1.rows = rows;
@@ -224,12 +227,16 @@ class ReceivableListByCollector extends Component {
                 <div style={{ fontSize: '2rem' }}>No receivable found!</div>
         }
         let isManager = AuthService.isManager();
+        let user = this.state.user;
+        if (!user) {
+            user = {};
+        }
         return (
             <Container className='col-sm-12 row justify-content-center'>
                 <div className="hungdtq-header">
                     <div>
                         <div className="d-inline-block hungdtq-header-text">
-                            <h1>{isManager ? `Receivables` : 'Your assigned receivables'}</h1>
+                            <h1>{isManager ? `Receivables of ${user.FirstName} ${user.LastName}` : 'Your assigned receivables'}</h1>
                         </div>
                         {/* Add button */}
                     </div>

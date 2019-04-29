@@ -194,7 +194,7 @@ class ReceivableList extends Component {
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
                 CurrentStage: `${r.Stage} (${r.ProgressPercent}%)`,
-                Status: [<Label color={statusColor}>{status}</Label>,
+                Status: [<Label style={{backgroundColor: statusColor, color: 'white' }}>{status}</Label>,
                     confirmComponent],
                 action: <Link target='_blank' to={`receivable/${r.Id}/view`}>View</Link>
             }
@@ -238,7 +238,7 @@ class ReceivableList extends Component {
                         onChange={(e, data) => {
                             this.toggleStatus(s.category, data.checked);
                         }} />
-                    <Label color={s.color} style={{ cursor: 'pointer' }} onClick={() => {
+                    <Label style={{ cursor: 'pointer', backgroundColor: s.color, color: 'white' }} onClick={() => {
                         let checked = !s.checked;
                         this.toggleStatus(s.category, checked);
                     }}>{`${s.category} (${s.value})`}</Label>

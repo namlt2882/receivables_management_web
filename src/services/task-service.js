@@ -6,5 +6,8 @@ export const TaskService = {
     },
     getCollectorTodayTask: (id) => {
         return AuthRequest.get(`Task/GetCollectorTodayTask?collectorId=${id}`);
+    },
+    getCompleteTask: (receivableId) => {
+        return AuthRequest.get(`Task/GetCompletedTaskByReceivableId/${receivableId}`);
     }
 }
