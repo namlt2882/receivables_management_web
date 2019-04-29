@@ -108,6 +108,7 @@ class ReceivableListByCollector extends Component {
                         receivableList: res.data
                     });
                     this.incrementLoading()
+                    this.filterReceivable()
                 });
             }
         }
