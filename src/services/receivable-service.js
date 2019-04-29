@@ -38,5 +38,8 @@ export const ReceivableService = {
             CollectorId: collectorId,
             PayableDay: payableDay
         }]);
+    },
+    getReceivablesByCollector: (collectorId) => {
+        return AuthRequest.get(`Receivable/GetReceivaleByCollectorId/${collectorId}`);
     }
 }

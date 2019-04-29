@@ -104,6 +104,13 @@ const menus = [
         roles: ['Collector', 'Manager']
     },
     {
+        name: 'Collector',
+        to: '/collectors',
+        exact: false,
+        icon: 'users',
+        roles: ['Manager']
+    },
+    {
         name: 'User',
         to: '/users',
         exact: false,

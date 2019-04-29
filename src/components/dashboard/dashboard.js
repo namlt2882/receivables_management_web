@@ -15,9 +15,9 @@ import {
     ChartSeriesItem
 } from '@progress/kendo-react-charts';
 
-import DetailReport from './detail-report';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 import { AuthService } from '../../services/auth-service';
-
 
 
 const ROLE_MANAGER = 'Manager';
@@ -53,6 +53,63 @@ class Dashboard extends Component {
             );
         }
 
+    }
+
+    renderMonthReport(data) {
+        return (
+            <TabPanel>
+                <table className="monthlyReport">
+                    <tr>
+                        <td>Receivable Created</td>
+                        <td>{data.NumberOfCreatedReceivable}</td>
+                    </tr>
+                    <tr>
+                        <td>Receivable Canceled</td>
+                        <td>{data.NumberOfCanceledReceivable}</td>
+                    </tr>
+                    <tr>
+                        <td>Receivable Closed</td>
+                        <td>{data.NumberofClosedReceivable}</td>
+                    </tr>
+                    <tr>
+                        <td>Receivable Done in Month</td>
+                        <td>{data.NumberOfDoneReceivable}</td>
+                    </tr>
+                </table>
+            </TabPanel>
+        )
+    }
+
+    renderMonthTabNameReport(data) {
+        return (
+            <Tab>{data.substring(0,7)}</Tab>
+        )
+    }
+
+    renderMonthlyReport() {
+        var renderData = {
+            tabName: [],
+            tabPanel: []
+        }
+
+        this.state.reportData.ReceivableReports.MonthlyReport.map((report, index) => {
+            renderData.tabName.push(this.renderMonthTabNameReport(report.Milestone));
+            renderData.tabPanel.push(this.renderMonthReport(report));
+        });
+
+
+        return (
+            <div className="hungdtq-Wrapper">
+                <div className="hungdtq-Container">
+                    <Tabs>
+                        <TabList>
+                            {renderData.tabName}
+                        </TabList>
+                        {renderData.tabPanel}
+                    </Tabs>
+                </div>
+            </div>
+        );
     }
 
     renderReceivableTable() {
@@ -124,6 +181,10 @@ class Dashboard extends Component {
                 // Done
                 statusColor = 'blue';
                 break;
+            case 3:
+                // Late
+                statusColor = 'yellow';
+                break;
             case 4:
                 // Pending
                 statusColor = 'orange';
@@ -149,6 +210,10 @@ class Dashboard extends Component {
                 // Pending
                 rs = 'Pending';
                 break;
+            case 3:
+                // Late
+                rs = 'Late';
+                break;
             case 5:
                 // Closed
                 rs = 'Closed';
@@ -163,6 +228,8 @@ class Dashboard extends Component {
 
             let renderReceivableData = this.renderReceivableTable();
             let renderTaskData = this.renderTaskTable();
+            let renderReportData = this.renderMonthlyReport();
+
             return (
                 <div>
                     <OverallReport
@@ -171,6 +238,7 @@ class Dashboard extends Component {
                         NumberOfDoneReceivables={this.state.reportData.NumberOfDoneReceivables}
                         NumberOfPendingReceivables={this.state.reportData.NumberOfPendingReceivables}
                         NumberOfRecoveredReceivables={this.state.reportData.NumberOfRecoveredReceivables}
+                        renderReportData = {renderReportData}
                     />
                     <RecentTable
                         style={{ marginTop: '0px' }}
@@ -213,7 +281,6 @@ class Dashboard extends Component {
                     </div>
                     {renderComponent}
                     <hr></hr>
-                    <DetailReport />
                 </div>
             </div>
 
@@ -294,5 +361,6 @@ const taskTable = {
         }
     ]
 }
+
 
 export default Dashboard;

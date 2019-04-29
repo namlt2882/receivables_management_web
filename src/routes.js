@@ -15,6 +15,8 @@ import TodayTask from './components/task-pages/today-task';
 import NewAssignedReceivable from './components/receivable-pages/new-assigned-receivable';
 import UserList from './components/customer-pages/customer-list';
 import CustomerActionPage from './components/customer-pages/customer-action';
+import ListUserWithReceivable from './components/user-pages/list-user-receivable';
+import ReceivableListByCollector from './components/receivable-pages/list-recevable-by-Collector';
 
 const routes = [
     {
@@ -81,6 +83,16 @@ const routes = [
         path: '/receivable',
         exact: true,
         main: ({ match, history }) => <ReceivableList match={match} history={history} />
+    },
+    {
+        path: '/collectors',
+        exact: true,
+        main: ({ match, history }) => <ListUserWithReceivable history={history} />
+    },
+    {
+        path: '/collectors/:collectorId/receivable',
+        exact: true,
+        main: ({ match, history }) => <ReceivableListByCollector match={match} history={history} />
     },
     {
         path: '/receivable/add',

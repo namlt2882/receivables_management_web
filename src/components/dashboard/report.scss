@@ -1,25 +1,34 @@
-.report-card{
+.report-card {
     min-width: 10rem !important;
     color: white;
     font-weight: bold !important;
     border-radius: 30px !important;
     text-align: center;
+    margin-top: 10px;
 }
 
-.report-card .card-body{
+.card-deck .report-card:first-child{
+    min-width: 15rem !important;
+}
+
+.card-deck > .report-card:first-child > .card-body > .card-text{
+    font-size: 8rem !important;
+}
+
+.report-card .card-body {
     padding: 0px !important;
 }
 
-.report-card .card-body .card-text{
+.report-card .card-body .card-text {
     color: white !important;
     font-size: 3rem !important;
 }
 
-.report-card-day-number{
+.report-card-day-number {
     font-size: 10rem !important;
 }
 
-.report-card-day-title{
+.report-card-day-title {
     background-color: #3778c2 !important;
     color: white;
     font-weight: bold !important;
@@ -30,11 +39,36 @@
     margin: 0px !important;
 }
 
-.recent-deck{
+.recent-deck {
     width: 90%;
     margin: 0px !important;
 }
 
-.report-card-body{
+.report-card-body {
     background-color: #6db1ea42 !important;
+}
+
+.react-tabs__tab--selected {
+    background-color: #6db1ea1f !important;
+}
+
+.monthlyReport{
+    width: 100%;
+}
+
+.monthlyReport tr{
+    border-bottom: 1px solid black;
+}
+
+.monthlyReport tr td:first-child{
+    background-color: #6db1ea1f !important;
+    width: 40%;
+    height: 2rem;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.monthlyReport tr td:nth-child(2){
+    text-align: center;
 }
