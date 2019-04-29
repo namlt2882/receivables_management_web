@@ -98,9 +98,9 @@ export class UpdateProcessForm extends Component {
                 {/* Input name */}
                 <Form action='/' onSubmit={this.updateProcess} ref='form'>
                     <Form.Field>
-                        <Form.Input label='Profile Name:' value={this.state.name} required={true}
+                        <Form.Input label='Procedure Name:' value={this.state.name} required={true}
                             onChange={(e) => { this.setState({ name: e.target.value }) }}
-                            placeholder='name of profile' />
+                            placeholder='name of procedure' />
                     </Form.Field>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
                 </Form>
@@ -115,7 +115,7 @@ export class UpdateProcessForm extends Component {
 
 export const validateProcess = (process) => {
     if (process.Stages.length === 0) {
-        return 'A Profile must has at least 1 stage!'
+        return 'A Procedure must has at least 1 stage!'
     }
     return null;
 }

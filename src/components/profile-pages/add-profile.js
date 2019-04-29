@@ -57,7 +57,7 @@ class AddProfile extends Component {
                 <div className="hungdtq-header">
                     <div>
                         <div className="d-inline-block hungdtq-header-text">
-                            <h1>Add new Profiles</h1>
+                            <h1>Add new Procedures</h1>
                         </div>
                     </div>
                     <Divider />

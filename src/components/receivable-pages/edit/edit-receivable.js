@@ -11,6 +11,7 @@ import { ComboBox } from '@progress/kendo-react-dropdowns';
 import { errorAlert, successAlert } from '../../common/my-menu';
 import MyToolTip from '../../common/my-tooltip';
 import { MiddlePopup } from '../../common/middle-popup';
+import { AuthService } from '../../../services/auth-service';
 library.add(faPen);
 
 class EditReceivable extends Component {
@@ -189,9 +190,9 @@ class EditReceivable extends Component {
         }
 
         return (<div style={{ width: '30px', float: 'right', paddingRight: '20px' }}>
-            <FontAwesomeIcon icon='pen' size='sm' color='black' className='icon-btn'
-                id='edit-receivable-info' onClick={this.openModal} />
-            <MyToolTip target='edit-receivable-info' message='Edit receivable info' />
+            {AuthService.isManager() ? [<FontAwesomeIcon icon='pen' size='sm' color='black' className='icon-btn'
+                id='edit-receivable-info' onClick={this.openModal} />,
+            <MyToolTip target='edit-receivable-info' message='Edit receivable info' />] : null}
             <Modal isOpen={this.state.modal} className={modalClass}
                 style={{ minHeight: '30rem !important' }}>
                 <ModalHeader>Update information of receivable</ModalHeader>

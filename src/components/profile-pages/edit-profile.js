@@ -185,14 +185,14 @@ class CloneProfileForm extends Component {
     }
     render() {
         return (<Modal isOpen={this.props.isOpen}>
-            <ModalHeader>Clone this profile</ModalHeader>
+            <ModalHeader>Clone this procedure</ModalHeader>
             <ModalBody>
                 {/* Input name */}
                 <Form action='/' onSubmit={this.cloneNewProfile} ref='form'>
                     <Form.Field>
-                        <Form.Input label='Profile Name:' value={this.state.name} required={true}
+                        <Form.Input label='Procedure Name:' value={this.state.name} required={true}
                             onChange={(e) => { this.setState({ name: e.target.value }) }}
-                            placeholder='name of profile' />
+                            placeholder='name of procedure' />
                     </Form.Field>
                     <button type='submit' ref='btnSubmit' style={{ display: 'none' }}></button>
                 </Form>

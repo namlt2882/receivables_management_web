@@ -331,37 +331,37 @@ class ReceivableDetail extends Component {
                                         </td>
                                     </tr> : null}
                                     <tr>
-                                        <td>Debt amount:</td>
-                                        <td>{receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                        <td>Debt amount</td>
+                                        <td>: {receivable.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
                                     </tr>
                                     <tr>
-                                        <td>Prepaid amount:</td>
-                                        <td>{receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
+                                        <td>Prepaid amount</td>
+                                        <td>: {receivable.PrepaidAmount.toLocaleString(undefined, { minimumFractionDigits: 0 })}</td>
                                     </tr>
                                     <tr>
-                                        <td>Partner:</td>
-                                        <td>{receivable.customer ? receivable.customer.Name : null}</td>
+                                        <td>Partner</td>
+                                        <td>: {receivable.customer ? receivable.customer.Name : null}</td>
                                     </tr>
                                     <tr>
-                                        <td>Start day:</td>
-                                        <td>{numAsDate(receivable.PayableDay)}</td>
+                                        <td>Start day</td>
+                                        <td>: {numAsDate(receivable.PayableDay)}</td>
                                     </tr>
                                     <tr>
-                                        <td>End day:</td>
+                                        <td>End day</td>
                                         <td>
-                                            {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
+                                            : {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Collector:</td>
+                                        <td>Collector</td>
                                         <td>
-                                            {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
+                                            : {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Profile:</td>
+                                        <td>Procedure</td>
                                         <td>
-                                            {this.state.profile ?
+                                            : {this.state.profile ?
                                                 (AuthService.isManager() ? <a target='_blank'
                                                     href={`/profile/${this.state.profile.Id}/view`}>
                                                     {this.state.profile.Name}
