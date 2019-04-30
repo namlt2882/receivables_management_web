@@ -1,13 +1,14 @@
-import React from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
-import { numAsDate, numAsTime } from '../../../utils/time-converter';
-import { Button, Divider, Label } from 'semantic-ui-react';
-import ConfirmModal from '../../modal/ConfirmModal';
-import { successAlert, errorAlert } from '../../common/my-menu';
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
+import React from 'react';
+import { connect } from 'react-redux';
+import { Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink } from 'reactstrap';
+import { Button, Divider, Label } from 'semantic-ui-react';
+import { SmsAndPhonecallAction } from '../../../actions/sms-and-phonecall-action';
 import { AuthService } from '../../../services/auth-service';
 import { TaskService } from '../../../services/task-service';
+import { numAsDate, numAsTime } from '../../../utils/time-converter';
+import { errorAlert, successAlert } from '../../common/my-menu';
+import ConfirmModal from '../../modal/ConfirmModal';
 
 class SmsPhonecallHistory extends React.Component {
     constructor(props) {
@@ -49,8 +50,19 @@ class SmsPhonecallHistory extends React.Component {
     }
     componentDidMount() {
         let stages = this.state.stages;
-        stages = this.filterAction(stages);
-        this.setState({ stages: stages });
+        let modal = this.state.modal;
+        let showSuccess = this.state.showSuccess;
+        if (this.props.smsAndPhonecall.open) {
+            modal = true;
+            showSuccess = false;
+            this.props.setSmsAndPhonecallClose();
+        }
+        stages = this.filterAction(stages, showSuccess);
+        this.setState({
+            stages: stages,
+            modal: modal,
+            showSuccess: showSuccess
+        });
     }
     filterAction(stages, showSuccess = this.state.showSuccess) {
         let totalSuccess = 0;
@@ -231,5 +243,17 @@ const describeActionStatus = (status, smsOrPhonecall = false) => {
         default: return 'Cancel';
     }
 }
+const mapStateToProps = state => {
+    return {
+        smsAndPhonecall: state.smsAndPhonecall
+    }
+}
 
-export default SmsPhonecallHistory;
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        setSmsAndPhonecallClose: () => {
+            dispatch(SmsAndPhonecallAction.setOpen(false));
+        }
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(SmsPhonecallHistory);
