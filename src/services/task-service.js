@@ -9,5 +9,8 @@ export const TaskService = {
     },
     getCompleteTask: (receivableId) => {
         return AuthRequest.get(`Task/GetCompletedTaskByReceivableId/${receivableId}`);
+    },
+    makeManualAction: (actionId) => {
+        return AuthRequest.put(`Task/MakeManualAction/${actionId}`);
     }
 }

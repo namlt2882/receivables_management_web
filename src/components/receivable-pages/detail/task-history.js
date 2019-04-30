@@ -93,16 +93,16 @@ class ActionRecord extends React.Component {
         let action = this.props.action;
         let date = numAsDate(action.ExcutionDay);
         let time = numAsTime(action.StartTime);
-        let color = 'orange';
+        let color = 'red';
         switch (action.Status) {
-            case 0:
-                color = 'red'
-                break;
             case 1:
                 color = 'gray'
                 break;
             case 2:
                 color = 'green'
+                break;
+            case 3:
+                color = 'yellow';
                 break;
         }
         return (<tr>

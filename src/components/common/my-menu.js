@@ -15,6 +15,7 @@ import { NotificationService } from '../../services/notification-service';
 import { ReceivableService } from '../../services/receivable-service';
 import NewAssignedReceivable from '../receivable-pages/new-assigned-receivable';
 import './common.scss';
+import { SmsAndPhonecallAction } from '../../actions/sms-and-phonecall-action';
 library.add(faBell, faUserCircle, faCreditCard,
     faChartLine, faUsers, faCommentAlt, faChalkboardTeacher, faSignOutAlt, faTasks, faAddressBook);
 
@@ -122,6 +123,8 @@ class Notification extends React.Component {
         this.createNotification = this.createNotification.bind(this);
         this.type11Action = this.type11Action.bind(this);
         this.type12Action = this.type12Action.bind(this);
+        this.type14Action = this.type14Action.bind(this);
+        this.type15Action = this.type15Action.bind(this);
         this.getAction = this.getAction.bind(this);
         this.start = this.start.bind(this);
     }
@@ -196,8 +199,13 @@ class Notification extends React.Component {
             case 12:
                 action = this.type12Action(parseInt(NData));
                 openModal = false;
+                break;
             case 14: action = this.type14Action(parseInt(NData));
                 openModal = false;
+                break;
+            case 15: action = this.type15Action(parseInt(NData));
+                openModal = false;
+                break;
         }
         return () => {
             action();
@@ -221,6 +229,13 @@ class Notification extends React.Component {
                     }
                 })
             }
+        }
+    }
+
+    type15Action(id) {
+        return () => {
+            this.props.setSmsAndPhonecallOpen();
+            this.props.history.push(`/receivable/${id}/view`);
         }
     }
 
@@ -353,7 +368,8 @@ class Notification extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        newReceiavbleIds: state.newReceiavbleIds
+        newReceiavbleIds: state.newReceiavbleIds,
+        smsAndPhonecall: state.smsAndPhonecall
     }
 }
 
@@ -364,6 +380,9 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         setReceivables: (list) => {
             dispatch(ReceivableAction.setReceivableList2(list));
+        },
+        setSmsAndPhonecallOpen: () => {
+            dispatch(SmsAndPhonecallAction.setOpen(true));
         }
     }
 }

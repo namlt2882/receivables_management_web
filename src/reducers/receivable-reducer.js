@@ -26,3 +26,14 @@ export const newReceiavbleIds = (state = [], { type, list }) => {
         default: return state;
     }
 }
+
+export const smsAndPhonecall = (state = {
+    open: false
+}, { type, open }) => {
+    switch (type) {
+        case Types.SET_SMS_AND_PHONECALL_OPEN:
+            state.open = open
+            return state;
+        default: return state;
+    }
+}
