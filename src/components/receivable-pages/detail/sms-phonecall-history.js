@@ -179,20 +179,28 @@ class ActionRecord extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: false
         }
         this.resendAction = this.resendAction.bind(this);
     }
 
     resendAction() {
         let action = this.props.action;
+        this.setState({ loading: true });
         TaskService.makeManualAction(action.Id).then(res => {
             let action1 = res.data;
             action.Note = action1.Note;
             action.Status = action1.Status;
+            if (action.Status == 2) {
+                successAlert(`${action.Name} has been resent to debtor!`);
+            } else {
+                errorAlert(`Fail to resend ${action.Name}, please try again later!`);
+            }
             this.props.updateStages();
-            successAlert(`${action.Name} has been resent to debtor!`);
+            this.setState({ loading: false });
         }).catch(err => {
             console.error(err);
+            this.setState({ loading: false });
             errorAlert('Something went wrong, please try again!');
         })
     }
@@ -222,10 +230,12 @@ class ActionRecord extends React.Component {
             <td>
                 <Label color={color}>{describeActionStatus(action.Status, true)}</Label>
             </td>
-            <td style={{ display: AuthService.isManager() ? 'none' : 'table-cell' }}>{action.Status == 1 || action.Status == 3 ? <Button color='primary'
-                onClick={() => {
-                    this.props.setOnConfirm(action.Name, this.resendAction)
-                }}>Resend</Button> : null}</td>
+            <td style={{ display: AuthService.isManager() ? 'none' : 'table-cell' }}>
+                {action.Status == 1 || action.Status == 3 ?
+                    <Button loading={this.state.loading} color='primary'
+                        onClick={() => {
+                            this.props.setOnConfirm(action.Name, this.resendAction)
+                        }}>Resend</Button> : null}</td>
         </tr>);
     }
 }
