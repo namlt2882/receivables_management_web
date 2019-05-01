@@ -27,7 +27,7 @@ class ProfileList extends Component {
         this.setState(pre => ({ isOpenAddForm: !pre.isOpenAddForm }))
     }
     componentDidMount() {
-        document.title = 'Profiles';
+        document.title = 'Procedures';
         available(resolve => setTimeout(resolve, 400));
         ProfileService.getAll().then(res => {
             this.props.fetchAllProfiles(res.data);

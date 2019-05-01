@@ -4,6 +4,7 @@ import { numAsTime } from '../../../utils/time-converter';
 import { Button, Label } from 'semantic-ui-react';
 import { describeActionType } from './receivable-detail';
 import { describeActionStatus } from './task-history';
+import { SERVER_IP } from '../../../constants/config';
 
 class TodayTask extends React.Component {
     constructor(props) {
@@ -40,7 +41,7 @@ class TodayTask extends React.Component {
                             <tr>
                                 <th>#</th>
                                 <th>Task</th>
-                                <th>Start time</th>
+                                <th>Time</th>
                                 <th>Evidence</th>
                                 <th>Status</th>
                             </tr>
@@ -61,9 +62,9 @@ class TodayTask extends React.Component {
                                 }
                                 return <tr>
                                     <td>{i + 1}</td>
-                                    <td>{describeActionType(t.Name, t.Type)}</td>
+                                    <td>{describeActionType(t.Name, t.Type)}{t.Type == 0 || t.Type == 1 ? (t.Note ? ` - [${t.Note} times]` : null) : null}</td>
                                     <td>{numAsTime(t.StartTime)}</td>
-                                    <td>{t.Evidence ? <a target='_blank' href={`/task/${t.Evidence}`}></a> : null}</td>
+                                    <td>{t.Evidence ? <a target='_blank' href={`${SERVER_IP}/task/${t.Evidence}`}>View evidence</a> : null}</td>
                                     <th><Label color={color}>{describeActionStatus(t.Status)}</Label></th>
                                 </tr>
                             })}

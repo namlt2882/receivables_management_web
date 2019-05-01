@@ -6,7 +6,7 @@ import { Button, Divider, Label } from 'semantic-ui-react';
 import { SmsAndPhonecallAction } from '../../../actions/sms-and-phonecall-action';
 import { AuthService } from '../../../services/auth-service';
 import { TaskService } from '../../../services/task-service';
-import { numAsDate, numAsTime } from '../../../utils/time-converter';
+import { numAsDate, numAsTime, compareIntDate } from '../../../utils/time-converter';
 import { errorAlert, successAlert } from '../../common/my-menu';
 import ConfirmModal from '../../modal/ConfirmModal';
 
@@ -67,8 +67,11 @@ class SmsPhonecallHistory extends React.Component {
     filterAction(stages, showSuccess = this.state.showSuccess) {
         let totalSuccess = 0;
         let totalNotSuccess = 0;
+        let currentDate = this.props.currentDate;
         stages.forEach(stage => {
-            stage.history_actions = stage.Actions.filter(a => {
+            stage.history_actions = stage.Actions
+                .filter(a => compareIntDate(a.ExcutionDay, currentDate) >= 0)
+                .filter(a => {
                 let rsSuccess = a.Status !== 1 && a.Status === 2 && (a.Type === 0 || a.Type === 1);
                 if (rsSuccess) {
                     totalSuccess++;
@@ -231,7 +234,7 @@ class ActionRecord extends React.Component {
                 <Label color={color}>{describeActionStatus(action.Status, true)}</Label>
             </td>
             <td style={{ display: AuthService.isManager() ? 'none' : 'table-cell' }}>
-                {(action.Status == 0) && this.props.showResend ?
+                {(action.Status == 0 || action.Status == 3) && this.props.showResend ?
                     <Button loading={this.state.loading} color='primary'
                         onClick={() => {
                             this.props.setOnConfirm(action.Name, this.resendAction)
