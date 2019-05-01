@@ -152,7 +152,7 @@ class SmsPhonecallHistory extends React.Component {
                                 </thead>
                                 <tbody>
                                     {actions.map((action, i) => {
-                                        return <ActionRecord updateStages={this.updateStages} setOnConfirm={this.setOnConfirm} action={action} key={i} />
+                                        return <ActionRecord showResend={this.props.showResend} updateStages={this.updateStages} setOnConfirm={this.setOnConfirm} action={action} key={i} />
                                     })}
                                 </tbody>
                             </table>
@@ -212,7 +212,7 @@ class ActionRecord extends React.Component {
         let color = 'red';
         switch (action.Status) {
             case 1:
-                color = 'gray'
+                color = 'blue'
                 break;
             case 2:
                 color = 'green'
@@ -231,7 +231,7 @@ class ActionRecord extends React.Component {
                 <Label color={color}>{describeActionStatus(action.Status, true)}</Label>
             </td>
             <td style={{ display: AuthService.isManager() ? 'none' : 'table-cell' }}>
-                {action.Status == 1 || action.Status == 3 ?
+                {(action.Status == 0) && this.props.showResend ?
                     <Button loading={this.state.loading} color='primary'
                         onClick={() => {
                             this.props.setOnConfirm(action.Name, this.resendAction)
@@ -243,7 +243,7 @@ class ActionRecord extends React.Component {
 const describeActionStatus = (status, smsOrPhonecall = false) => {
     switch (status) {
         case 1:
-            return 'Not done';
+            return 'In-order';
         case 2: return 'Done';
         case 3:
             if (smsOrPhonecall) {
