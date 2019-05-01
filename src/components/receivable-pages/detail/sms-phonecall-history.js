@@ -224,8 +224,8 @@ class ActionRecord extends React.Component {
                 <span>At{` ${date} ${time}`}</span>
             </td>
             <td>
-                {action.Status != 2 ? '4' : '1'}
-                {/* {action.Note} */}
+                {/* {action.Status != 2 ? '4' : '1'} */}
+                {action.Note}
             </td>
             <td>
                 <Label color={color}>{describeActionStatus(action.Status, true)}</Label>
