@@ -147,7 +147,7 @@ class ImportReceivable extends Component {
             if (tmp.length > 0) {
                 this.validateReceivables(() => {
                     this.increaseStep();
-                });    
+                });
             } else {
                 this.setState({ fileWarning: 'Not found any validated rows in import file, please check import file again!' });
             }
@@ -171,7 +171,7 @@ class ImportReceivable extends Component {
                 partnerCode = ('' + partnerCode).toUpperCase();
             }
             rei.Customer = this.props.customers
-                .find(c => c.Code.toUpperCase() == partnerCode);
+                .find(c => c.Code == partnerCode);
             return rei;
         }).filter(rei => rei.Customer);
         contactData.map((contact) => {
@@ -681,7 +681,7 @@ const pushData2 = (receivableList, collectorList) => {
                 Profile: profile ? profile.Name : null,
                 PayableDay: numAsDate(r.PayableDay),
                 Collector: collector ? collector.DisplayName : null,
-                Status: <Label color={statusColor}>{status}</Label>,
+                Status: <Label style={{ backgroundColor: statusColor, color: 'white' }}>{status}</Label>,
                 action: <Link target='_blank' to={`/receivable/${r.Id}/view`}>View</Link>
             }
         });

@@ -39,7 +39,7 @@ class NewAssignedReceivable extends Component {
                 CustomerName: r.CustomerName,
                 DebtAmount: r.DebtAmount.toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
-                Status: <Label color={statusColor}>{status}</Label>,
+                Status: <Label style={{ backgroundColor: statusColor, color: 'white' }}>{status}</Label>,
                 action: <Link target='_blank' to={`/receivable/${r.Id}/view`}>Detail</Link>
             }
         });
