@@ -45,11 +45,11 @@ class Contact extends Component {
                         <FontAwesomeIcon icon={this.props.isDebtor ? 'user-injured' : 'user-friends'}
                             color='black' size='md' style={{ marginRight: '10px' }} />,
                         this.props.title,
-                        (AuthService.isCollector() && !isFinished ? <div style={{ width: '30px', float: 'right', paddingRight: '20px' }}>
+                        (AuthService.isManager() && !isFinished ? <div style={{ width: '30px', float: 'right', paddingRight: '20px' }}>
                             <EditContact contact={debtor} updateReceivable={updateReceivable} />
                         </div> : null)] : null}
                 </Header>
-                {addable && !isFinished ? <AddContact receivableId={receivableId} updateReceivable={updateReceivable} /> : null}
+                {AuthService.isCollector() && addable && !isFinished ? <AddContact receivableId={receivableId} updateReceivable={updateReceivable} /> : null}
                 {this.props.isDebtor ? this.props.contacts.map((contact) =>
                     (<div className='info-card'><table className='info-table'>
                         <tbody>
