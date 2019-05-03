@@ -148,7 +148,7 @@ class SmsPhonecallHistory extends React.Component {
                                     <tr>
                                         <th>Type</th>
                                         <th>Time</th>
-                                        <th>Count</th>
+                                        <th>Fail times</th>
                                         <th>Status</th>
                                         <th style={{ display: AuthService.isManager() ? 'none' : 'table-cell' }}></th>
                                     </tr>

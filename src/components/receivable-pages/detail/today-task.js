@@ -62,7 +62,7 @@ class TodayTask extends React.Component {
                                 }
                                 return <tr>
                                     <td>{i + 1}</td>
-                                    <td>{describeActionType(t.Name, t.Type)}{t.Type == 0 || t.Type == 1 ? (t.Note ? ` - [${t.Note} times]` : null) : null}</td>
+                                    <td>{describeActionType(t.Name, t.Type)}{t.Type == 0 || t.Type == 1 ? (t.Note ? ` - [Fail ${t.Note} times]` : null) : null}</td>
                                     <td>{numAsTime(t.StartTime)}</td>
                                     <td>{t.Evidence ? <a target='_blank' href={`${SERVER_IP}/task/${t.Evidence}`}>View evidence</a> : null}</td>
                                     <th><Label color={color}>{describeActionStatus(t.Status)}</Label></th>
