@@ -19,6 +19,7 @@ import { available, PrimaryLoadingPage } from '../common/loading-page';
 import { compareStatus, describeStatus, getStatusColor } from './detail/receivable-detail';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classnames from 'classnames';
+import InputRange from 'react-input-range';
 library.add(faCheck, faExclamationCircle, faRedo);
 
 class ReceivableList extends Component {
@@ -40,6 +41,7 @@ class ReceivableList extends Component {
                 { category: 'Closed', value: 0, color: getStatusColor(5), checked: true, isConfirmed: false },
                 { category: 'Cancel', value: 0, color: getStatusColor(0), checked: true, isConfirmed: false }
             ],
+            filterRate: { min: 0, max: 100 },
             sumConfirmed: 0,
             sumNotConfirmed: 0,
             getConfirmed: true,
@@ -59,6 +61,7 @@ class ReceivableList extends Component {
         this.managerFilterComp = this.managerFilterComp.bind(this);
         this.toggleConfirmed = this.toggleConfirmed.bind(this);
         this.refreshData = this.refreshData.bind(this);
+        this.onChangeRate = this.onChangeRate.bind(this);
     }
     setSeriesState(series, getConfirmed = this.state.getConfirmed) {
         let state = {};
@@ -83,7 +86,8 @@ class ReceivableList extends Component {
     }
     filterReceivable(selectedSeries,
         collectors = this.state.selectedCollector, customers = this.state.selectedCustomer,
-        getConfirmed = this.state.getConfirmed) {
+        getConfirmed = this.state.getConfirmed,
+        filterRate = this.state.filterRate) {
         if (!selectedSeries) {
             selectedSeries = this.currentSeries(getConfirmed).filter(s => s.checked);
         }
@@ -114,6 +118,10 @@ class ReceivableList extends Component {
                 if (mapCustomer.size > 0) {
                     rs = mapCustomer.has(r.CustomerName);
                 }
+            }
+            //Filter by rate of collection progress
+            if (rs) {
+                rs = filterRate.min <= r.ProgressPercent && filterRate.max >= r.ProgressPercent;
             }
             return rs;
         })
@@ -193,8 +201,15 @@ class ReceivableList extends Component {
                 CollectorName: collector ? `${collector.FullName}` : null,
                 DebtAmount: (r.DebtAmount - r.PrepaidAmount).toLocaleString(undefined, { minimumFractionDigits: 0 }),
                 PayableDay: numAsDate(r.PayableDay),
-                CurrentStage: `${r.Stage} (${r.ProgressPercent}%)`,
-                Status: [<Label style={{backgroundColor: statusColor, color: 'white' }}>{status}</Label>,
+                CurrentStage: <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>{r.Stage}</span>,
+                Progress:
+                    <span style={{
+                        fontSize: '1rem', fontWeight: 'bold',
+                        color: r.CollectionProgressStatus == 1 && r.ProgressPercent >= 30 ? 'red' : 'black'
+                    }}>
+                        {r.ProgressPercent} %
+                    </span>,
+                Status: [<Label style={{ backgroundColor: statusColor, color: 'white' }}>{status}</Label>,
                     confirmComponent],
                 action: <Link target='_blank' to={`receivable/${r.Id}/view`}>View</Link>
             }
@@ -226,8 +241,13 @@ class ReceivableList extends Component {
         this.filterReceivable(series.filter(s => s.checked))
     }
 
+    onChangeRate(val) {
+        this.setState({ filterRate: val });
+        this.filterReceivable(undefined, undefined, undefined, undefined, val);
+    }
+
     statusFilterComp() {
-        return <div className='col-sm-7' style={{ marginTop: '10px', float: 'left' }}>
+        return <div className='col-sm-7 row' style={{ marginTop: '10px', float: 'left' }}>
             <div>
                 {this.currentSeries().map(s => <div style={{
                     padding: '5px',
@@ -243,6 +263,28 @@ class ReceivableList extends Component {
                         this.toggleStatus(s.category, checked);
                     }}>{`${s.category} (${s.value})`}</Label>
                 </div>)}
+            </div>
+            <div className='col-sm-12 row rate-range-chooser'>
+                <span className='col-sm-3'><b>Rate</b>:</span>
+                <div className='col-sm-9'>
+                    <InputRange
+                        step={5}
+                        style={{ margin: '10px 0px 10px 0px' }}
+                        formatLabel={(val) => `${val} %`}
+                        minValue={0}
+                        maxValue={100}
+                        value={this.state.filterRate}
+                        onChange={this.onChangeRate}
+                    />
+                </div>
+            </div>
+            <div className='col-sm-12' style={{
+                fontSize: '0.9rem',
+                color: 'grey',
+                textAlign: 'right',
+                marginTop: '20px'
+            }}>
+                <i>Found {this.state.receivableList.filter(r => r.Display).length} receivable(s)</i>
             </div>
         </div>
     }
@@ -295,6 +337,7 @@ class ReceivableList extends Component {
                 className='hide-last-row'
                 striped
                 bordered
+                sortable={false}
                 data={data1} /> :
                 <div style={{ fontSize: '2rem' }}>No receivable found!</div>
         }
@@ -392,42 +435,41 @@ const data = {
         {
             label: 'Partner',
             field: 'CustomerName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Debtor',
             field: 'DebtorName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Collector',
             field: 'CollectorName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Debt amount',
             field: 'DebtAmount',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Start day',
             field: 'PayableDay',
-            sort: 'asc',
+            width: 200
+        },
+        {
+            label: 'Stage',
+            field: 'CurrentStage',
             width: 200
         },
         {
             label: 'Progress',
-            field: 'CurrentStage',
+            field: 'Progress',
             width: 200
         },
         {
             label: 'Status',
             field: 'Status',
-            sort: 'asc',
             width: 100
         },
         {
@@ -456,14 +498,13 @@ const mapDispatchToProps = (dispatch, props) => {
                     list = list.filter(r => r.AssignedCollectorId === id);
                 }
                 list.sort((a, b) => {
-                    if (describeStatus(a.CollectionProgressStatus) === describeStatus(b.CollectionProgressStatus)) {
-                        if (a.PayableDay === null) {
-                            if (b.PayableDay === null) {
-                                return 0;
-                            }
-                            return 1;
+                    if (a.CollectionProgressStatus === b.CollectionProgressStatus) {
+                        let rs = b.ProgressPercent - a.ProgressPercent;
+                        if (rs == 0) {
+                            return compareIntDate(b.PayableDay, a.PayableDay);
+                        } else {
+                            return rs;
                         }
-                        return compareIntDate(a.PayableDay, b.PayableDay)
                     } else {
                         return compareStatus(a.CollectionProgressStatus, b.CollectionProgressStatus);
                     }

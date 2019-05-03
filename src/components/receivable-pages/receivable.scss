@@ -121,10 +121,20 @@
 // .full-combobox-holder.suggtion-holder>.k-combobox {
 //     width: 100%;
 // }
-.choosen-collector-info{
+.choosen-collector-info {
     display: none;
 }
-.full-combobox-holder.suggtion-holder>.choosen-collector-info{
+
+.full-combobox-holder.suggtion-holder>.choosen-collector-info {
     width: 100%;
     display: block;
+}
+
+.rate-range-chooser {
+    margin: 20px 0px 10px 0px;
+}
+
+.rate-range-chooser * {
+    color: black;
+    font-size: 1.2rem;
 }

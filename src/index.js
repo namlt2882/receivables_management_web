@@ -14,6 +14,7 @@ import '@progress/kendo-theme-bootstrap/dist/all.css';
 import 'hammerjs'
 import 'react-notifications/lib/notifications.css';
 import './index.scss';
+import 'react-input-range/lib/css/index.css';
 
 const store = createStore(
     appReducers,
