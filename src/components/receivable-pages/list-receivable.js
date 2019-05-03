@@ -337,6 +337,7 @@ class ReceivableList extends Component {
                 className='hide-last-row'
                 striped
                 bordered
+                sortable={false}
                 data={data1} /> :
                 <div style={{ fontSize: '2rem' }}>No receivable found!</div>
         }
@@ -434,31 +435,26 @@ const data = {
         {
             label: 'Partner',
             field: 'CustomerName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Debtor',
             field: 'DebtorName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Collector',
             field: 'CollectorName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Debt amount',
             field: 'DebtAmount',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Start day',
             field: 'PayableDay',
-            sort: 'asc',
             width: 200
         },
         {
@@ -474,7 +470,6 @@ const data = {
         {
             label: 'Status',
             field: 'Status',
-            sort: 'asc',
             width: 100
         },
         {
