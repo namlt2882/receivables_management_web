@@ -123,6 +123,7 @@ class Dashboard extends Component {
                 PartnerName: receivable.PartnerName,
                 DebtorName: receivable.DebtorName,
                 CollectorName: receivable.CollectorName,
+                UpdateTime: receivable.UpdatedTime,
                 Status: <Label color={statusColor}>{status}</Label>,
                 Action: <Link target='#' to={`receivable/${receivable.Id}/view`}>View</Link>
             }
@@ -151,6 +152,7 @@ class Dashboard extends Component {
                 No: (index + 1),
                 CollectorName: task.CollectorName,
                 TaskName: task.TaskName,
+                UpdateTime: task.UpdatedTime,
                 Status: <Label color={statusColor}>{status}</Label>,
                 Action: <Link target='#' to={`receivable/${task.ReceivableId}/view`}>View</Link>
             }
@@ -298,25 +300,26 @@ const receivableTable = {
         {
             label: 'Partner',
             field: 'PartnerName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Debtor',
             field: 'DebtorName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Collector',
             field: 'CollectorName',
-            sort: 'asc',
+            width: 270
+        },
+        {
+            label: 'Update Time',
+            field: 'UpdateTime',
             width: 270
         },
         {
             label: 'Status',
             field: 'Status',
-            sort: 'asc',
             width: 270
         },
         {
@@ -339,19 +342,21 @@ const taskTable = {
         {
             label: 'Collector',
             field: 'CollectorName',
-            sort: 'asc',
             width: 270
         },
         {
             label: 'Task',
             field: 'TaskName',
-            sort: 'asc',
+            width: 270
+        },
+        {
+            label: 'Update Time',
+            field: 'UpdateTime',
             width: 270
         },
         {
             label: 'Status',
             field: 'Status',
-            sort: 'asc',
             width: 270
         },
         {
