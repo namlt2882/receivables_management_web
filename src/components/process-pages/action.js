@@ -1,10 +1,9 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { ProcessActionTypes } from '../../reducers/process-reducer'
-import { Table } from 'semantic-ui-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { ProcessActionTypes } from '../../reducers/process-reducer';
 library.add(faTrashAlt);
 
 class Action extends Component {
@@ -15,13 +14,21 @@ class Action extends Component {
         if (action.StartTime < 1000) {
             time = '0' + time;
         }
+        let _24Array = new Array(25).fill({ val: 0 })
+            .map((ele, i) => ({ val: i }))
+            .filter(ele => 7 <= ele.val && 22 >= ele.val);
+        let _60Array = new Array(60).fill({ val: 0 })
+            .map((ele, i) => ({ val: i }))
+            .filter(ele => ele.val % 5 == 0);
         this.state = {
             messageFormId: action.ProfileMessageFormId === null ? '-1' : action.ProfileMessageFormId,
             name: action.Name,
             type: action.Type,
             frequency: action.Frequency,
             hour: parseInt(time.substring(0, 2)),
-            minute: parseInt(time.substring(2))
+            minute: parseInt(time.substring(2)),
+            _24Array: _24Array,
+            _60Array: _60Array
         }
         this.editType = this.editType.bind(this);
         this.editMessageForm = this.editMessageForm.bind(this);
@@ -108,7 +115,7 @@ class Action extends Component {
     editHour(e) {
         let hour = parseInt(e.target.value);
         let minute = this.state.minute;
-        if (hour == 24) {
+        if (hour == 22) {
             minute = 0;
         }
         this.editStartTime(hour, minute);
@@ -125,8 +132,7 @@ class Action extends Component {
 
     render() {
         let action = this.props.action;
-        let _24Array = new Array(25).fill(0);
-        let _60Array = new Array(61).fill(0);
+
         // get message form
         return (<tr>
             <td width='5%'>
@@ -150,12 +156,12 @@ class Action extends Component {
             <td width='20%' style={{ boxSizing: 'border-box' }}>
                 {/* Start time */}
                 <select style={{ width: '40%', display: 'inline-block', marginLeft: '10%' }} value={this.state.hour} onChange={this.editHour}>
-                    {_24Array.map((tmp, i) =>
-                        <option value={i}>{i}</option>)}
+                    {this.state._24Array.map((ele, i) =>
+                        <option value={ele.val}>{ele.val}</option>)}
                 </select>
                 <select style={{ width: '40%', display: 'inline-block', marginRight: '10%' }} value={this.state.minute} onChange={this.editMinute}>
-                    {_60Array.map((tmp, i) =>
-                        <option value={i}>{i}</option>)}
+                    {this.state._60Array.map((ele, i) =>
+                        <option value={ele.val}>{ele.val}</option>)}
                 </select>
             </td>
             <td width='10%'>
