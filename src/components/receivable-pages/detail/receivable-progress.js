@@ -47,7 +47,7 @@ class ReceivableProgress extends Component {
                 if (stage.isCurrentStage) {
                     //in stage
                     className += 'progress-current-stage';
-                    status = 'Collection';
+                    status = 'Collecting';
                     if (percent < 5) {
                         percent = 5;
                     }
