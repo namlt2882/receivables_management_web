@@ -31,8 +31,7 @@ class SmsPhonecallHistory extends React.Component {
         this.filterAction = this.filterAction.bind(this);
         this.updateStages = this.updateStages.bind(this);
     }
-    toggleShowSuccessAction() {
-        let showSuccess = !this.state.showSuccess;
+    toggleShowSuccessAction(showSuccess) {
         this.setState({ showSuccess: showSuccess })
         let stages = this.state.stages;
         stages = this.filterAction(stages, showSuccess);
@@ -72,20 +71,20 @@ class SmsPhonecallHistory extends React.Component {
             stage.history_actions = stage.Actions
                 .filter(a => compareIntDate(a.ExcutionDay, currentDate) >= 0)
                 .filter(a => {
-                let rsSuccess = a.Status !== 1 && a.Status === 2 && (a.Type === 0 || a.Type === 1);
-                if (rsSuccess) {
-                    totalSuccess++;
-                }
-                let rsNotSuccess = a.Status !== 1 && a.Status !== 2 && (a.Type === 0 || a.Type === 1)
-                if (rsNotSuccess) {
-                    totalNotSuccess++;
-                }
-                if (showSuccess) {
-                    return rsSuccess;
-                } else {
-                    return rsNotSuccess;
-                }
-            });
+                    let rsSuccess = a.Status !== 1 && a.Status === 2 && (a.Type === 0 || a.Type === 1);
+                    if (rsSuccess) {
+                        totalSuccess++;
+                    }
+                    let rsNotSuccess = a.Status !== 1 && a.Status !== 2 && (a.Type === 0 || a.Type === 1)
+                    if (rsNotSuccess) {
+                        totalNotSuccess++;
+                    }
+                    if (showSuccess) {
+                        return rsSuccess;
+                    } else {
+                        return rsNotSuccess;
+                    }
+                });
         })
         this.setState({
             total: totalSuccess + totalNotSuccess,
@@ -116,13 +115,17 @@ class SmsPhonecallHistory extends React.Component {
                     <Nav tabs>
                         <NavItem>
                             <NavLink className={classnames({ active: this.state.showSuccess })}
-                                onClick={this.toggleShowSuccessAction}>
+                                onClick={() => {
+                                    this.toggleShowSuccessAction(true)
+                                }}>
                                 {`Success SMS and Phone call history (${this.state.totalSuccess})`}
                             </NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink className={classnames({ active: !this.state.showSuccess })}
-                                onClick={this.toggleShowSuccessAction}>
+                                onClick={() => {
+                                    this.toggleShowSuccessAction(false)
+                                }}>
                                 {`Fail SMS and Phone call history (${this.state.totalNotSuccess})`}
                             </NavLink>
                         </NavItem>
