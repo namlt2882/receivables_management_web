@@ -41,5 +41,8 @@ export const ReceivableService = {
     },
     getReceivablesByCollector: (collectorId) => {
         return AuthRequest.get(`Receivable/GetReceivaleByCollectorId/${collectorId}`);
+    },
+    reopen: (id) => {
+        return AuthRequest.put('Receivable/OpenReceivable', { Id: id });
     }
 }

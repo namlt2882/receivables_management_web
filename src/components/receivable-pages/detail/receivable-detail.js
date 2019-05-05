@@ -1,29 +1,30 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import Component from '../../common/component'
-import { available1, PrimaryLoadingPage } from '../../common/loading-page';
-import { ReceivableService } from '../../../services/receivable-service';
-import Contact from '../contact-pages/contact'
-import '../receivable.scss'
-import { dateToInt, compareIntDate, addDayAsInt, numAsDate } from '../../../utils/time-converter';
+import { Button, Container, Header, Icon, Label } from 'semantic-ui-react';
+import { AuthService } from '../../../services/auth-service';
 import { CustomerService } from '../../../services/customer-service';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
-import ReceivableProgress from './receivable-progress';
-import CurrentStage from './current-stage';
-import SmsPhonecallHistory from './sms-phonecall-history';
-import { Container, Header, Table, Divider, Label, Button } from 'semantic-ui-react'
+import { ProfileService } from '../../../services/profile-service';
+import { ReceivableService } from '../../../services/receivable-service';
+import { TaskService } from '../../../services/task-service';
 import { UserService } from '../../../services/user-service';
 import { UtilityService } from '../../../services/utility-service';
-import { AuthService } from '../../../services/auth-service';
-import TodayTask from './today-task';
+import { addDayAsInt, compareIntDate, dateToInt, numAsDate } from '../../../utils/time-converter';
+import Component from '../../common/component';
+import { available1, PrimaryLoadingPage } from '../../common/loading-page';
+import { errorAlert, successAlert } from '../../common/my-menu';
+import MyToolTip from '../../common/my-tooltip';
+import ConfirmModal from '../../modal/ConfirmModal';
+import Contact from '../contact-pages/contact';
 import ChangeStatus from '../edit/change-status';
 import EditReceivable from '../edit/edit-receivable';
-import { TaskService } from '../../../services/task-service';
-import ConfirmModal from '../../modal/ConfirmModal';
-import { successAlert, errorAlert } from '../../common/my-menu';
-import { ProfileService } from '../../../services/profile-service';
+import '../receivable.scss';
+import CurrentStage from './current-stage';
+import ReceivableProgress from './receivable-progress';
+import SmsPhonecallHistory from './sms-phonecall-history';
 import TaskHistory from './task-history';
+import TodayTask from './today-task';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -39,10 +40,16 @@ class ReceivableDetail extends Component {
             todayTask: [],
             completeTask: [],
             openConfirm: false,
-            profile: null
+            profile: null,
+            confirmHeader: '',
+            confirmBody: '',
+            confirmCallback: () => { }
         }
         this.updateReceivable = this.updateReceivable.bind(this);
-        this.confirm = this.confirm.bind(this);
+        this.confirmReceivable = this.confirmReceivable.bind(this);
+        this.reopenReceivable = this.reopenReceivable.bind(this);
+        this.openConfirmReceivable = this.openConfirmReceivable.bind(this);
+        this.openReopenReceivable = this.openReopenReceivable.bind(this);
     }
     updateReceivable(receivable = this.state.receivable, resolve = (receivable) => { }) {
         resolve(receivable);
@@ -78,7 +85,7 @@ class ReceivableDetail extends Component {
                 this.incrementLoading();
             }
             //[Receivable detail] get today task of receivable
-            if (!receivable.ClosedDay) {
+            if (receivable.CollectionProgress.Status == 1) {
                 TaskService.getReceivableTodayTask(receivable.Id).then(res6 => {
                     this.setState({ todayTask: res6.data });
                     this.incrementLoading();
@@ -113,7 +120,7 @@ class ReceivableDetail extends Component {
             errorAlert('Service unavailable, please try again later!');
         })
     }
-    confirm() {
+    confirmReceivable() {
         ReceivableService.confirm(this.state.receivable.Id).then(res => {
             this.state.receivable.IsConfirmed = true;
             this.setState(pre => ({
@@ -123,6 +130,23 @@ class ReceivableDetail extends Component {
         }).catch(err => {
             console.error(err);
             errorAlert('Fail to confirm this receivable! Please try again later!');
+        })
+    }
+    reopenReceivable() {
+        ReceivableService.reopen(this.state.receivable.Id).then(res => {
+            this.state.receivable.CollectionProgress.Status = 1;
+            this.setState(pre => ({
+                receivable: pre.receivable
+            }))
+            this.incrementLoading(-1);
+            TaskService.getReceivableTodayTask(this.state.receivable.Id).then(res1 => {
+                this.setState({ todayTask: res1.data });
+                this.incrementLoading();
+            })
+            successAlert('This case is reopened!');
+        }).catch(err => {
+            console.error(err);
+            errorAlert('Fail to reopen this receivable! Please try again later!');
         })
     }
     edit(e) {
@@ -170,10 +194,10 @@ class ReceivableDetail extends Component {
         })
         return groupActions;
     }
-    calculateStage(stages, payableDay, closedDay) {
+    calculateStage(stages, payableDay, closedDay, receivableStatus) {
         let currentStage = null;
         let currentDate = this.state.currentDate;
-        if (closedDay) {
+        if (closedDay && (receivableStatus == 2 || receivableStatus == 0 || receivableStatus == 5)) {
             currentDate = closedDay;
         }
         let stageStartDay = payableDay;
@@ -216,10 +240,27 @@ class ReceivableDetail extends Component {
         })
         return currentStage;
     }
+    openConfirmReceivable() {
+        this.setState({
+            openConfirm: true,
+            confirmHeader: 'Confirm receivable',
+            confirmBody: 'Are you sure want to confirm this receivable?',
+            confirmCallback: this.confirmReceivable
+        })
+    }
+    openReopenReceivable() {
+        this.setState({
+            openConfirm: true,
+            confirmHeader: 'Reopen receivable',
+            confirmBody: 'Are you sure want to reopen this receivable?',
+            confirmCallback: this.reopenReceivable
+        })
+    }
     render() {
         if (this.isLoading()) {
             return <PrimaryLoadingPage />;
         }
+        //#region Prepare for rendering
         let receivable = this.state.receivable;
         let collector = receivable.collector;
         let contacts = receivable != null ? receivable.Contacts : [];
@@ -241,7 +282,7 @@ class ReceivableDetail extends Component {
             isFinished = status === 0 || status === 5 || status === 2;
         }
         //get current stage
-        let currentStage = this.calculateStage(stages, receivable.PayableDay, receivable.ClosedDay);
+        let currentStage = this.calculateStage(stages, receivable.PayableDay, receivable.ClosedDay, receivable.CollectionProgress.Status);
         //get first date of process
         let totalDay = 0;
         let startDate = 0;
@@ -256,8 +297,8 @@ class ReceivableDetail extends Component {
 
         // get end date of process
         let endDate = receivable.ClosedDay ? receivable.ClosedDay : null;
+        let len = stages.length;
         if (!endDate && stages.length > 0) {
-            let len = stages.length;
             endDate = stages[len - 1].endDate;
         }
         let dateNote = '';
@@ -287,6 +328,9 @@ class ReceivableDetail extends Component {
         }
         let status = describeStatus(receivable.CollectionProgress.Status);
         let statusColor = getStatusColor(receivable.CollectionProgress.Status);
+        let expectedClosedDay = stages[len - 1].endDate;
+        let reopenDisable = compareIntDate(expectedClosedDay, this.state.currentDate) >= 0;
+        //#endregion Prepare for rendering
         return (<div className='col-sm-12 row'>
             {/* History */}
             <div className='col-sm-3' style={{ boxSizing: 'border-box', fontSize: '0.9rem' }}>
@@ -296,8 +340,10 @@ class ReceivableDetail extends Component {
                     <span>Today is <b>{` ${numAsDate(this.state.currentDate)}`}</b></span>
                 </div>
                 <div className='col-sm-12'>
-                    <SmsPhonecallHistory currentDate={receivable.ClosedDay ? receivable.ClosedDay : this.state.currentDate} showResend={receivable.CollectionProgress.Status == 1} stages={receivable.CollectionProgress.Stages} /><br />
-                    <TaskHistory currentDate={receivable.ClosedDay ? receivable.ClosedDay : this.state.currentDate} stages={receivable.CollectionProgress.Stages} /><br />
+                    <SmsPhonecallHistory currentDate={receivable.ClosedDay &&
+                        receivable.CollectionProgress.Status != 1 && receivable.CollectionProgress.Status != 4 ? receivable.ClosedDay : this.state.currentDate} showResend={receivable.CollectionProgress.Status == 1} stages={receivable.CollectionProgress.Stages} /><br />
+                    <TaskHistory currentDate={receivable.ClosedDay &&
+                        receivable.CollectionProgress.Status != 1 && receivable.CollectionProgress.Status != 4 ? receivable.ClosedDay : this.state.currentDate} stages={receivable.CollectionProgress.Stages} /><br />
                     {isFinished ? null : <TodayTask todayTask={this.state.todayTask} />}
                 </div>
             </div>
@@ -373,15 +419,24 @@ class ReceivableDetail extends Component {
                                     </tr>
                                     {isFinished && receivable.CollectionProgress.Status !== 2 && !receivable.IsConfirmed && AuthService.isManager() ?
                                         <tr>
-                                            <td></td>
-                                            <td>
-                                                <Button color='green' onClick={() => { this.setState({ openConfirm: true }) }}>Confirm</Button>
+                                            <td colSpan='2' style={{ boxSizing: 'border-box' }}>
+                                                <Button.Group style={{ marginLeft: '5%' }}>
+                                                    <Button positive onClick={this.openConfirmReceivable}>Confirm</Button>
+                                                    <Button.Or />
+                                                    <Button color='orange' disabled={reopenDisable}
+                                                        onClick={this.openReopenReceivable}>Reopen</Button>
+                                                </Button.Group>
+
+                                                {reopenDisable ?
+                                                    [<Icon name='question' id='btn-reopen-question' inverted color='orange' size='small' circular />,
+                                                    <MyToolTip target='btn-reopen-question'
+                                                        message='You can not reopen this receivable because the collection progress is ended!' />] : null}
                                                 <ConfirmModal
                                                     show={this.state.openConfirm}
                                                     onHide={() => { this.setState({ openConfirm: false }) }}
-                                                    header='Confirm'
-                                                    body='Are you sure want to confirm this case?'
-                                                    callback={this.confirm}
+                                                    header={this.state.confirmHeader}
+                                                    body={this.state.confirmBody}
+                                                    callback={this.state.confirmCallback}
                                                 />
                                             </td>
                                         </tr> : null}
