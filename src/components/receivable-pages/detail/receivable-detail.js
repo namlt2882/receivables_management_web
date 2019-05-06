@@ -328,8 +328,11 @@ class ReceivableDetail extends Component {
         }
         let status = describeStatus(receivable.CollectionProgress.Status);
         let statusColor = getStatusColor(receivable.CollectionProgress.Status);
-        let expectedClosedDay = stages[len - 1].endDate;
-        let reopenDisable = compareIntDate(expectedClosedDay, this.state.currentDate) >= 0;
+        let reopenDisable = true;
+        if (receivable.CollectionProgress.Status != 4) {
+            let expectedClosedDay = stages[len - 1].endDate;
+            reopenDisable = compareIntDate(expectedClosedDay, this.state.currentDate) >= 0;
+        }
         //#endregion Prepare for rendering
         return (<div className='col-sm-12 row'>
             {/* History */}
@@ -393,18 +396,18 @@ class ReceivableDetail extends Component {
                                     </tr>
                                     <tr>
                                         <td>Start day</td>
-                                        <td>: {numAsDate(receivable.PayableDay)}</td>
+                                        <td>: {receivable.PayableDay ? numAsDate(receivable.PayableDay) : '<none>'}</td>
                                     </tr>
                                     <tr>
                                         <td>End day</td>
                                         <td>
-                                            : {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '')}`}
+                                            : {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '<none>')}`}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Collector</td>
                                         <td>
-                                            : {collector ? `${collector.FirstName} ${collector.LastName}` : ''}
+                                            : {collector ? `${collector.FirstName} ${collector.LastName}` : '<none>'}
                                         </td>
                                     </tr>
                                     <tr>
