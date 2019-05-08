@@ -207,6 +207,8 @@ class ReceivableDetail extends Component {
                 stage.isIncommingStage = false;
             }
             stageStartDay = nextStartDay;
+            //filter actions
+            stage.Actions = stage.Actions.filter(a => compareIntDate(a.ExcutionDay, currentDate) >= 0);
             //sort actions
             stage.Actions.sort((a1, a2) => {
                 return a1.ExcutionDay - a2.ExcutionDay
@@ -296,7 +298,7 @@ class ReceivableDetail extends Component {
                     <span>Today is <b>{` ${numAsDate(this.state.currentDate)}`}</b></span>
                 </div>
                 <div className='col-sm-12'>
-                    <SmsPhonecallHistory stages={receivable.CollectionProgress.Stages} /><br />
+                    <SmsPhonecallHistory showResend={receivable.CollectionProgress.Status == 1} stages={receivable.CollectionProgress.Stages} /><br />
                     <TaskHistory stages={receivable.CollectionProgress.Stages} /><br />
                     {isFinished ? null : <TodayTask todayTask={this.state.todayTask} />}
                 </div>
@@ -453,7 +455,7 @@ export const getStatusColor = (status) => {
             // Pending
             statusColor = '#ffc107';
             break;
-            // Closed
+        // Closed
         case 5: statusColor = '#28a745';
             break;
     }

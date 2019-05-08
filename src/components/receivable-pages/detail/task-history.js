@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
-import { numAsDate, numAsTime } from '../../../utils/time-converter';
+import { numAsDate, numAsTime, dateToInt } from '../../../utils/time-converter';
 import { Button, Divider, Label } from 'semantic-ui-react';
 
 class TaskHistory extends React.Component {
@@ -118,12 +118,12 @@ class ActionRecord extends React.Component {
     }
 }
 
-const describeActionStatus = (status) => {
+export const describeActionStatus = (status) => {
     switch (status) {
         case 0:
             return 'Cancel';
         case 1:
-            return 'Not done';
+            return 'In-order';
         case 2:
             return 'Done';
         default:
