@@ -396,18 +396,18 @@ class ReceivableDetail extends Component {
                                     </tr>
                                     <tr>
                                         <td>Start day</td>
-                                        <td>: {receivable.PayableDay ? numAsDate(receivable.PayableDay) : '<none>'}</td>
+                                        <td>: {receivable.PayableDay ? numAsDate(receivable.PayableDay) : 'N/A'}</td>
                                     </tr>
                                     <tr>
                                         <td>End day</td>
                                         <td>
-                                            : {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : '<none>')}`}
+                                            : {`${(endDate ? numAsDate(endDate) : '')}${(!isFinished && receivable.PayableDay ? ' (Expectation)' : 'N/A')}`}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Collector</td>
                                         <td>
-                                            : {collector ? `${collector.FirstName} ${collector.LastName}` : '<none>'}
+                                            : {collector ? `${collector.FirstName} ${collector.LastName}` : 'N/A'}
                                         </td>
                                     </tr>
                                     <tr>
