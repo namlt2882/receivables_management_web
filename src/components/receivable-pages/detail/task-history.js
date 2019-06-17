@@ -61,7 +61,7 @@ class TaskHistory extends React.Component {
                             <table className='table thin text-center'>
                                 <thead>
                                     <tr>
-                                        <th>Type</th>
+                                        <th>Task</th>
                                         <th>Time</th>
                                         <th>Evidence</th>
                                         <th>Status</th>

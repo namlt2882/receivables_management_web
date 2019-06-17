@@ -234,7 +234,7 @@ class ActionRecord extends React.Component {
                 <Label color={color}>{describeActionStatus(action.Status, true)}</Label>
             </td>
             <td style={{ display: AuthService.isManager() ? 'none' : 'table-cell' }}>
-                {(action.Status == 0) && this.props.showResend ?
+                {(action.Status == 0 || action.Status == 3) && this.props.showResend ?
                     <Button loading={this.state.loading} color='primary'
                         onClick={() => {
                             this.props.setOnConfirm(action.Name, this.resendAction)
