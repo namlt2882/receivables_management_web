@@ -24,7 +24,7 @@ class AddProfile extends Component {
         this.createNewProfile = this.createNewProfile.bind(this);
     }
     componentDidMount() {
-        document.title = 'New profile';
+        document.title = 'New procedure';
         available(resolve => setTimeout(resolve, 400));
         this.props.setEditable();
         this.props.getAllMessageForms().then(res => { this.incrementLoading() })

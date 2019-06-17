@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Table, Badge } from 'reactstrap';
-import { numAsDate, numAsTime, dateToInt } from '../../../utils/time-converter';
+import { numAsDate, numAsTime, dateToInt, compareIntDate } from '../../../utils/time-converter';
 import { Button, Divider, Label } from 'semantic-ui-react';
 
 class TaskHistory extends React.Component {
@@ -16,8 +16,11 @@ class TaskHistory extends React.Component {
     }
     componentDidMount() {
         let stages = this.state.stages;
+        let currentDate = this.props.currentDate;
         stages.forEach(stage => {
-            stage.complete_task = stage.Actions.filter(a => a.Status !== 1 && a.Type !== 0 && a.Type !== 1);
+            stage.complete_task = stage.Actions
+                .filter(a => compareIntDate(a.ExcutionDay, currentDate) >= 0
+                    && a.Status !== 1 && a.Type !== 0 && a.Type !== 1);
             this.setState(pre => ({
                 total: pre.total + stage.complete_task.length
             }))
