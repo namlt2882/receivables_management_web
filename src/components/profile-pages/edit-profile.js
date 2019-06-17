@@ -38,7 +38,7 @@ class EditProfile extends Component {
     }
     componentDidMount() {
         if (!this.props.isPopup) {
-            document.title = 'Profile detail';
+            document.title = 'Procedure detail';
             var url = window.location.href;
             var lastPart = url.substr(url.lastIndexOf('/') + 1);
             if (lastPart == 'view') {
