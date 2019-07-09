@@ -196,6 +196,8 @@ class Notification extends React.Component {
             case 12:
                 action = this.type12Action(parseInt(NData));
                 openModal = false;
+            case 14: action = this.type14Action(parseInt(NData));
+                openModal = false;
         }
         return () => {
             action();
@@ -219,6 +221,12 @@ class Notification extends React.Component {
                     }
                 })
             }
+        }
+    }
+
+    type14Action(id) {
+        return () => {
+            this.props.history.push(`/receivable/${id}/view`);
         }
     }
 
