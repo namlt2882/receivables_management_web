@@ -11,18 +11,19 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import ReceivableProgress from './receivable-progress';
 import CurrentStage from './current-stage';
-import ActionHistory from './action-history';
+import SmsPhonecallHistory from './sms-phonecall-history';
 import { Container, Header, Table, Divider, Label, Button } from 'semantic-ui-react'
 import { UserService } from '../../../services/user-service';
 import { UtilityService } from '../../../services/utility-service';
 import { AuthService } from '../../../services/auth-service';
-import TaskHistory from './task-history';
+import TodayTask from './today-task';
 import ChangeStatus from '../edit/change-status';
 import EditReceivable from '../edit/edit-receivable';
 import { TaskService } from '../../../services/task-service';
 import ConfirmModal from '../../modal/ConfirmModal';
 import { successAlert, errorAlert } from '../../common/my-menu';
 import { ProfileService } from '../../../services/profile-service';
+import TaskHistory from './task-history';
 library.add(faCreditCard);
 
 class ReceivableDetail extends Component {
@@ -36,6 +37,7 @@ class ReceivableDetail extends Component {
             collectorList: [],
             customerList: [],
             todayTask: [],
+            completeTask: [],
             openConfirm: false,
             profile: null
         }
@@ -294,8 +296,9 @@ class ReceivableDetail extends Component {
                     <span>Today is <b>{` ${numAsDate(this.state.currentDate)}`}</b></span>
                 </div>
                 <div className='col-sm-12'>
-                    <ActionHistory stages={receivable.CollectionProgress.Stages} /><br />
-                    {isFinished ? null : <TaskHistory todayTask={this.state.todayTask} />}
+                    <SmsPhonecallHistory stages={receivable.CollectionProgress.Stages} /><br />
+                    <TaskHistory stages={receivable.CollectionProgress.Stages} /><br/>
+                    {isFinished ? null : <TodayTask todayTask={this.state.todayTask} />}
                 </div>
             </div>
             {/* Progress bar */}
